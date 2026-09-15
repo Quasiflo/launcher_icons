@@ -43,6 +43,8 @@ dart run launcher_icons -f my_icons.yaml
 
 Use one high-resolution **PNG** — **1024×1024 recommended**. Everything is downscaled from it (iOS needs the 1024px App Store icon), so starting smaller loses quality. JPG/JPEG/WebP are only accepted for Android adaptive backgrounds. All outputs are PNG, except the Windows `.ico`.
 
+SVG sources are supported, but the built-in renderer is beta quality: stick to basic shapes, paths, fills, strokes, and gradients. `<text>` elements generally do not render (convert text to outlines first), advanced features like filters, masks, patterns, and embedded images may be ignored or misrendered, and very thin strokes can glitch. Transparency is recovered by compositing, so semi-transparent edges can fringe slightly, and the SVG must declare dimensions (a `viewBox` or `width` and `height`). Simple logos are usually fine — but if the output doesn't match your editor, export PNGs externally (e.g. Figma, Inkscape, Illustrator at 1024px) and feed those in instead.
+
 | Platform | What gets generated |
 | --- | --- |
 | Android legacy | 48, 72, 96, 144, 192 (`mipmap-mdpi` → `mipmap-xxxhdpi`) |
@@ -55,48 +57,101 @@ Use one high-resolution **PNG** — **1024×1024 recommended**. Everything is do
 
 ## Configuration
 
-Top-level `image_path` is the default for every platform; any platform-level `image_path` overrides it. Paths must be local files (PNG, JPG/JPEG/WebP where noted, or SVG). Top-level `svg_rasterize_per_size` (`false` by default, see Source Image) applies to every SVG source.
+Top-level `image_path` is the default for every platform; any platform-level `image_path` overrides it. Paths must be local files (PNG, JPG/JPEG/WebP where noted, or SVG — see the beta note in Source Image).
+
+- `image_path` — default source image for every platform (see Source Image for format rules).
+- `svg_rasterize_per_size` — `false` by default: each SVG rasterizes once at 1024px and every output size downscales from that master (fast, and as crisp for icon art). `true` re-rasterizes the vector at every output size (crisper pixel-aligned edges, much slower on large sets like iOS).
 
 ### Android
 
-- `generate`, `image_path`, `icon_name` — a custom name (e.g. `"ic_launcher"`) creates a new icon without removing the default, and updates `AndroidManifest.xml`.
-- `adaptive_icon_background` — hex color (`"#ffffff"`), `"transparent"` (no `colors.xml` entry), or image (png/jpg/jpeg/webp). Adaptive icons need this **and** `adaptive_icon_foreground`; `image_path` is never used as the foreground.
-- `adaptive_icon_foreground` — foreground image. Inset with `adaptive_icon_foreground_inset` (percent, default `16`). Without both keys, round launchers may show your square icon inside a white circle — the tool never auto-rounds or pads.
-- `adaptive_icon_monochrome` — Android 13+ themed-icon silhouette. Inset `0` emits the canonical plain `<monochrome android:drawable>` form. See [Android Adaptive Icons](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive).
-- `adaptive_icon_round` — opt-in round icon: drawables, `ic_launcher_round.xml`, and `android:roundIcon` wiring.
+- `generate` — enable Android output.
+- `image_path` — source for the legacy mipmap icons; falls back to top-level `image_path`.
+- `icon_name` — custom resource name (lowercase letters, numbers, underscores, e.g. `"ic_launcher_xyz"`): creates a new icon and updates `AndroidManifest.xml` instead of overwriting the default.
+- `adaptive_icon_background` — back layer of the adaptive icon: a hex color (`"#ffffff"`), `"transparent"` (no `colors.xml` entry), or an image (png/jpg/jpeg/webp). Adaptive icons need this **and** `adaptive_icon_foreground`.
+- `adaptive_icon_foreground` — front layer image of the adaptive icon; `image_path` is never used as the foreground.
+- `adaptive_icon_foreground_inset` — trims this percent off each side of the foreground (default `16`) to keep art inside the safe zone. Without both adaptive keys, round launchers may show your square icon inside a white circle — the tool never auto-rounds or pads.
+- `adaptive_icon_monochrome` — Android 13+ single-color themed-icon layer image; inset `0` emits the canonical plain `<monochrome android:drawable>` form. See [Android Adaptive Icons](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive).
+- `adaptive_icon_round` — opt-in round-icon source image: emits round drawables plus `ic_launcher_round.xml` and wires `android:roundIcon` in the manifest. Requires the adaptive pair.
 - `play_store_icon` — off by default. When `true`, writes a 512px `play_store_icon.png` sidecar next to the project for store upload (never into `android/res`; warns past the 1024KB budget).
 
 ### iOS
 
-- `generate`, `image_path`, `icon_name` (own `<name>.appiconset`, like flavors), `xcodeproj_path` (default `"ios/Runner.xcodeproj"`), `single_size` (one 1024px icon; dark/tinted ignored; default `false`).
-- `remove_alpha` — blends transparency onto `background_color` (`"#RRGGBB"`, default `"#ffffff"`; only used when removing alpha). The dark variant keeps its transparency (Apple shows the system background through it); the tinted variant is forced opaque.
-- `image_path_dark_transparent`, `image_path_tinted_grayscale`, `desaturate_tinted_to_grayscale` (default `false`) — iOS 18+ variants. See [Apple's app-icon guidance](https://developer.apple.com/design/human-interface-guidelines/app-icons#iOS-iPadOS). Fill the whole image; transparent borders render black.
+- `generate` — enable iOS output.
+- `single_size` — when `true`, emits only the single 1024px icon; dark/tinted variants are ignored (default `false`).
+- `image_path` — source image; falls back to top-level `image_path`.
+- `icon_name` — writes an own `<name>.appiconset` (like flavors) instead of overwriting the default set.
+- `xcodeproj_path` — path to the Xcode project (default `"ios/Runner.xcodeproj"`); set it when the project was renamed.
 - `flavor_mode` — `"pbxproj"` (default) rewrites `ASSETCATALOG_COMPILER_APPICON_NAME` per build configuration; `"xcconfig"` writes `ios/Flutter/<flavor>-<Mode>.xcconfig` overrides instead (assign them as base configuration files in Xcode once).
-- Liquid glass (writes a `.icon` bundle for Apple's Icon Composer alongside the PNG catalog, which stays the fallback on older systems): `image_path_liquid_glass_icon` (enables it; SVGs pass through), `image_path_liquid_glass_icon_dark` / `_tinted` (fall back to the dark/tinted sources), `remove_liquid_glass`, `liquid_glass_icon_scale` (1.0), `liquid_glass_translucency` (0.5), `liquid_glass_specular` (true), `liquid_glass_shadow_kind` (`"Neutral"`/`"Chromatic"`), `liquid_glass_shadow_opacity` (0.5), `liquid_glass_blur` (0.5), `liquid_glass_offset_x` / `_y` (0.0), `liquid_glass_lighting` (`"individual"`/`"combined"`), `liquid_glass_refractivity_enabled` (+ `liquid_glass_refractivity_depth` / `_strength`), `liquid_glass_specular_highlight_placement` (`"inside"`/`"outside"`).
+- `image_path_dark_transparent` — iOS 18+ dark-mode source: full art on transparency, because the system background shows through it. Keep the background transparent.
+- `image_path_tinted_grayscale` — iOS 18+ tinted-mode source: must read as a single-color silhouette, i.e. grayscale, or you get a warning.
+- `desaturate_tinted_to_grayscale` — converts the tinted source to grayscale for you (default `false`; set it instead of hand-converting).
+- `remove_alpha` — flattens transparency onto `background_color` (default `false`). The base and tinted images are flattened; the dark variant intentionally keeps its transparency. Without it, transparent art triggers an App Store alpha warning.
+- `background_color` — matte color used by `remove_alpha` (`"#RRGGBB"`, default `"#ffffff"`).
+- `image_path_liquid_glass_icon` — enables the liquid-glass `.icon` bundle for Apple's Icon Composer (the PNG catalog stays the fallback on older systems); SVGs pass through verbatim.
+- `image_path_liquid_glass_icon_dark` / `image_path_liquid_glass_icon_tinted` — dark/tinted layer sources for the glass bundle; fall back to the dark/tinted PNG sources above when unset.
+- `remove_liquid_glass` — emits the `.icon` layers flat, without glass effects (default `false`).
+- `liquid_glass_icon_scale` — artwork scale inside the glass layer (default `1.0`).
+- `liquid_glass_translucency` — how see-through the glass reads, `0.0` (opaque) to `1.0` (clear); default `0.5`.
+- `liquid_glass_specular` — specular highlights on the glass (default `true`).
+- `liquid_glass_shadow_kind` — drop-shadow style: `"Neutral"` or `"Chromatic"` (default `"Neutral"`).
+- `liquid_glass_shadow_opacity` — drop-shadow strength (default `0.5`).
+- `liquid_glass_blur` — background blur radius behind the glass (default `0.5`).
+- `liquid_glass_offset_x` / `liquid_glass_offset_y` — layer offset in points (default `0.0`).
+- `liquid_glass_lighting` — group lighting model: `"individual"` lights each layer separately, `"combined"` treats the group as one shape. Unset by default; only observable with 2+ layers.
+- `liquid_glass_refractivity_enabled` — turns on glass distortion; requires `liquid_glass_refractivity_depth` and `liquid_glass_refractivity_strength` to be set as well.
+- `liquid_glass_refractivity_depth` / `liquid_glass_refractivity_strength` — depth and strength of the refraction effect (only used when refractivity is enabled).
+- `liquid_glass_specular_highlight_placement` — edge highlight position: `"inside"` or `"outside"`. Unset by default.
 
 After generating, Xcode must point at the set: `Build Settings` > `Asset Catalog App Icon Set Name` (`AppIcon`, or `AppIcon-<flavor>`).
 
 ### Web
 
-- `generate`, `image_path`, `image_path_favicon` (falls back to the web, then global, image), `image_path_maskable` (safe-zone-aware source; otherwise a padded derivation off the logo at ~80% on the opaque `background_color`).
-- `favicon_size` (PNG size, default `16`; the `.ico` always holds 16+32+48), `favicon_ico` (default `true`; `false` ships the PNG only).
-- `output_path` (web root, default `web`; set per flavor to keep outputs apart — serve that directory when building).
-- `background_color` / `theme_color` — must be hex. Written to `web/manifest.json` (background also flattens the opaque 180px `apple-touch-icon.png`; theme also adds the `<meta name="theme-color">` tag). The tool manages one `<!--LI-->…<!--LIEND-->` block in `index.html`.
+- `generate` — enable web output.
+- `image_path` — source image; falls back to top-level `image_path`.
+- `image_path_favicon` — dedicated favicon source; falls back to the web, then global, image.
+- `image_path_maskable` — dedicated maskable-icon source (opaque, full-bleed, safe-zone aware). When omitted, maskable files are derived from the base image: the logo is scaled to ~80% and centered on the opaque `background_color` so the outer edge survives maskable cropping.
+- `output_path` — web root directory (default `web`); set per flavor to keep outputs apart — serve that directory when building.
+- `favicon_size` — PNG favicon size in pixels (default `16`; the `.ico` always holds 16+32+48).
+- `favicon_ico` — emit multi-frame `favicon.ico` alongside `favicon.png` (default `true`; browsers request `/favicon.ico` by default, set `false` to ship the PNG only).
+- `background_color` — must be hex when set. Written to `web/manifest.json`, used as the maskable-derivation canvas, and flattens the opaque 180px `apple-touch-icon.png`.
+- `theme_color` — must be hex when set. Written to `web/manifest.json` and added as the `<meta name="theme-color">` tag. The tool manages one `<!--LI-->…<!--LIEND-->` block in `index.html`.
 
 ### Windows
 
-- `generate`, `image_path` (sources under 256px warn about upscaling), `icon_filename` (default `app_icon.ico`, the `Runner.rc` contract — set per flavor so runs don't clobber each other, and wire it into `Runner.rc(.in)`).
+- `generate` — enable Windows output.
+- `image_path` — source image; falls back to top-level `image_path`. Sources under 256px warn about upscaling, because the 256px ICO frame goes soft.
+- `icon_filename` — output `.ico` name inside `windows/runner/resources/` (default `app_icon.ico`, the `Runner.rc` contract). Set a per-flavor name so sequential flavor runs don't clobber each other, and wire it into `Runner.rc(.in)`.
 
 ### macOS
 
-- `generate`, `image_path`, `padding` (safe-area margin as % per side, default `0`), `rounded_corners` (continuous-corner squircle mask, default `false`). Flavors write `AppIcon-<flavor>.appiconset`; select it in Xcode like iOS. Transparency is preserved, never filled — prefer opaque art.
-- Liquid glass (writes a `.icon` bundle for Apple's Icon Composer next to the PNG catalog, which stays the fallback on macOS older than Tahoe 26 — same document format and options as iOS): `image_path_liquid_glass_icon` (enables it; SVGs pass through), `image_path_liquid_glass_icon_dark` / `_tinted` (no fallbacks — macOS has no dark/tinted catalog variants), `remove_liquid_glass`, `background_color` (`#ffffff`), `liquid_glass_icon_scale` (1.0), `liquid_glass_translucency` (0.5), `liquid_glass_specular` (true), `liquid_glass_shadow_kind` (`"Neutral"`/`"Chromatic"`), `liquid_glass_shadow_opacity` (0.5), `liquid_glass_blur` (0.5), `liquid_glass_offset_x` / `_y` (0.0), `liquid_glass_lighting` (`"individual"`/`"combined"`), `liquid_glass_refractivity_enabled` (+ `liquid_glass_refractivity_depth` / `_strength`), `liquid_glass_specular_highlight_placement` (`"inside"`/`"outside"`).
+- `generate` — enable macOS output.
+- `image_path` — source image; falls back to top-level `image_path`.
+- `padding` — safe-area margin as a percent of the icon size, applied on every side (default `0`, which fills the icon edge to edge). The artwork is scaled into the remaining inner area and centered on a transparent canvas.
+- `rounded_corners` — masks the canvas with an Apple-like squircle (default `false`). macOS does not shape the artwork itself, so leave this off for square art.
+- `background_color` — canvas fill behind the glass in the liquid-glass bundle (`#RRGGBB`, default `#ffffff`). Transparency is otherwise preserved, never filled — prefer opaque art.
+- `image_path_liquid_glass_icon` — enables the liquid-glass `.icon` bundle next to the PNG catalog (same format as iOS; the PNG set stays the fallback on macOS older than Tahoe 26). Unlike iOS, the dark/tinted layer sources below have no fallbacks — macOS has no dark/tinted catalog variants to reuse.
+- `image_path_liquid_glass_icon_dark` / `image_path_liquid_glass_icon_tinted` — dark/tinted layer sources for the glass bundle (no fallbacks on macOS; each must be set explicitly to get that appearance).
+- `remove_liquid_glass` — emits the `.icon` layers flat, without glass effects (default `false`).
+- `liquid_glass_icon_scale` — artwork scale inside the glass layer (default `1.0`).
+- `liquid_glass_translucency` — how see-through the glass reads, `0.0` (opaque) to `1.0` (clear); default `0.5`.
+- `liquid_glass_specular` — specular highlights on the glass (default `true`).
+- `liquid_glass_shadow_kind` — drop-shadow style: `"Neutral"` or `"Chromatic"` (default `"Neutral"`).
+- `liquid_glass_shadow_opacity` — drop-shadow strength (default `0.5`).
+- `liquid_glass_blur` — background blur radius behind the glass (default `0.5`).
+- `liquid_glass_offset_x` / `liquid_glass_offset_y` — layer offset in points (default `0.0`).
+- `liquid_glass_lighting` — group lighting model: `"individual"` or `"combined"`. Unset by default; only observable with 2+ layers.
+- `liquid_glass_refractivity_enabled` — turns on glass distortion; requires `liquid_glass_refractivity_depth` and `liquid_glass_refractivity_strength` to be set as well.
+- `liquid_glass_refractivity_depth` / `liquid_glass_refractivity_strength` — depth and strength of the refraction effect (only used when refractivity is enabled).
+- `liquid_glass_specular_highlight_placement` — edge highlight position: `"inside"` or `"outside"`. Unset by default.
 
-After generating, add `<name>.icon` to the Xcode project (the tool registers the file reference in `project.pbxproj` automatically) and set the target's App Icon to it; the PNG set keeps working untouched.
+After generating, add `<name>.icon` to the Xcode project (the tool registers the file reference in `project.pbxproj` automatically) and set the target's App Icon to it; the PNG set keeps working untouched. Flavors write `AppIcon-<flavor>.appiconset`; select it in Xcode like iOS.
 
 ### Linux
 
-- `generate`, `image_path` — must be declared under `flutter: assets:` in `pubspec.yaml` (any asset path, not just `assets/`) so it ships inside the bundle. Emits the hicolor tree, `.desktop` entries, and `snap/` files — each strictly only-if-absent — and patches `my_application.cc` with an executable-relative icon path that works under `flutter run` and in release bundles.
+- `generate` — enable Linux output.
+- `image_path` — source image; falls back to top-level `image_path`. Must also be declared under `flutter: assets:` in `pubspec.yaml` (any asset path, not just `assets/`) so it ships inside the bundle — the runner resolves it at runtime, so generation fails without this.
+
+Emits the hicolor tree, `.desktop` entries, and `snap/` files — each strictly only-if-absent — and patches `my_application.cc` with an executable-relative icon path that works under `flutter run` and in release bundles.
 
 ## Flavors
 
