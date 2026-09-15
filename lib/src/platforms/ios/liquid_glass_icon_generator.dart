@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/ios_config.dart';
+import 'package:launcher_icons/src/config/liquid_glass_layer.dart';
 import 'package:launcher_icons/src/config/macos_config.dart';
 import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
@@ -22,31 +23,30 @@ Future<void> generateLiquidGlassIcon(
   }
 
   final iosConfig = config.iosConfig!;
-  final String? liquidGlassImagePath = iosConfig.imagePathLiquidGlassIcon;
-  if (liquidGlassImagePath == null) {
-    return;
-  }
 
   printStatus('Creating liquid glass .icon for $iconName', logger);
 
   // Resolve per-appearance sources. Variants fall back to the dark/tinted
   // app artwork so one file serves both unless explicitly overridden.
-  final darkSource = iosConfig.imagePathLiquidGlassIconDark ??
-      iosConfig.imagePathDarkTransparent;
-  final tintedSource = iosConfig.imagePathLiquidGlassIconTinted ??
-      iosConfig.imagePathTintedGrayscale;
+  final layers = iosConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[];
+  final darkFallback = iosConfig.imagePathDarkTransparent;
+  final tintedFallback = iosConfig.imagePathTintedGrayscale;
 
   await _writeLiquidGlassBundle(
     sources: {
-      liquidGlassImagePath,
-      if (darkSource != null) darkSource,
-      if (tintedSource != null) tintedSource,
+      for (final layer in layers) ...[
+        layer.imagePath,
+        if ((layer.imagePathDark ?? darkFallback) != null)
+          (layer.imagePathDark ?? darkFallback)!,
+        if ((layer.imagePathTinted ?? tintedFallback) != null)
+          (layer.imagePathTinted ?? tintedFallback)!,
+      ],
     },
     iconFolderPath: withPrefix(prefixPath, iosLiquidGlassIconPath(iconName)),
     assetsFolderPath:
         withPrefix(prefixPath, iosLiquidGlassAssetsPath(iconName)),
     configFilePath: withPrefix(prefixPath, iosLiquidGlassConfigPath(iconName)),
-    iconConfig: generateIconConfig(config, path.basename(liquidGlassImagePath)),
+    iconConfig: generateIconConfig(config),
     iconFolderDisplayPath: iosLiquidGlassIconPath(iconName),
     logger: logger,
     prefixPath: prefixPath,
@@ -66,30 +66,27 @@ Future<void> generateMacOSLiquidGlassIcon(
   }
 
   final macOSConfig = config.macOSConfig!;
-  final String? liquidGlassImagePath = macOSConfig.imagePathLiquidGlassIcon;
-  if (liquidGlassImagePath == null) {
-    return;
-  }
 
   printStatus('Creating macOS liquid glass .icon for $iconName', logger);
 
   // macOS has no dark/tinted PNG catalog variants to fall back to: only
   // explicitly configured layer sources become appearances.
+  final layers = macOSConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[];
+
   await _writeLiquidGlassBundle(
     sources: {
-      liquidGlassImagePath,
-      if (macOSConfig.imagePathLiquidGlassIconDark != null)
-        macOSConfig.imagePathLiquidGlassIconDark!,
-      if (macOSConfig.imagePathLiquidGlassIconTinted != null)
-        macOSConfig.imagePathLiquidGlassIconTinted!,
+      for (final layer in layers) ...[
+        layer.imagePath,
+        if (layer.imagePathDark != null) layer.imagePathDark!,
+        if (layer.imagePathTinted != null) layer.imagePathTinted!,
+      ],
     },
     iconFolderPath: withPrefix(prefixPath, macOSLiquidGlassIconPath(iconName)),
     assetsFolderPath:
         withPrefix(prefixPath, macOSLiquidGlassAssetsPath(iconName)),
     configFilePath:
         withPrefix(prefixPath, macOSLiquidGlassConfigPath(iconName)),
-    iconConfig:
-        generateMacOSIconConfig(config, path.basename(liquidGlassImagePath)),
+    iconConfig: generateMacOSIconConfig(config),
     iconFolderDisplayPath: macOSLiquidGlassIconPath(iconName),
     logger: logger,
     prefixPath: prefixPath,
@@ -157,27 +154,16 @@ String? _variantName(String? source, String imageFileName) {
 
 /// Generate the icon.json configuration
 @visibleForTesting
-Map<String, dynamic> generateIconConfig(Config config, String imageFileName) {
+Map<String, dynamic> generateIconConfig(Config config) {
   // Fall back to defaults so direct callers don't need an ios block.
   final iosConfig = config.iosConfig ?? const IOSConfig();
   return buildLiquidGlassDocument(
     platform: 'ios',
     backgroundColor: iosConfig.backgroundColor,
-    imageFileName: imageFileName,
-    darkName: _variantName(
-      iosConfig.imagePathLiquidGlassIconDark ??
-          iosConfig.imagePathDarkTransparent,
-      imageFileName,
-    ),
-    tintedName: _variantName(
-      iosConfig.imagePathLiquidGlassIconTinted ??
-          iosConfig.imagePathTintedGrayscale,
-      imageFileName,
-    ),
+    layers: iosConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[],
+    darkFallback: iosConfig.imagePathDarkTransparent,
+    tintedFallback: iosConfig.imagePathTintedGrayscale,
     removeGlass: iosConfig.removeLiquidGlass,
-    scale: iosConfig.liquidGlassIconScale,
-    offsetX: iosConfig.liquidGlassOffsetX,
-    offsetY: iosConfig.liquidGlassOffsetY,
     translucency: iosConfig.liquidGlassTranslucency,
     specular: iosConfig.liquidGlassSpecular,
     shadowKind: iosConfig.liquidGlassShadowKind,
@@ -196,28 +182,14 @@ Map<String, dynamic> generateIconConfig(Config config, String imageFileName) {
 /// macOS shares Icon Composer's document format with iOS (one shared square
 /// design covers both); only the option source differs.
 @visibleForTesting
-Map<String, dynamic> generateMacOSIconConfig(
-  Config config,
-  String imageFileName,
-) {
+Map<String, dynamic> generateMacOSIconConfig(Config config) {
   // Fall back to defaults so direct callers don't need a macos block.
   final macOSConfig = config.macOSConfig ?? const MacOSConfig();
   return buildLiquidGlassDocument(
     platform: 'macos',
     backgroundColor: macOSConfig.backgroundColor,
-    imageFileName: imageFileName,
-    darkName: _variantName(
-      macOSConfig.imagePathLiquidGlassIconDark,
-      imageFileName,
-    ),
-    tintedName: _variantName(
-      macOSConfig.imagePathLiquidGlassIconTinted,
-      imageFileName,
-    ),
+    layers: macOSConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[],
     removeGlass: macOSConfig.removeLiquidGlass,
-    scale: macOSConfig.liquidGlassIconScale,
-    offsetX: macOSConfig.liquidGlassOffsetX,
-    offsetY: macOSConfig.liquidGlassOffsetY,
     translucency: macOSConfig.liquidGlassTranslucency,
     specular: macOSConfig.liquidGlassSpecular,
     shadowKind: macOSConfig.liquidGlassShadowKind,
@@ -231,21 +203,43 @@ Map<String, dynamic> generateMacOSIconConfig(
   );
 }
 
+/// Blend modes Icon Composer accepts on a layer.
+const _blendModes = <String>{
+  'normal',
+  'plus-lighter',
+  'plus-darker',
+  'overlay',
+  'multiply',
+  'soft-light',
+  'hard-light',
+  'darken',
+  'lighten',
+  'screen',
+};
+
+/// Converts [hex] to display P3, labelling failures with the config [key].
+String _displayP3(String hex, String key) {
+  try {
+    return convertHexToDisplayP3(hex);
+  } on InvalidConfigException catch (e) {
+    throw InvalidConfigException('$key must be a hex color: ${e.message}');
+  }
+}
+
 /// Builds the Icon Composer `icon.json` document from explicit values.
 ///
-/// [platform] labels validation errors (`ios` or `macos`). Optical
-/// pass-throughs are opt-in so unset keys stay out of the document.
+/// [platform] labels validation errors (`ios` or `macos`). [layers] stack
+/// bottom-to-top in list order inside one group sharing the group's glass
+/// pass. Optical pass-throughs are opt-in so unset keys stay out of the
+/// document and historical output is byte-identical.
 @visibleForTesting
 Map<String, dynamic> buildLiquidGlassDocument({
   required String platform,
   required String backgroundColor,
-  required String imageFileName,
-  required String? darkName,
-  required String? tintedName,
+  required List<LiquidGlassLayer> layers,
+  String? darkFallback,
+  String? tintedFallback,
   required bool removeGlass,
-  required double scale,
-  required double? offsetX,
-  required double? offsetY,
   required double? translucency,
   required bool specular,
   required String shadowKind,
@@ -259,9 +253,6 @@ Map<String, dynamic> buildLiquidGlassDocument({
 }) {
   // Convert background color to display P3 format
   final displayP3Color = convertHexToDisplayP3(backgroundColor);
-
-  // Extract image name without extension for the layer name
-  final imageName = path.basenameWithoutExtension(imageFileName);
 
   // Validate shadow kind
   if (shadowKind.toLowerCase() != 'neutral' &&
@@ -305,23 +296,18 @@ Map<String, dynamic> buildLiquidGlassDocument({
   // per the format (the keys below stand alone), and actool rejects the
   // array with an internal error — verified against Xcode 26.6.
 
-  final layer = <String, dynamic>{
-    'glass': !removeGlass,
-    'hidden': false,
-    'name': imageName,
-    'position': {
-      'scale': scale,
-      'translation-in-points': [offsetX ?? 0.0, offsetY ?? 0.0],
-    },
-  };
-  if (darkName == null && tintedName == null) {
-    layer['image-name'] = imageFileName;
-  } else {
-    layer['image-name-specializations'] = [
-      {'value': imageFileName},
-      if (darkName != null) {'appearance': 'dark', 'value': darkName},
-      if (tintedName != null) {'appearance': 'tinted', 'value': tintedName},
-    ];
+  final layersJson = <Map<String, dynamic>>[];
+  for (var i = 0; i < layers.length; i++) {
+    layersJson.add(
+      _buildLayer(
+        platform,
+        i,
+        layers[i],
+        darkFallback: darkFallback,
+        tintedFallback: tintedFallback,
+        removeGlass: removeGlass,
+      ),
+    );
   }
 
   return {
@@ -332,7 +318,7 @@ Map<String, dynamic> buildLiquidGlassDocument({
       {
         'blur-material': blur,
         if (lighting != null) 'lighting': lighting,
-        'layers': [layer],
+        'layers': layersJson,
         if (refractivity != null) 'refractivity': refractivity,
         'shadow': {
           'kind': shadowKind.toLowerCase() == 'chromatic'
@@ -354,6 +340,106 @@ Map<String, dynamic> buildLiquidGlassDocument({
       'squares': 'shared',
     },
   };
+}
+
+/// Builds one Icon Composer layer document from [layer], validating the
+/// per-layer composition keys and resolving appearance variants against
+/// the [darkFallback]/[tintedFallback] catalog sources.
+Map<String, dynamic> _buildLayer(
+  String platform,
+  int index,
+  LiquidGlassLayer layer, {
+  required String? darkFallback,
+  required String? tintedFallback,
+  required bool removeGlass,
+}) {
+  final label = '$platform.liquid_glass_layers[$index]';
+
+  final opacity = layer.opacity;
+  if (opacity != null && (opacity < 0.0 || opacity > 1.0)) {
+    throw InvalidConfigException(
+      '$label.opacity must be between 0.0 and 1.0, got: $opacity',
+    );
+  }
+
+  final blendMode = layer.blendMode?.toLowerCase();
+  if (blendMode != null && !_blendModes.contains(blendMode)) {
+    throw InvalidConfigException(
+      '$label.blend_mode must be one of ${_blendModes.join(', ')}, '
+      'got: ${layer.blendMode}',
+    );
+  }
+
+  // Extract image name without extension for the layer name
+  final imageFileName = path.basename(layer.imagePath);
+  final imageName = path.basenameWithoutExtension(imageFileName);
+
+  final darkName = _variantName(
+    layer.imagePathDark ?? darkFallback,
+    imageFileName,
+  );
+  final tintedName = _variantName(
+    layer.imagePathTinted ?? tintedFallback,
+    imageFileName,
+  );
+
+  final doc = <String, dynamic>{
+    'glass': !removeGlass && layer.glass,
+    'hidden': false,
+    'name': imageName,
+    'position': {
+      'scale': layer.scale,
+      'translation-in-points': [
+        layer.offsetX ?? 0.0,
+        layer.offsetY ?? 0.0,
+      ],
+    },
+  };
+  if (opacity != null) {
+    doc['opacity'] = opacity;
+  }
+  if (blendMode != null) {
+    doc['blend-mode'] = blendMode;
+  }
+  if (darkName == null && tintedName == null) {
+    doc['image-name'] = imageFileName;
+  } else {
+    doc['image-name-specializations'] = [
+      {'value': imageFileName},
+      if (darkName != null) {'appearance': 'dark', 'value': darkName},
+      if (tintedName != null) {'appearance': 'tinted', 'value': tintedName},
+    ];
+  }
+
+  // A recolor tint for the artwork. Like image-name, the plain key and the
+  // specializations array are mutually exclusive (the plain key silently
+  // wins), so a lone fill stays flat and variants become an array. The
+  // base value is the first set key, so a variant-only tint still emits.
+  final fill = layer.fill;
+  final fillDark = layer.fillDark;
+  final fillTinted = layer.fillTinted;
+  final fillBase = fill ?? fillDark ?? fillTinted;
+  if (fillBase != null && fillDark == null && fillTinted == null) {
+    doc['fill'] = {'solid': _displayP3(fillBase, '$label.fill')};
+  } else if (fillBase != null) {
+    doc['fill-specializations'] = [
+      {
+        'value': {'solid': _displayP3(fillBase, '$label.fill')},
+      },
+      if (fillDark != null)
+        {
+          'appearance': 'dark',
+          'value': {'solid': _displayP3(fillDark, '$label.fill_dark')},
+        },
+      if (fillTinted != null)
+        {
+          'appearance': 'tinted',
+          'value': {'solid': _displayP3(fillTinted, '$label.fill_tinted')},
+        },
+    ];
+  }
+
+  return doc;
 }
 
 /// Convert hex color to Display P3 format (as used by Apple Icon Composer)

@@ -31,6 +31,32 @@
                             "value": "icon-prod-glass-tinted.svg"
                         }
                     ]
+                },
+                {
+                    "glass": true,
+                    "hidden": false,
+                    "name": "icon-prod-foreground",
+                    "position": {
+                        "scale": 0.7,
+                        "translation-in-points": [
+                            0.0,
+                            0.0
+                        ]
+                    },
+                    "blend-mode": "normal",
+                    "image-name-specializations": [
+                        {
+                            "value": "icon-prod-foreground.svg"
+                        },
+                        {
+                            "appearance": "dark",
+                            "value": "icon-prod-dark.svg"
+                        },
+                        {
+                            "appearance": "tinted",
+                            "value": "icon-prod-tinted.svg"
+                        }
+                    ]
                 }
             ],
             "refractivity": {

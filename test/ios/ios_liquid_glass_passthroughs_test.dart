@@ -10,7 +10,7 @@ void main() {
   group('generateIconConfig optical pass-throughs', () {
     Map<String, dynamic> iconJsonFor(Map<String, dynamic> ios) {
       final config = Config.fromJson(<String, dynamic>{'ios': ios});
-      return generateIconConfig(config, 'icon.png');
+      return generateIconConfig(config);
     }
 
     Map<String, dynamic> groupFor(Map<String, dynamic> ios) {
@@ -18,34 +18,35 @@ void main() {
       return groups.first as Map<String, dynamic>;
     }
 
+    Map<String, dynamic> withLayer(Map<String, dynamic> extra) =>
+        <String, dynamic>{
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'icon.png'},
+          ],
+          ...extra,
+        };
+
     test('emits lighting when set', () {
-      final group = groupFor(<String, dynamic>{
-        'generate': true,
-        'image_path_liquid_glass_icon': 'icon.png',
-        'liquid_glass_lighting': 'combined',
-      });
+      final group = groupFor(withLayer({'liquid_glass_lighting': 'combined'}));
       expect(group['lighting'], equals('combined'));
     });
 
     test('rejects unknown lighting values', () {
       expect(
-        () => iconJsonFor(<String, dynamic>{
-          'generate': true,
-          'image_path_liquid_glass_icon': 'icon.png',
-          'liquid_glass_lighting': 'dramatic',
-        }),
+        () => iconJsonFor(withLayer({'liquid_glass_lighting': 'dramatic'})),
         throwsA(isA<InvalidConfigException>()),
       );
     });
 
     test('emits refractivity object without a features array', () {
-      final json = iconJsonFor(<String, dynamic>{
-        'generate': true,
-        'image_path_liquid_glass_icon': 'icon.png',
-        'liquid_glass_refractivity_enabled': true,
-        'liquid_glass_refractivity_depth': 0.6,
-        'liquid_glass_refractivity_strength': 0.7,
-      });
+      final json = iconJsonFor(
+        withLayer({
+          'liquid_glass_refractivity_enabled': true,
+          'liquid_glass_refractivity_depth': 0.6,
+          'liquid_glass_refractivity_strength': 0.7,
+        }),
+      );
       final group = (json['groups'] as List).first as Map<String, dynamic>;
       expect(
         group['refractivity'],
@@ -58,21 +59,17 @@ void main() {
 
     test('requires depth and strength when refractivity is enabled', () {
       expect(
-        () => iconJsonFor(<String, dynamic>{
-          'generate': true,
-          'image_path_liquid_glass_icon': 'icon.png',
-          'liquid_glass_refractivity_enabled': true,
-        }),
+        () => iconJsonFor(
+          withLayer({'liquid_glass_refractivity_enabled': true}),
+        ),
         throwsA(isA<InvalidConfigException>()),
       );
     });
 
     test('emits specular placement without a features array', () {
-      final json = iconJsonFor(<String, dynamic>{
-        'generate': true,
-        'image_path_liquid_glass_icon': 'icon.png',
-        'liquid_glass_specular_highlight_placement': 'inside',
-      });
+      final json = iconJsonFor(
+        withLayer({'liquid_glass_specular_highlight_placement': 'inside'}),
+      );
       final group = (json['groups'] as List).first as Map<String, dynamic>;
       expect(group['specular-highlight-placement'], equals('inside'));
       expect(json.containsKey('features'), isFalse);
@@ -80,20 +77,15 @@ void main() {
 
     test('rejects unknown specular placements', () {
       expect(
-        () => iconJsonFor(<String, dynamic>{
-          'generate': true,
-          'image_path_liquid_glass_icon': 'icon.png',
-          'liquid_glass_specular_highlight_placement': 'behind',
-        }),
+        () => iconJsonFor(
+          withLayer({'liquid_glass_specular_highlight_placement': 'behind'}),
+        ),
         throwsA(isA<InvalidConfigException>()),
       );
     });
 
     test('omits features and optical keys by default', () {
-      final json = iconJsonFor(<String, dynamic>{
-        'generate': true,
-        'image_path_liquid_glass_icon': 'icon.png',
-      });
+      final json = iconJsonFor(withLayer({}));
       final group = (json['groups'] as List).first as Map<String, dynamic>;
       expect(json.containsKey('features'), isFalse);
       expect(group.containsKey('lighting'), isFalse);

@@ -16,18 +16,15 @@ MacOSConfig _$MacOSConfigFromJson(Map json) => $checkedCreate(
           padding: $checkedConvert('padding', (v) => (v as num?)?.toInt() ?? 0),
           roundedCorners:
               $checkedConvert('rounded_corners', (v) => v as bool? ?? false),
-          imagePathLiquidGlassIcon: $checkedConvert(
-              'image_path_liquid_glass_icon', (v) => v as String?),
-          imagePathLiquidGlassIconDark: $checkedConvert(
-              'image_path_liquid_glass_icon_dark', (v) => v as String?),
-          imagePathLiquidGlassIconTinted: $checkedConvert(
-              'image_path_liquid_glass_icon_tinted', (v) => v as String?),
+          liquidGlassLayers: $checkedConvert(
+              'liquid_glass_layers',
+              (v) => (v as List<dynamic>?)
+                  ?.map((e) => LiquidGlassLayer.fromJson(e as Map))
+                  .toList()),
           removeLiquidGlass: $checkedConvert(
               'remove_liquid_glass', (v) => v as bool? ?? false),
           backgroundColor: $checkedConvert(
               'background_color', (v) => v as String? ?? '#ffffff'),
-          liquidGlassIconScale: $checkedConvert(
-              'liquid_glass_icon_scale', (v) => (v as num?)?.toDouble() ?? 1),
           liquidGlassTranslucency: $checkedConvert('liquid_glass_translucency',
               (v) => (v as num?)?.toDouble() ?? 0.5),
           liquidGlassSpecular: $checkedConvert(
@@ -51,22 +48,15 @@ MacOSConfig _$MacOSConfigFromJson(Map json) => $checkedCreate(
               (v) => (v as num?)?.toDouble()),
           liquidGlassSpecularHighlightPlacement: $checkedConvert(
               'liquid_glass_specular_highlight_placement', (v) => v as String?),
-          liquidGlassOffsetX: $checkedConvert(
-              'liquid_glass_offset_x', (v) => (v as num?)?.toDouble() ?? 0.0),
-          liquidGlassOffsetY: $checkedConvert(
-              'liquid_glass_offset_y', (v) => (v as num?)?.toDouble() ?? 0.0),
         );
         return val;
       },
       fieldKeyMap: const {
         'imagePath': 'image_path',
         'roundedCorners': 'rounded_corners',
-        'imagePathLiquidGlassIcon': 'image_path_liquid_glass_icon',
-        'imagePathLiquidGlassIconDark': 'image_path_liquid_glass_icon_dark',
-        'imagePathLiquidGlassIconTinted': 'image_path_liquid_glass_icon_tinted',
+        'liquidGlassLayers': 'liquid_glass_layers',
         'removeLiquidGlass': 'remove_liquid_glass',
         'backgroundColor': 'background_color',
-        'liquidGlassIconScale': 'liquid_glass_icon_scale',
         'liquidGlassTranslucency': 'liquid_glass_translucency',
         'liquidGlassSpecular': 'liquid_glass_specular',
         'liquidGlassShadowKind': 'liquid_glass_shadow_kind',
@@ -77,9 +67,7 @@ MacOSConfig _$MacOSConfigFromJson(Map json) => $checkedCreate(
         'liquidGlassRefractivityDepth': 'liquid_glass_refractivity_depth',
         'liquidGlassRefractivityStrength': 'liquid_glass_refractivity_strength',
         'liquidGlassSpecularHighlightPlacement':
-            'liquid_glass_specular_highlight_placement',
-        'liquidGlassOffsetX': 'liquid_glass_offset_x',
-        'liquidGlassOffsetY': 'liquid_glass_offset_y'
+            'liquid_glass_specular_highlight_placement'
       },
     );
 
@@ -89,14 +77,10 @@ Map<String, dynamic> _$MacOSConfigToJson(MacOSConfig instance) =>
       'image_path': instance.imagePath,
       'padding': instance.padding,
       'rounded_corners': instance.roundedCorners,
-      'image_path_liquid_glass_icon': instance.imagePathLiquidGlassIcon,
-      'image_path_liquid_glass_icon_dark':
-          instance.imagePathLiquidGlassIconDark,
-      'image_path_liquid_glass_icon_tinted':
-          instance.imagePathLiquidGlassIconTinted,
+      'liquid_glass_layers':
+          instance.liquidGlassLayers?.map((e) => e.toJson()).toList(),
       'remove_liquid_glass': instance.removeLiquidGlass,
       'background_color': instance.backgroundColor,
-      'liquid_glass_icon_scale': instance.liquidGlassIconScale,
       'liquid_glass_translucency': instance.liquidGlassTranslucency,
       'liquid_glass_specular': instance.liquidGlassSpecular,
       'liquid_glass_shadow_kind': instance.liquidGlassShadowKind,
@@ -110,6 +94,4 @@ Map<String, dynamic> _$MacOSConfigToJson(MacOSConfig instance) =>
           instance.liquidGlassRefractivityStrength,
       'liquid_glass_specular_highlight_placement':
           instance.liquidGlassSpecularHighlightPlacement,
-      'liquid_glass_offset_x': instance.liquidGlassOffsetX,
-      'liquid_glass_offset_y': instance.liquidGlassOffsetY,
     };

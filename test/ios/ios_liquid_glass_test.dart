@@ -11,18 +11,30 @@ import 'package:test/test.dart';
 // Unit tests for the liquid glass icon generator (lib/src/platforms/ios).
 void main() {
   group('hasLiquidGlassIconConfig', () {
-    test('is true when ios.image_path_liquid_glass_icon is set', () {
+    test('is true when ios.liquid_glass_layers is non-empty', () {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
         },
       });
       expect(config.hasLiquidGlassIconConfig, isTrue);
     });
 
-    test('is false when ios.image_path_liquid_glass_icon is not set', () {
+    test('is false when ios.liquid_glass_layers is not set', () {
       final config = Config.fromJson(<String, dynamic>{});
+      expect(config.hasLiquidGlassIconConfig, isFalse);
+    });
+
+    test('is false when ios.liquid_glass_layers is empty', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': <dynamic>[],
+        },
+      });
       expect(config.hasLiquidGlassIconConfig, isFalse);
     });
   });
@@ -32,45 +44,80 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
+          'liquid_glass_layers': [
+            {
+              'image_path': 'assets/icon.png',
+              'image_path_dark': 'assets/icon-dark.png',
+              'image_path_tinted': 'assets/icon-tinted.png',
+              'scale': 0.85,
+              'offset_x': 0.1,
+              'offset_y': -0.2,
+              'glass': false,
+              'opacity': 0.8,
+              'blend_mode': 'multiply',
+              'fill': '#FF0000',
+              'fill_dark': '#00FF00',
+              'fill_tinted': '#0000FF',
+            },
+          ],
           'remove_liquid_glass': true,
-          'liquid_glass_icon_scale': 0.85,
           'liquid_glass_translucency': 0.3,
           'liquid_glass_specular': false,
           'liquid_glass_shadow_kind': 'Chromatic',
           'liquid_glass_shadow_opacity': 0.7,
           'liquid_glass_blur': 0.4,
-          'liquid_glass_offset_x': 0.1,
-          'liquid_glass_offset_y': -0.2,
         },
       });
       final iosConfig = config.iosConfig!;
-      expect(iosConfig.imagePathLiquidGlassIcon, 'assets/icon.png');
+      final layer = iosConfig.liquidGlassLayers!.single;
+      expect(layer.imagePath, 'assets/icon.png');
+      expect(layer.imagePathDark, 'assets/icon-dark.png');
+      expect(layer.imagePathTinted, 'assets/icon-tinted.png');
+      expect(layer.scale, 0.85);
+      expect(layer.offsetX, 0.1);
+      expect(layer.offsetY, -0.2);
+      expect(layer.glass, isFalse);
+      expect(layer.opacity, 0.8);
+      expect(layer.blendMode, 'multiply');
+      expect(layer.fill, '#FF0000');
+      expect(layer.fillDark, '#00FF00');
+      expect(layer.fillTinted, '#0000FF');
       expect(iosConfig.removeLiquidGlass, isTrue);
-      expect(iosConfig.liquidGlassIconScale, 0.85);
       expect(iosConfig.liquidGlassTranslucency, 0.3);
       expect(iosConfig.liquidGlassSpecular, isFalse);
       expect(iosConfig.liquidGlassShadowKind, 'Chromatic');
       expect(iosConfig.liquidGlassShadowOpacity, 0.7);
       expect(iosConfig.liquidGlassBlur, 0.4);
-      expect(iosConfig.liquidGlassOffsetX, 0.1);
-      expect(iosConfig.liquidGlassOffsetY, -0.2);
     });
 
     test('liquid glass config fields have default values', () {
       final config = Config.fromJson(<String, dynamic>{
-        'ios': {'generate': true},
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+        },
       });
       final iosConfig = config.iosConfig!;
+      final layer = iosConfig.liquidGlassLayers!.single;
+      expect(layer.imagePathDark, isNull);
+      expect(layer.imagePathTinted, isNull);
+      expect(layer.scale, 1.0);
+      expect(layer.offsetX, 0.0);
+      expect(layer.offsetY, 0.0);
+      expect(layer.glass, isTrue);
+      expect(layer.opacity, isNull);
+      expect(layer.blendMode, isNull);
+      expect(layer.fill, isNull);
+      expect(layer.fillDark, isNull);
+      expect(layer.fillTinted, isNull);
       expect(iosConfig.removeLiquidGlass, isFalse);
-      expect(iosConfig.liquidGlassIconScale, 1);
       expect(iosConfig.liquidGlassTranslucency, 0.5);
       expect(iosConfig.liquidGlassSpecular, isTrue);
       expect(iosConfig.liquidGlassShadowKind, 'Neutral');
       expect(iosConfig.liquidGlassShadowOpacity, 0.5);
       expect(iosConfig.liquidGlassBlur, 0.5);
-      expect(iosConfig.liquidGlassOffsetX, 0.0);
-      expect(iosConfig.liquidGlassOffsetY, 0.0);
     });
   });
 
@@ -115,19 +162,23 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
-          'liquid_glass_icon_scale': 0.85,
+          'liquid_glass_layers': [
+            {
+              'image_path': 'assets/liquid_glass_icon.png',
+              'scale': 0.85,
+              'offset_x': 0.1,
+              'offset_y': -0.2,
+            },
+          ],
           'liquid_glass_translucency': 0.3,
           'liquid_glass_specular': true,
           'liquid_glass_shadow_kind': 'Neutral',
           'liquid_glass_shadow_opacity': 0.7,
           'liquid_glass_blur': 0.4,
-          'liquid_glass_offset_x': 0.1,
-          'liquid_glass_offset_y': -0.2,
         },
       });
       expect(
-        generateIconConfig(config, 'liquid_glass_icon.png'),
+        generateIconConfig(config),
         equals(<String, dynamic>{
           'fill': <String, dynamic>{
             'solid': 'display-p3:1.00000,1.00000,1.00000,1.00000',
@@ -170,11 +221,13 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
           'liquid_glass_shadow_kind': 'Chromatic',
         },
       });
-      final groups = generateIconConfig(config, 'icon.png')['groups'] as List;
+      final groups = generateIconConfig(config)['groups'] as List;
       final shadow = (groups.first as Map<String, dynamic>)['shadow']
           as Map<String, dynamic>;
       expect(shadow['kind'], 'layer-color');
@@ -185,11 +238,13 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
           'remove_liquid_glass': true,
         },
       });
-      final groups = generateIconConfig(config, 'icon.png')['groups'] as List;
+      final groups = generateIconConfig(config)['groups'] as List;
       final firstGroup = groups.first as Map<String, dynamic>;
       final layer =
           (firstGroup['layers'] as List).first as Map<String, dynamic>;
@@ -204,7 +259,9 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'missing-icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'missing-icon.png'},
+          ],
           'liquid_glass_shadow_kind': 'Invalid',
         },
       });
@@ -218,7 +275,9 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'missing-icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'missing-icon.png'},
+          ],
         },
       });
       expect(
@@ -257,7 +316,9 @@ void main() {
         final config = Config.fromJson(<String, dynamic>{
           'ios': {
             'generate': true,
-            'image_path_liquid_glass_icon': 'master-light-1024.png',
+            'liquid_glass_layers': [
+              {'image_path': 'master-light-1024.png'},
+            ],
             'background_color': '#FF0000',
           },
         });
@@ -292,7 +353,9 @@ void main() {
         final config = Config.fromJson(<String, dynamic>{
           'ios': {
             'generate': true,
-            'image_path_liquid_glass_icon': 'master-light-1024.png',
+            'liquid_glass_layers': [
+              {'image_path': 'master-light-1024.png'},
+            ],
             'background_color': '#FF0000',
           },
         });

@@ -220,13 +220,6 @@ class MockMacOSConfig extends _i1.Mock implements _i4.MacOSConfig {
       ) as String);
 
   @override
-  double get liquidGlassIconScale => (super.noSuchMethod(
-        Invocation.getter(#liquidGlassIconScale),
-        returnValue: 0.0,
-        returnValueForMissingStub: 0.0,
-      ) as double);
-
-  @override
   bool get liquidGlassSpecular => (super.noSuchMethod(
         Invocation.getter(#liquidGlassSpecular),
         returnValue: false,

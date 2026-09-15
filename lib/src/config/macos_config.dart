@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:launcher_icons/src/config/liquid_glass_layer.dart';
 
 part 'macos_config.g.dart';
 
@@ -6,6 +7,7 @@ part 'macos_config.g.dart';
 @JsonSerializable(
   anyMap: true,
   checked: true,
+  explicitToJson: true,
 )
 class MacOSConfig {
   /// Specifies weather to generate icons for macos
@@ -29,23 +31,12 @@ class MacOSConfig {
   @JsonKey(name: 'rounded_corners')
   final bool roundedCorners;
 
-  /// macOS image_path_liquid_glass_icon.
-  ///
-  /// Enables the liquid glass `.icon` bundle (macOS Tahoe 26+ renders live
-  /// glass from it via Icon Composer's format; the PNG catalog stays the
-  /// fallback on older systems). Sources pass through verbatim, so SVGs work.
-  @JsonKey(name: 'image_path_liquid_glass_icon')
-  final String? imagePathLiquidGlassIcon;
-
-  /// Liquid glass dark-appearance layer source (no fallback: macOS has no
-  /// dark PNG catalog variant to reuse).
-  @JsonKey(name: 'image_path_liquid_glass_icon_dark')
-  final String? imagePathLiquidGlassIconDark;
-
-  /// Liquid glass tinted-appearance layer source (no fallback: macOS has no
-  /// tinted PNG catalog variant to reuse).
-  @JsonKey(name: 'image_path_liquid_glass_icon_tinted')
-  final String? imagePathLiquidGlassIconTinted;
+  /// Liquid glass artwork layers (bottom-to-top). The `.icon` bundle is
+  /// emitted when the list is non-empty; each entry is one Icon Composer
+  /// layer with its own artwork, position, and composition. Unlike iOS,
+  /// per-layer dark/tinted sources have no catalog fallbacks.
+  @JsonKey(name: 'liquid_glass_layers')
+  final List<LiquidGlassLayer>? liquidGlassLayers;
 
   /// macOS remove_liquid_glass: flat icon without glass effects.
   @JsonKey(name: 'remove_liquid_glass')
@@ -54,10 +45,6 @@ class MacOSConfig {
   /// macOS background_color: canvas fill behind the glass (hex `#RRGGBB`).
   @JsonKey(name: 'background_color')
   final String backgroundColor;
-
-  /// macOS liquid_glass_icon_scale
-  @JsonKey(name: 'liquid_glass_icon_scale')
-  final double liquidGlassIconScale;
 
   /// macOS liquid glass translucency
   @JsonKey(name: 'liquid_glass_translucency')
@@ -100,26 +87,15 @@ class MacOSConfig {
   @JsonKey(name: 'liquid_glass_specular_highlight_placement')
   final String? liquidGlassSpecularHighlightPlacement;
 
-  /// macOS liquid glass offset X
-  @JsonKey(name: 'liquid_glass_offset_x')
-  final double? liquidGlassOffsetX;
-
-  /// macOS liquid glass offset Y
-  @JsonKey(name: 'liquid_glass_offset_y')
-  final double? liquidGlassOffsetY;
-
   /// Creates a instance of [MacOSConfig]
   const MacOSConfig({
     this.generate = false,
     this.imagePath,
     this.padding = 0,
     this.roundedCorners = false,
-    this.imagePathLiquidGlassIcon,
-    this.imagePathLiquidGlassIconDark,
-    this.imagePathLiquidGlassIconTinted,
+    this.liquidGlassLayers,
     this.removeLiquidGlass = false,
     this.backgroundColor = '#ffffff',
-    this.liquidGlassIconScale = 1,
     this.liquidGlassTranslucency = 0.5,
     this.liquidGlassSpecular = true,
     this.liquidGlassShadowKind = 'Neutral',
@@ -130,8 +106,6 @@ class MacOSConfig {
     this.liquidGlassRefractivityDepth,
     this.liquidGlassRefractivityStrength,
     this.liquidGlassSpecularHighlightPlacement,
-    this.liquidGlassOffsetX = 0.0,
-    this.liquidGlassOffsetY = 0.0,
   });
 
   /// Creates [MacOSConfig] from [json]

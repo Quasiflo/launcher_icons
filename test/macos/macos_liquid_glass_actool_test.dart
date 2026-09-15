@@ -26,7 +26,12 @@ void main() {
           sandbox.deleteSync(recursive: true);
         }
         sandbox.createSync(recursive: true);
-        for (final name in ['icon.png', 'icon-dark.png', 'icon-tinted.png']) {
+        for (final name in [
+          'icon.png',
+          'icon-dark.png',
+          'icon-tinted.png',
+          'glyph.png',
+        ]) {
           File(
             path.join(
               originalDir,
@@ -74,7 +79,9 @@ void main() {
         final config = Config.fromJson(<String, dynamic>{
           'macos': {
             'generate': true,
-            'image_path_liquid_glass_icon': 'icon.png',
+            'liquid_glass_layers': [
+              {'image_path': 'icon.png'},
+            ],
           },
         });
 
@@ -100,9 +107,13 @@ void main() {
         final config = Config.fromJson(<String, dynamic>{
           'macos': {
             'generate': true,
-            'image_path_liquid_glass_icon': 'icon.png',
-            'image_path_liquid_glass_icon_dark': 'icon-dark.png',
-            'image_path_liquid_glass_icon_tinted': 'icon-tinted.png',
+            'liquid_glass_layers': [
+              {
+                'image_path': 'icon.png',
+                'image_path_dark': 'icon-dark.png',
+                'image_path_tinted': 'icon-tinted.png',
+              },
+            ],
             'liquid_glass_shadow_kind': 'Chromatic',
           },
         });
@@ -129,9 +140,13 @@ void main() {
         final config = Config.fromJson(<String, dynamic>{
           'macos': {
             'generate': true,
-            'image_path_liquid_glass_icon': 'icon.png',
-            'image_path_liquid_glass_icon_dark': 'icon-dark.png',
-            'image_path_liquid_glass_icon_tinted': 'icon-tinted.png',
+            'liquid_glass_layers': [
+              {
+                'image_path': 'icon.png',
+                'image_path_dark': 'icon-dark.png',
+                'image_path_tinted': 'icon-tinted.png',
+              },
+            ],
             'liquid_glass_lighting': 'combined',
             'liquid_glass_refractivity_enabled': true,
             'liquid_glass_refractivity_depth': 0.6,
@@ -155,6 +170,48 @@ void main() {
         );
         expect(
           File(path.join('compiled-full', 'Assets.car')).existsSync(),
+          isTrue,
+        );
+      });
+
+      test('multi-layer bundle compiles without errors', () async {
+        final config = Config.fromJson(<String, dynamic>{
+          'macos': {
+            'generate': true,
+            'liquid_glass_layers': [
+              {
+                'image_path': 'icon.png',
+                'image_path_dark': 'icon-dark.png',
+                'image_path_tinted': 'icon-tinted.png',
+              },
+              {
+                'image_path': 'glyph.png',
+                'scale': 0.7,
+                'glass': false,
+                'opacity': 0.9,
+                'blend_mode': 'screen',
+                'fill': '#FF0000',
+              },
+            ],
+            'liquid_glass_lighting': 'individual',
+            'liquid_glass_shadow_kind': 'Chromatic',
+          },
+        });
+
+        await generateMacOSLiquidGlassIcon(config, 'AppIcon');
+
+        final result = await compileIcon(
+          'macos/Runner/AppIcon.icon',
+          'AppIcon',
+          'compiled-layers',
+        );
+        expect(
+          result.exitCode,
+          equals(0),
+          reason: result.stdout.toString() + result.stderr.toString(),
+        );
+        expect(
+          File(path.join('compiled-layers', 'Assets.car')).existsSync(),
           isTrue,
         );
       });

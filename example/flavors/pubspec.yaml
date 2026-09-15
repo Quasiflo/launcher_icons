@@ -150,16 +150,14 @@ launcher_icons-development:
       image_path_dark_transparent: "assets/icon/icon-dev-dark.svg"
       image_path_tinted_grayscale: "assets/icon/icon-dev-tinted.svg"
       desaturate_tinted_to_grayscale: true
-      image_path_liquid_glass_icon: "assets/icon/icon-dev.svg"
+      liquid_glass_layers:
+        - image_path: "assets/icon/icon-dev.svg"
       remove_liquid_glass: false
-      liquid_glass_icon_scale: 1.0
       liquid_glass_translucency: 0.5
       liquid_glass_specular: true
       liquid_glass_shadow_kind: "Chromatic"
       liquid_glass_shadow_opacity: 0.5
       liquid_glass_blur: 0.5
-      liquid_glass_offset_x: 0.0
-      liquid_glass_offset_y: 0.0
 
     web:
       generate: true
@@ -219,18 +217,22 @@ launcher_icons-production:
       image_path_dark_transparent: "assets/icon/icon-prod-dark.svg"
       image_path_tinted_grayscale: "assets/icon/icon-prod-tinted.svg"
       desaturate_tinted_to_grayscale: false
-      image_path_liquid_glass_icon: "assets/icon/icon-prod-glass.svg"
-      image_path_liquid_glass_icon_dark: "assets/icon/icon-prod-glass-dark.svg"
-      image_path_liquid_glass_icon_tinted: "assets/icon/icon-prod-glass-tinted.svg"
+      liquid_glass_layers:
+        - image_path: "assets/icon/icon-prod-glass.svg"
+          image_path_dark: "assets/icon/icon-prod-glass-dark.svg"
+          image_path_tinted: "assets/icon/icon-prod-glass-tinted.svg"
+          scale: 0.9
+          offset_y: 4.0
+        - image_path: "assets/icon/icon-prod-foreground.svg"
+          scale: 0.7
+          glass: true
+          blend_mode: "normal"
       remove_liquid_glass: false
-      liquid_glass_icon_scale: 0.9
       liquid_glass_translucency: 0.7
       liquid_glass_specular: true
       liquid_glass_shadow_kind: "Neutral"
       liquid_glass_shadow_opacity: 0.3
       liquid_glass_blur: 0.8
-      liquid_glass_offset_x: 0.0
-      liquid_glass_offset_y: 4.0
       liquid_glass_lighting: "individual"
       liquid_glass_refractivity_enabled: true
       liquid_glass_refractivity_depth: 0.5
@@ -258,19 +260,23 @@ launcher_icons-production:
       image_path: "assets/icon/icon-prod.svg"
       padding: 0
       rounded_corners: false
-      image_path_liquid_glass_icon: "assets/icon/icon-prod-glass.svg"
-      image_path_liquid_glass_icon_dark: "assets/icon/icon-prod-glass-dark.svg"
-      image_path_liquid_glass_icon_tinted: "assets/icon/icon-prod-glass-tinted.svg"
+      liquid_glass_layers:
+        - image_path: "assets/icon/icon-prod-glass.svg"
+          image_path_dark: "assets/icon/icon-prod-glass-dark.svg"
+          image_path_tinted: "assets/icon/icon-prod-glass-tinted.svg"
+          scale: 0.9
+          offset_y: 4.0
+        - image_path: "assets/icon/icon-prod-foreground.svg"
+          scale: 0.7
+          glass: true
+          blend_mode: "normal"
       remove_liquid_glass: false
       background_color: "#ffffff"
-      liquid_glass_icon_scale: 0.9
       liquid_glass_translucency: 0.7
       liquid_glass_specular: true
       liquid_glass_shadow_kind: "Neutral"
       liquid_glass_shadow_opacity: 0.3
       liquid_glass_blur: 0.8
-      liquid_glass_offset_x: 0.0
-      liquid_glass_offset_y: 4.0
       liquid_glass_lighting: "individual"
       liquid_glass_refractivity_enabled: true
       liquid_glass_refractivity_depth: 0.5

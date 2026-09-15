@@ -27,15 +27,14 @@ launcher_icons:
     remove_alpha: true
     background_color: "#ffffff"
     # Liquid Glass .icon configuration for iOS
-    image_path_liquid_glass_icon: "assets/images/icon-master-1024.png"
-    liquid_glass_icon_scale: 0.85
+    liquid_glass_layers:
+      - image_path: "assets/images/icon-master-1024.png"
+        scale: 0.85
     liquid_glass_translucency: 0.5
     liquid_glass_specular: true
     liquid_glass_shadow_kind: "Chromatic"
     liquid_glass_shadow_opacity: 0.5
     liquid_glass_blur: 0.5
-    liquid_glass_offset_x: 0.0
-    liquid_glass_offset_y: 0.0
   web:
     generate: true
     image_path: "assets/images/icon-master-1024.png"

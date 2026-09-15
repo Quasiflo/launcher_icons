@@ -13,7 +13,7 @@ void main() {
   group('generateIconConfig specializations', () {
     Map<String, dynamic> layerFor(Map<String, dynamic> ios) {
       final config = Config.fromJson(<String, dynamic>{'ios': ios});
-      final groups = generateIconConfig(config, 'icon.png')['groups'] as List;
+      final groups = generateIconConfig(config)['groups'] as List;
       return (groups.first as Map<String, dynamic>)['layers'].first
           as Map<String, dynamic>;
     }
@@ -21,9 +21,13 @@ void main() {
     test('emits image-name-specializations for dark and tinted sources', () {
       final layer = layerFor(<String, dynamic>{
         'generate': true,
-        'image_path_liquid_glass_icon': 'icon.png',
-        'image_path_liquid_glass_icon_dark': 'icon-dark.png',
-        'image_path_liquid_glass_icon_tinted': 'icon-tinted.png',
+        'liquid_glass_layers': [
+          {
+            'image_path': 'icon.png',
+            'image_path_dark': 'icon-dark.png',
+            'image_path_tinted': 'icon-tinted.png',
+          },
+        ],
       });
 
       expect(layer.containsKey('image-name'), isFalse);
@@ -40,7 +44,9 @@ void main() {
     test('falls back to the dark/tinted app artwork sources', () {
       final layer = layerFor(<String, dynamic>{
         'generate': true,
-        'image_path_liquid_glass_icon': 'icon.png',
+        'liquid_glass_layers': [
+          {'image_path': 'icon.png'},
+        ],
         'image_path_dark_transparent': 'assets/icon-dark.png',
         'image_path_tinted_grayscale': 'assets/icon-tinted.png',
       });
@@ -58,7 +64,9 @@ void main() {
     test('keeps the plain image-name without variants', () {
       final layer = layerFor(<String, dynamic>{
         'generate': true,
-        'image_path_liquid_glass_icon': 'icon.png',
+        'liquid_glass_layers': [
+          {'image_path': 'icon.png'},
+        ],
       });
 
       expect(layer['image-name'], equals('icon.png'));
@@ -100,9 +108,13 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'icon.png',
-          'image_path_liquid_glass_icon_dark': 'icon-dark.png',
-          'image_path_liquid_glass_icon_tinted': 'icon-tinted.png',
+          'liquid_glass_layers': [
+            {
+              'image_path': 'icon.png',
+              'image_path_dark': 'icon-dark.png',
+              'image_path_tinted': 'icon-tinted.png',
+            },
+          ],
         },
       });
 
@@ -118,7 +130,9 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'icon.svg',
+          'liquid_glass_layers': [
+            {'image_path': 'icon.svg'},
+          ],
         },
       });
 
@@ -130,7 +144,7 @@ void main() {
         ).existsSync(),
         isTrue,
       );
-      final iconJson = generateIconConfig(config, 'icon.svg');
+      final iconJson = generateIconConfig(config);
       final groups = iconJson['groups'] as List;
       final layer = (groups.first as Map)['layers'].first as Map;
       expect(layer['image-name'], equals('icon.svg'));

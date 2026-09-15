@@ -61,17 +61,19 @@ const _pbxproj = r'''
 // Unit tests for macOS liquid glass support (lib/src/platforms/macos).
 void main() {
   group('hasMacOSLiquidGlassIconConfig', () {
-    test('is true when macos.image_path_liquid_glass_icon is set', () {
+    test('is true when macos.liquid_glass_layers is non-empty', () {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
         },
       });
       expect(config.hasMacOSLiquidGlassIconConfig, isTrue);
     });
 
-    test('is false when macos.image_path_liquid_glass_icon is not set', () {
+    test('is false when macos.liquid_glass_layers is not set', () {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {'generate': true},
       });
@@ -89,40 +91,50 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
-          'image_path_liquid_glass_icon_dark': 'assets/icon-dark.png',
-          'image_path_liquid_glass_icon_tinted': 'assets/icon-tinted.png',
+          'liquid_glass_layers': [
+            {
+              'image_path': 'assets/icon.png',
+              'image_path_dark': 'assets/icon-dark.png',
+              'image_path_tinted': 'assets/icon-tinted.png',
+              'scale': 0.85,
+              'offset_x': 0.1,
+              'offset_y': -0.2,
+              'glass': false,
+              'opacity': 0.8,
+              'blend_mode': 'screen',
+              'fill': '#FF0000',
+            },
+          ],
           'remove_liquid_glass': true,
           'background_color': '#FF0000',
-          'liquid_glass_icon_scale': 0.85,
           'liquid_glass_translucency': 0.3,
           'liquid_glass_specular': false,
           'liquid_glass_shadow_kind': 'Chromatic',
           'liquid_glass_shadow_opacity': 0.7,
           'liquid_glass_blur': 0.4,
           'liquid_glass_lighting': 'combined',
-          'liquid_glass_offset_x': 0.1,
-          'liquid_glass_offset_y': -0.2,
         },
       });
       final macOSConfig = config.macOSConfig!;
-      expect(macOSConfig.imagePathLiquidGlassIcon, 'assets/icon.png');
-      expect(macOSConfig.imagePathLiquidGlassIconDark, 'assets/icon-dark.png');
-      expect(
-        macOSConfig.imagePathLiquidGlassIconTinted,
-        'assets/icon-tinted.png',
-      );
+      final layer = macOSConfig.liquidGlassLayers!.single;
+      expect(layer.imagePath, 'assets/icon.png');
+      expect(layer.imagePathDark, 'assets/icon-dark.png');
+      expect(layer.imagePathTinted, 'assets/icon-tinted.png');
+      expect(layer.scale, 0.85);
+      expect(layer.offsetX, 0.1);
+      expect(layer.offsetY, -0.2);
+      expect(layer.glass, isFalse);
+      expect(layer.opacity, 0.8);
+      expect(layer.blendMode, 'screen');
+      expect(layer.fill, '#FF0000');
       expect(macOSConfig.removeLiquidGlass, isTrue);
       expect(macOSConfig.backgroundColor, '#FF0000');
-      expect(macOSConfig.liquidGlassIconScale, 0.85);
       expect(macOSConfig.liquidGlassTranslucency, 0.3);
       expect(macOSConfig.liquidGlassSpecular, isFalse);
       expect(macOSConfig.liquidGlassShadowKind, 'Chromatic');
       expect(macOSConfig.liquidGlassShadowOpacity, 0.7);
       expect(macOSConfig.liquidGlassBlur, 0.4);
       expect(macOSConfig.liquidGlassLighting, 'combined');
-      expect(macOSConfig.liquidGlassOffsetX, 0.1);
-      expect(macOSConfig.liquidGlassOffsetY, -0.2);
     });
 
     test('liquid glass config fields have default values', () {
@@ -130,17 +142,15 @@ void main() {
         'macos': {'generate': true},
       });
       final macOSConfig = config.macOSConfig!;
+      expect(macOSConfig.liquidGlassLayers, isNull);
       expect(macOSConfig.removeLiquidGlass, isFalse);
       expect(macOSConfig.backgroundColor, '#ffffff');
-      expect(macOSConfig.liquidGlassIconScale, 1);
       expect(macOSConfig.liquidGlassTranslucency, 0.5);
       expect(macOSConfig.liquidGlassSpecular, isTrue);
       expect(macOSConfig.liquidGlassShadowKind, 'Neutral');
       expect(macOSConfig.liquidGlassShadowOpacity, 0.5);
       expect(macOSConfig.liquidGlassBlur, 0.5);
       expect(macOSConfig.liquidGlassLighting, isNull);
-      expect(macOSConfig.liquidGlassOffsetX, 0.0);
-      expect(macOSConfig.liquidGlassOffsetY, 0.0);
     });
   });
 
@@ -149,12 +159,14 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'assets/icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
           'background_color': '#FF0000',
         },
       });
 
-      final iconJson = generateMacOSIconConfig(config, 'icon.png');
+      final iconJson = generateMacOSIconConfig(config);
 
       expect(
         iconJson['fill'],
@@ -180,13 +192,17 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'icon.png',
-          'image_path_liquid_glass_icon_dark': 'icon-dark.png',
-          'image_path_liquid_glass_icon_tinted': 'icon-tinted.png',
+          'liquid_glass_layers': [
+            {
+              'image_path': 'icon.png',
+              'image_path_dark': 'icon-dark.png',
+              'image_path_tinted': 'icon-tinted.png',
+            },
+          ],
         },
       });
 
-      final iconJson = generateMacOSIconConfig(config, 'icon.png');
+      final iconJson = generateMacOSIconConfig(config);
       final groups = iconJson['groups'] as List;
       final layers = (groups.first as Map)['layers'] as List;
       final layer = layers.first as Map<String, dynamic>;
@@ -207,11 +223,13 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'icon.png'},
+          ],
         },
       });
 
-      final iconJson = generateMacOSIconConfig(config, 'icon.png');
+      final iconJson = generateMacOSIconConfig(config);
       final groups = iconJson['groups'] as List;
       final layers = (groups.first as Map)['layers'] as List;
       final layer = layers.first as Map<String, dynamic>;
@@ -222,12 +240,14 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'icon.png'},
+          ],
           'remove_liquid_glass': true,
         },
       });
 
-      final iconJson = generateMacOSIconConfig(config, 'icon.png');
+      final iconJson = generateMacOSIconConfig(config);
       final groups = iconJson['groups'] as List;
       final group = groups.first as Map<String, dynamic>;
       final layers = group['layers'] as List;
@@ -241,12 +261,14 @@ void main() {
     test('rejects invalid values with macos-labelled errors', () {
       Map<String, dynamic> iconJsonFor(Map<String, dynamic> macos) {
         final config = Config.fromJson(<String, dynamic>{'macos': macos});
-        return generateMacOSIconConfig(config, 'icon.png');
+        return generateMacOSIconConfig(config);
       }
 
       Map<String, dynamic> base() => <String, dynamic>{
             'generate': true,
-            'image_path_liquid_glass_icon': 'icon.png',
+            'liquid_glass_layers': [
+              {'image_path': 'icon.png'},
+            ],
           };
 
       expect(
@@ -293,6 +315,36 @@ void main() {
           ),
         ),
       );
+      expect(
+        () => iconJsonFor(<String, dynamic>{
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'icon.png', 'opacity': 2.0},
+          ],
+        }),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('macos.liquid_glass_layers[0].opacity'),
+          ),
+        ),
+      );
+      expect(
+        () => iconJsonFor(<String, dynamic>{
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'icon.png', 'blend_mode': 'dissolve'},
+          ],
+        }),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('macos.liquid_glass_layers[0].blend_mode'),
+          ),
+        ),
+      );
     });
   });
 
@@ -301,7 +353,9 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'missing-icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'missing-icon.png'},
+          ],
           'liquid_glass_shadow_kind': 'Invalid',
         },
       });
@@ -315,7 +369,9 @@ void main() {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
-          'image_path_liquid_glass_icon': 'missing-icon.png',
+          'liquid_glass_layers': [
+            {'image_path': 'missing-icon.png'},
+          ],
         },
       });
       expect(
@@ -363,7 +419,9 @@ void main() {
         final config = Config.fromJson(<String, dynamic>{
           'macos': {
             'generate': true,
-            'image_path_liquid_glass_icon': 'master-light-1024.png',
+            'liquid_glass_layers': [
+              {'image_path': 'master-light-1024.png'},
+            ],
             'background_color': '#FF0000',
           },
         });
@@ -418,7 +476,9 @@ void main() {
         final config = Config.fromJson(<String, dynamic>{
           'macos': {
             'generate': true,
-            'image_path_liquid_glass_icon': 'master-light-1024.png',
+            'liquid_glass_layers': [
+              {'image_path': 'master-light-1024.png'},
+            ],
             'background_color': '#FF0000',
           },
         });
@@ -522,7 +582,9 @@ void main() {
         'macos': {
           'generate': true,
           'image_path': 'master-light-1024.png',
-          'image_path_liquid_glass_icon': 'master-light-1024.png',
+          'liquid_glass_layers': [
+            {'image_path': 'master-light-1024.png'},
+          ],
         },
       });
       final generator = MacOSIconGenerator(
@@ -579,7 +641,9 @@ void main() {
         'macos': {
           'generate': true,
           'image_path': 'master-light-1024.png',
-          'image_path_liquid_glass_icon': 'master-light-1024.png',
+          'liquid_glass_layers': [
+            {'image_path': 'master-light-1024.png'},
+          ],
         },
       });
       final generator = MacOSIconGenerator(

@@ -115,23 +115,31 @@ launcher_icons:
     # image_path_tinted_grayscale: "assets/icon/icon_tinted.png"
     # desaturate_tinted_to_grayscale: true
     # background_color: "#ffffff"
-    # image_path_liquid_glass_icon: "assets/icon/liquid_glass_icon.png"
-    # image_path_liquid_glass_icon_dark: "assets/icon/liquid_glass_icon_dark.png"
-    # image_path_liquid_glass_icon_tinted: "assets/icon/liquid_glass_icon_tinted.png"
     # remove_liquid_glass: true # flat icon without glass effects
-    # liquid_glass_icon_scale: 1.0
     # liquid_glass_translucency: 0.5
     # liquid_glass_specular: true
     # liquid_glass_shadow_kind: "Neutral" # "Neutral" or "Chromatic"
     # liquid_glass_shadow_opacity: 0.5
     # liquid_glass_blur: 0.5
-    # liquid_glass_offset_x: 0.0
-    # liquid_glass_offset_y: 0.0
     # liquid_glass_lighting: "combined" # "individual" or "combined"
     # liquid_glass_refractivity_enabled: true # requires depth + strength
     # liquid_glass_refractivity_depth: 0.5
     # liquid_glass_refractivity_strength: 0.5
     # liquid_glass_specular_highlight_placement: "inside" # "inside" or "outside"
+    # liquid_glass_layers: # one entry per artwork layer, bottom-to-top; the .icon bundle is emitted when non-empty
+    #   - image_path: "assets/icon/liquid_glass_background.png"
+    #     image_path_dark: "assets/icon/liquid_glass_background_dark.png" # falls back to image_path_dark_transparent
+    #     image_path_tinted: "assets/icon/liquid_glass_background_tinted.png" # falls back to image_path_tinted_grayscale
+    #     scale: 1.0 # artwork scale within the canvas
+    #     offset_x: 0.0 # layer offset in points
+    #     offset_y: 0.0 # layer offset in points
+    #     glass: true # layer participates in the glass effect
+    #     opacity: 1.0 # 0.0 (transparent) to 1.0 (opaque)
+    #     blend_mode: "normal" # normal, plus-lighter, plus-darker, overlay, multiply, soft-light, hard-light, darken, lighten, screen
+    #     fill: "#ffffff" # recolor tint applied to the artwork
+    #     fill_dark: "#ffffff" # dark-appearance tint, falls back to fill
+    #     fill_tinted: "#ffffff" # tinted-appearance tint, falls back to fill
+    #   - image_path: "assets/icon/liquid_glass_glyph.png" # extra layers stack on top
 
   web:
     generate: true
@@ -154,24 +162,28 @@ launcher_icons:
     image_path: "path/to/image.png"
     # padding: 10 # safe-area margin as % of icon size, 0 disables
     # rounded_corners: true # mask corners with an Apple-like shape
-    # image_path_liquid_glass_icon: "assets/icon/liquid_glass_icon.png" # Tahoe 26+ glass .icon; the PNG catalog stays the fallback
-    # image_path_liquid_glass_icon_dark: "assets/icon/liquid_glass_icon_dark.png"
-    # image_path_liquid_glass_icon_tinted: "assets/icon/liquid_glass_icon_tinted.png"
     # remove_liquid_glass: true # flat icon without glass effects
     # background_color: "#ffffff"
-    # liquid_glass_icon_scale: 1.0
     # liquid_glass_translucency: 0.5
     # liquid_glass_specular: true
     # liquid_glass_shadow_kind: "Neutral" # "Neutral" or "Chromatic"
     # liquid_glass_shadow_opacity: 0.5
     # liquid_glass_blur: 0.5
-    # liquid_glass_offset_x: 0.0
-    # liquid_glass_offset_y: 0.0
     # liquid_glass_lighting: "combined" # "individual" or "combined"
     # liquid_glass_refractivity_enabled: true # requires depth + strength
     # liquid_glass_refractivity_depth: 0.5
     # liquid_glass_refractivity_strength: 0.5
     # liquid_glass_specular_highlight_placement: "inside" # "inside" or "outside"
+    # liquid_glass_layers: # one entry per artwork layer, bottom-to-top; the .icon bundle is emitted when non-empty (Tahoe 26+ glass .icon; the PNG catalog stays the fallback)
+    #   - image_path: "assets/icon/liquid_glass_background.png"
+    #     scale: 1.0 # artwork scale within the canvas
+    #     offset_x: 0.0 # layer offset in points
+    #     offset_y: 0.0 # layer offset in points
+    #     glass: true # layer participates in the glass effect
+    #     opacity: 1.0 # 0.0 (transparent) to 1.0 (opaque)
+    #     blend_mode: "normal" # normal, plus-lighter, plus-darker, overlay, multiply, soft-light, hard-light, darken, lighten, screen
+    #     fill: "#ffffff" # recolor tint applied to the artwork
+    #   - image_path: "assets/icon/liquid_glass_glyph.png" # extra layers stack on top
 
   linux:
     generate: true

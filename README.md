@@ -87,16 +87,22 @@ Top-level `image_path` is the default for every platform; any platform-level `im
 - `desaturate_tinted_to_grayscale` — converts the tinted source to grayscale for you (default `false`; set it instead of hand-converting).
 - `remove_alpha` — flattens transparency onto `background_color` (default `false`). The base and tinted images are flattened; the dark variant intentionally keeps its transparency. Without it, transparent art triggers an App Store alpha warning.
 - `background_color` — matte color used by `remove_alpha` (`"#RRGGBB"`, default `"#ffffff"`).
-- `image_path_liquid_glass_icon` — enables the liquid-glass `.icon` bundle for Apple's Icon Composer (the PNG catalog stays the fallback on older systems); SVGs pass through verbatim.
-- `image_path_liquid_glass_icon_dark` / `image_path_liquid_glass_icon_tinted` — dark/tinted layer sources for the glass bundle; fall back to the dark/tinted PNG sources above when unset.
+- `liquid_glass_layers` — artwork layers for the liquid-glass `.icon` bundle (Apple's Icon Composer format; the PNG catalog stays the fallback on older systems). One list entry per layer, bottom-to-top; the bundle is emitted when the list is non-empty. Sources pass through verbatim, so SVGs work. Each entry supports:
+- `liquid_glass_layers[].image_path` — artwork source for the layer (required).
+- `liquid_glass_layers[].image_path_dark` / `image_path_tinted` — dark/tinted artwork overrides; fall back to the dark/tinted PNG sources above when unset.
+- `liquid_glass_layers[].scale` — artwork scale within the canvas (default `1.0`).
+- `liquid_glass_layers[].offset_x` / `offset_y` — layer offset in points (default `0.0`).
+- `liquid_glass_layers[].glass` — layer participates in the glass effect (default `true`; group `remove_liquid_glass` overrides it off).
+- `liquid_glass_layers[].opacity` — artwork opacity, `0.0` to `1.0`. Unset by default (opaque).
+- `liquid_glass_layers[].blend_mode` — compositing against layers behind it: `"normal"`, `"plus-lighter"`, `"plus-darker"`, `"overlay"`, `"multiply"`, `"soft-light"`, `"hard-light"`, `"darken"`, `"lighten"`, `"screen"`. Unset by default (normal).
+- `liquid_glass_layers[].fill` — recolor tint applied to the artwork (hex `"#RRGGBB"`). Unset by default (artwork colors pass through).
+- `liquid_glass_layers[].fill_dark` / `fill_tinted` — dark/tinted recolor tints; each falls back to `fill` when unset.
 - `remove_liquid_glass` — emits the `.icon` layers flat, without glass effects (default `false`).
-- `liquid_glass_icon_scale` — artwork scale inside the glass layer (default `1.0`).
 - `liquid_glass_translucency` — how see-through the glass reads, `0.0` (opaque) to `1.0` (clear); default `0.5`.
 - `liquid_glass_specular` — specular highlights on the glass (default `true`).
 - `liquid_glass_shadow_kind` — drop-shadow style: `"Neutral"` or `"Chromatic"` (default `"Neutral"`).
 - `liquid_glass_shadow_opacity` — drop-shadow strength (default `0.5`).
 - `liquid_glass_blur` — background blur radius behind the glass (default `0.5`).
-- `liquid_glass_offset_x` / `liquid_glass_offset_y` — layer offset in points (default `0.0`).
 - `liquid_glass_lighting` — group lighting model: `"individual"` lights each layer separately, `"combined"` treats the group as one shape. Unset by default; only observable with 2+ layers.
 - `liquid_glass_refractivity_enabled` — turns on glass distortion; requires `liquid_glass_refractivity_depth` and `liquid_glass_refractivity_strength` to be set as well.
 - `liquid_glass_refractivity_depth` / `liquid_glass_refractivity_strength` — depth and strength of the refraction effect (only used when refractivity is enabled).
@@ -129,16 +135,22 @@ After generating, Xcode must point at the set: `Build Settings` > `Asset Catalog
 - `padding` — safe-area margin as a percent of the icon size, applied on every side (default `0`, which fills the icon edge to edge). The artwork is scaled into the remaining inner area and centered on a transparent canvas.
 - `rounded_corners` — masks the canvas with an Apple-like squircle (default `false`). macOS does not shape the artwork itself, so leave this off for square art.
 - `background_color` — canvas fill behind the glass in the liquid-glass bundle (`#RRGGBB`, default `#ffffff`). Transparency is otherwise preserved, never filled — prefer opaque art.
-- `image_path_liquid_glass_icon` — enables the liquid-glass `.icon` bundle next to the PNG catalog (same format as iOS; the PNG set stays the fallback on macOS older than Tahoe 26). Unlike iOS, the dark/tinted layer sources below have no fallbacks — macOS has no dark/tinted catalog variants to reuse.
-- `image_path_liquid_glass_icon_dark` / `image_path_liquid_glass_icon_tinted` — dark/tinted layer sources for the glass bundle (no fallbacks on macOS; each must be set explicitly to get that appearance).
+- `liquid_glass_layers` — artwork layers for the liquid-glass `.icon` bundle next to the PNG catalog (same format as iOS; the PNG set stays the fallback on macOS older than Tahoe 26). One list entry per layer, bottom-to-top; the bundle is emitted when the list is non-empty. Unlike iOS, per-layer dark/tinted sources have no fallbacks — macOS has no dark/tinted catalog variants to reuse. Each entry supports:
+- `liquid_glass_layers[].image_path` — artwork source for the layer (required).
+- `liquid_glass_layers[].image_path_dark` / `image_path_tinted` — dark/tinted artwork overrides (no fallbacks on macOS; each must be set explicitly to get that appearance).
+- `liquid_glass_layers[].scale` — artwork scale within the canvas (default `1.0`).
+- `liquid_glass_layers[].offset_x` / `offset_y` — layer offset in points (default `0.0`).
+- `liquid_glass_layers[].glass` — layer participates in the glass effect (default `true`; group `remove_liquid_glass` overrides it off).
+- `liquid_glass_layers[].opacity` — artwork opacity, `0.0` to `1.0`. Unset by default (opaque).
+- `liquid_glass_layers[].blend_mode` — compositing against layers behind it: `"normal"`, `"plus-lighter"`, `"plus-darker"`, `"overlay"`, `"multiply"`, `"soft-light"`, `"hard-light"`, `"darken"`, `"lighten"`, `"screen"`. Unset by default (normal).
+- `liquid_glass_layers[].fill` — recolor tint applied to the artwork (hex `"#RRGGBB"`). Unset by default (artwork colors pass through).
+- `liquid_glass_layers[].fill_dark` / `fill_tinted` — dark/tinted recolor tints; each falls back to `fill` when unset.
 - `remove_liquid_glass` — emits the `.icon` layers flat, without glass effects (default `false`).
-- `liquid_glass_icon_scale` — artwork scale inside the glass layer (default `1.0`).
 - `liquid_glass_translucency` — how see-through the glass reads, `0.0` (opaque) to `1.0` (clear); default `0.5`.
 - `liquid_glass_specular` — specular highlights on the glass (default `true`).
 - `liquid_glass_shadow_kind` — drop-shadow style: `"Neutral"` or `"Chromatic"` (default `"Neutral"`).
 - `liquid_glass_shadow_opacity` — drop-shadow strength (default `0.5`).
 - `liquid_glass_blur` — background blur radius behind the glass (default `0.5`).
-- `liquid_glass_offset_x` / `liquid_glass_offset_y` — layer offset in points (default `0.0`).
 - `liquid_glass_lighting` — group lighting model: `"individual"` or `"combined"`. Unset by default; only observable with 2+ layers.
 - `liquid_glass_refractivity_enabled` — turns on glass distortion; requires `liquid_glass_refractivity_depth` and `liquid_glass_refractivity_strength` to be set as well.
 - `liquid_glass_refractivity_depth` / `liquid_glass_refractivity_strength` — depth and strength of the refraction effect (only used when refractivity is enabled).

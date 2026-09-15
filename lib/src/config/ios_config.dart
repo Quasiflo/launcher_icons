@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:launcher_icons/src/config/liquid_glass_layer.dart';
 
 part 'ios_config.g.dart';
 
@@ -6,6 +7,7 @@ part 'ios_config.g.dart';
 @JsonSerializable(
   anyMap: true,
   checked: true,
+  explicitToJson: true,
 )
 class IOSConfig {
   /// Specifies whether to generate icons for iOS
@@ -49,22 +51,11 @@ class IOSConfig {
   @JsonKey(name: 'image_path_tinted_grayscale')
   final String? imagePathTintedGrayscale;
 
-  /// IOS image_path_liquid_glass_icon
-  @JsonKey(name: 'image_path_liquid_glass_icon')
-  final String? imagePathLiquidGlassIcon;
-
-  /// Liquid glass dark-appearance layer source.
-  ///
-  /// Falls back to `image_path_dark_transparent` when unset, so the dark
-  /// app artwork is reused instead of requiring a second file.
-  @JsonKey(name: 'image_path_liquid_glass_icon_dark')
-  final String? imagePathLiquidGlassIconDark;
-
-  /// Liquid glass tinted-appearance layer source.
-  ///
-  /// Falls back to `image_path_tinted_grayscale` when unset.
-  @JsonKey(name: 'image_path_liquid_glass_icon_tinted')
-  final String? imagePathLiquidGlassIconTinted;
+  /// Liquid glass artwork layers (bottom-to-top). The `.icon` bundle is
+  /// emitted when the list is non-empty; each entry is one Icon Composer
+  /// layer with its own artwork, position, and composition.
+  @JsonKey(name: 'liquid_glass_layers')
+  final List<LiquidGlassLayer>? liquidGlassLayers;
 
   /// IOS remove_alpha
   @JsonKey(name: 'remove_alpha')
@@ -81,10 +72,6 @@ class IOSConfig {
   /// IOS background_color
   @JsonKey(name: 'background_color')
   final String backgroundColor;
-
-  /// IOS liquid_glass_icon_scale
-  @JsonKey(name: 'liquid_glass_icon_scale')
-  final double liquidGlassIconScale;
 
   /// IOS liquid glass translucency
   @JsonKey(name: 'liquid_glass_translucency')
@@ -128,14 +115,6 @@ class IOSConfig {
   @JsonKey(name: 'liquid_glass_specular_highlight_placement')
   final String? liquidGlassSpecularHighlightPlacement;
 
-  /// IOS liquid glass offset X
-  @JsonKey(name: 'liquid_glass_offset_x')
-  final double? liquidGlassOffsetX;
-
-  /// IOS liquid glass offset Y
-  @JsonKey(name: 'liquid_glass_offset_y')
-  final double? liquidGlassOffsetY;
-
   /// Creates a instance of [IOSConfig]
   const IOSConfig({
     this.generate = false,
@@ -146,14 +125,11 @@ class IOSConfig {
     this.flavorMode = 'pbxproj',
     this.imagePathDarkTransparent,
     this.imagePathTintedGrayscale,
-    this.imagePathLiquidGlassIcon,
-    this.imagePathLiquidGlassIconDark,
-    this.imagePathLiquidGlassIconTinted,
+    this.liquidGlassLayers,
     this.removeAlpha = false,
     this.removeLiquidGlass = false,
     this.desaturateTintedToGrayscale = false,
     this.backgroundColor = '#ffffff',
-    this.liquidGlassIconScale = 1,
     this.liquidGlassTranslucency = 0.5,
     this.liquidGlassSpecular = true,
     this.liquidGlassShadowKind = 'Neutral',
@@ -164,8 +140,6 @@ class IOSConfig {
     this.liquidGlassRefractivityDepth,
     this.liquidGlassRefractivityStrength,
     this.liquidGlassSpecularHighlightPlacement,
-    this.liquidGlassOffsetX = 0.0,
-    this.liquidGlassOffsetY = 0.0,
   });
 
   /// Creates [IOSConfig] from [json]
