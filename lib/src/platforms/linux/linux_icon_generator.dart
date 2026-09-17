@@ -13,18 +13,42 @@ class LinuxIconGenerator extends IconGenerator {
   /// hicolor theme sizes (conventional full set).
   static const _hicolorSizes = [16, 22, 24, 32, 48, 64, 128, 256, 512];
 
+  /// Edge length of the derived runtime raster for SVG sources. The
+  /// runner loads the window icon from flutter_assets at runtime, where
+  /// only rasters work — so SVG sources are rasterized once to a
+  /// `<name>.linux.png` sibling at this size and wired instead.
+  static const _linuxRuntimeSize = 512;
+
   /// Creates a instance of [LinuxIconGenerator]
   LinuxIconGenerator(IconGeneratorContext context) : super(context, 'Linux');
 
   @override
   bool get isEnabled => context.linuxConfig?.generate ?? false;
 
+  /// Runtime icon path: SVG sources derive a sibling raster (see
+  /// [_linuxRuntimeSize]) because the runner can only load rasters;
+  /// raster sources pass through untouched.
+  static String runtimeIconPath(String iconPath) => utils.isSvgPath(iconPath)
+      ? path.join(
+          path.dirname(iconPath),
+          '${path.basenameWithoutExtension(iconPath)}.linux.png',
+        )
+      : iconPath;
+
   @override
   Future<void> createIcons() async {
-    final iconPath =
+    final sourcePath =
         context.config.resolveImagePath(context.linuxConfig!.imagePath)!;
+    final iconPath = runtimeIconPath(sourcePath);
 
     context.logger.verbose('Using Linux icon at $iconPath...');
+
+    // SVG sources can't be loaded by the runner: derive the runtime
+    // raster first. The file is tool-owned and always rewritten so the
+    // wired window icon can never go stale.
+    if (iconPath != sourcePath) {
+      await _writeDerivedRuntimeIcon(sourcePath, iconPath);
+    }
 
     // The icon must be a bundled flutter asset: the runner resolves it at
     // runtime via data/flutter_assets (a filesystem path, not an asset
@@ -32,11 +56,32 @@ class LinuxIconGenerator extends IconGenerator {
     // Bundling is enforced by validateRequirements() via _hasPubspecAsset.
 
     // Update my_application.cc file with the icon path (X11 window icon).
+    // On Wayland there is no window-icon protocol: the compositor matches
+    // the window to the installed .desktop file instead, which the
+    // packaging files below provide.
     await _updateMyApplicationFile(iconPath);
 
     // Real launcher deliverables for Wayland/desktop/snap. Everything is
     // strictly only-if-absent: existing files are never overwritten.
-    await _generatePackagingFiles(iconPath);
+    await _generatePackagingFiles(sourcePath);
+  }
+
+  /// Rasterizes the SVG at [sourcePath] to the [iconPath] runtime raster.
+  Future<void> _writeDerivedRuntimeIcon(
+    String sourcePath,
+    String iconPath,
+  ) async {
+    final image = await utils.cachedSvgRaster(
+      context.svgRasterCache,
+      path.join(context.prefixPath, sourcePath),
+      _linuxRuntimeSize,
+      _linuxRuntimeSize,
+      logger: context.logger,
+      message: 'Rasterizing SVG source $sourcePath for the Linux runtime icon',
+    );
+    final file = File(path.join(context.prefixPath, iconPath));
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes(encodePng(image));
   }
 
   /// Generates the real launcher deliverables: the hicolor PNG tree, the
@@ -50,6 +95,7 @@ class LinuxIconGenerator extends IconGenerator {
       path.join(context.prefixPath, iconPath),
       perSize: context.config.svgRasterizePerSize,
       logger: context.logger,
+      cache: context.svgRasterCache,
     );
     final appName = _readAppName();
     final appVersion = _readAppVersion();
@@ -71,13 +117,18 @@ class LinuxIconGenerator extends IconGenerator {
       path.join('snap', 'gui', '$appName.png'),
       encodePng(await loadSize(256)),
     );
+    final applicationId = _readApplicationId();
     await _writeStringIfAbsent(
       path.join('share', 'applications', '$appName.desktop'),
-      _desktopFile(appName, 'Icon=$appName'),
+      _desktopFile(appName, 'Icon=$appName', applicationId),
     );
     await _writeStringIfAbsent(
       path.join('snap', 'gui', '$appName.desktop'),
-      _desktopFile(appName, 'Icon=\${SNAP}/meta/gui/$appName.png'),
+      _desktopFile(
+        appName,
+        'Icon=\${SNAP}/meta/gui/$appName.png',
+        applicationId,
+      ),
     );
     await _writeStringIfAbsent(
       path.join('snap', 'snapcraft.yaml'),
@@ -147,8 +198,16 @@ class LinuxIconGenerator extends IconGenerator {
     }
   }
 
-  /// freedesktop desktop entry with the given `Icon=` line.
-  String _desktopFile(String appName, String iconLine) => '''
+  /// freedesktop desktop entry with the given `Icon=` line. [applicationId]
+  /// becomes `StartupWMClass=` so docks/taskbars group the window under
+  /// this entry; it is omitted when unknown (a wrong value is worse than
+  /// none — it would override the signals that already work).
+  String _desktopFile(
+    String appName,
+    String iconLine,
+    String? applicationId,
+  ) {
+    final buffer = StringBuffer('''
 [Desktop Entry]
 Name=$appName
 Comment=$appName
@@ -157,7 +216,48 @@ $iconLine
 Terminal=false
 Type=Application
 Categories=Utility;
-''';
+''');
+    if (applicationId != null) {
+      buffer.writeln('StartupWMClass=$applicationId');
+    }
+    return buffer.toString();
+  }
+
+  /// Reads the GTK application id from `linux/CMakeLists.txt`
+  /// (`set(APPLICATION_ID "...")`). This id is the window identity on both
+  /// session types (Wayland `app_id`, X11 `WM_CLASS` instance part), so it
+  /// is the only correct `StartupWMClass` value. A flavor-conditional
+  /// override (`if(FLUTTER_APP_FLAVOR STREQUAL "<flavor>")`) wins on flavor
+  /// runs. Null when absent — the caller omits the line rather than
+  /// guessing.
+  String? _readApplicationId() {
+    final file = File(path.join(context.prefixPath, 'linux', 'CMakeLists.txt'));
+    if (!file.existsSync()) {
+      return null;
+    }
+    try {
+      final content = file.readAsStringSync();
+      final matches = RegExp(r'set\s*\(\s*APPLICATION_ID\s+"([^"]+)"\s*\)')
+          .allMatches(content)
+          .toList();
+      if (matches.isEmpty) {
+        return null;
+      }
+      final flavor = context.flavor;
+      if (flavor != null) {
+        for (final match in matches) {
+          final contextStart = (match.start - 300).clamp(0, match.start);
+          final before = content.substring(contextStart, match.start);
+          if (before.contains('STREQUAL') && before.contains('"$flavor"')) {
+            return match.group(1);
+          }
+        }
+      }
+      return matches.first.group(1);
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Minimal snap packaging template off the pubspec name/version.
   String _snapcraftFile(String appName, String appVersion) => '''
@@ -198,19 +298,23 @@ parts:
     context.logger.verbose('Validating Linux config...');
     final linuxConfig = context.linuxConfig!;
 
-    if (context.config.resolveImagePath(linuxConfig.imagePath) == null) {
+    final sourcePath = context.config.resolveImagePath(linuxConfig.imagePath);
+    if (sourcePath == null) {
       context.logger.error(
         'Invalid config. Either provide linux.image_path or image_path',
       );
       return false;
     }
 
-    final iconPath = context.config.resolveImagePath(linuxConfig.imagePath)!;
+    // SVG sources derive a sibling raster at generation time (see
+    // [_linuxRuntimeSize]): the pubspec must bundle the derived file, and
+    // existence is checked on the configured source.
+    final iconPath = runtimeIconPath(sourcePath);
 
     final entitesToCheck = [
       path.join(context.prefixPath, constants.linuxDirPath),
       path.join(context.prefixPath, constants.linuxMyApplicationFile),
-      path.join(context.prefixPath, iconPath),
+      path.join(context.prefixPath, sourcePath),
     ];
 
     final failedEntityPath = utils.areFSEntiesExist(entitesToCheck);
@@ -221,7 +325,10 @@ parts:
       return false;
     }
 
-    if (!_hasPubspecAsset(iconPath)) {
+    if (!_hasPubspecAsset(
+      iconPath,
+      sourcePath: iconPath == sourcePath ? null : sourcePath,
+    )) {
       return false;
     }
 
@@ -229,8 +336,10 @@ parts:
   }
 
   /// Returns `true` when [iconPath] (or its directory) is declared in the
-  /// `assets:` list under `flutter:` in `pubspec.yaml`.
-  bool _hasPubspecAsset(String iconPath) {
+  /// `assets:` list under `flutter:` in `pubspec.yaml`. [sourcePath] names
+  /// the SVG the runtime raster derives from, so the error can explain
+  /// which file to declare.
+  bool _hasPubspecAsset(String iconPath, {String? sourcePath}) {
     final pubspecFile = File(path.join(context.prefixPath, 'pubspec.yaml'));
 
     if (!pubspecFile.existsSync()) {
@@ -284,7 +393,9 @@ parts:
     }
 
     context.logger.error(
-      'Icon path $iconPath not found in the `assets:` list under `flutter:` in pubspec.yaml. Please add "$iconPath" or "$iconDir" to it.',
+      sourcePath == null
+          ? 'Icon path $iconPath not found in the `assets:` list under `flutter:` in pubspec.yaml. Please add "$iconPath" or "$iconDir" to it.'
+          : 'Icon path $iconPath (rasterized from "$sourcePath" at generation time) not found in the `assets:` list under `flutter:` in pubspec.yaml. Please add "$iconPath" or "$iconDir" to it.',
     );
     return false;
   }

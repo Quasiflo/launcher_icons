@@ -65,6 +65,7 @@ flutter:
   # launcher_icons-development.yaml / launcher_icons-production.yaml.
   assets:
     - assets/icon/icon-dev.svg
+    - assets/icon/icon-dev.linux.png # derived at generation time from icon-dev.svg: the Linux runtime icon (flutter_assets only serves rasters)
     - assets/icon/icon-dev-dark.svg
     - assets/icon/icon-dev-tinted.svg
     - assets/icon/icon-dev-foreground.svg
@@ -73,6 +74,7 @@ flutter:
     - assets/icon/icon-dev-maskable.svg
     - assets/icon/icon-dev-favicon.svg
     - assets/icon/icon-prod.svg
+    - assets/icon/icon-prod.linux.png # derived at generation time from icon-prod.svg (see above)
     - assets/icon/icon-prod-dark.svg
     - assets/icon/icon-prod-tinted.svg
     - assets/icon/icon-prod-foreground.svg

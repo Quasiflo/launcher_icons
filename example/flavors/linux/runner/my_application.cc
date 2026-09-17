@@ -72,7 +72,7 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, window_title);
   }
 
-  g_autofree gchar* linux_icon_path = get_flutter_asset_path("assets/icon/icon-prod.svg");
+  g_autofree gchar* linux_icon_path = get_flutter_asset_path("assets/icon/icon-prod.linux.png");
   gtk_window_set_icon_from_file(window, linux_icon_path, NULL);
   gtk_window_set_default_size(window, 1280, 720);
 
