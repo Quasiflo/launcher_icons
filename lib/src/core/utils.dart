@@ -206,26 +206,17 @@ Image matteWhiteBlack(Image white, Image black) {
 
 /// Builds a per-size artwork loader for [imagePath].
 ///
-/// Raster sources decode once and resize per size. SVG sources rasterize at each requested size when [perSize], otherwise once at [svgMasterSize] and resize — equivalent crispness for icon art at a fraction of the cost.
+/// Raster sources decode once and resize per size. SVG sources rasterize
+/// once at [svgMasterSize] and resize — equivalent crispness for icon art
+/// at a fraction of the cost.
 typedef SizeImageLoader = Future<Image> Function(int size);
 
 /// Builds a [SizeImageLoader] for [imagePath] — see [SizeImageLoader].
 Future<SizeImageLoader> sizeImageLoaderFor(
   String imagePath, {
-  required bool perSize,
   LILogger? logger,
   SvgRasterCache? cache,
 }) async {
-  if (isSvgPath(imagePath) && perSize) {
-    return (int size) => cachedSvgRaster(
-          cache,
-          imagePath,
-          size,
-          size,
-          logger: logger,
-          message: 'Rasterizing SVG source $imagePath per output size',
-        );
-  }
   final master = isSvgPath(imagePath)
       ? await cachedSvgRaster(
           cache,

@@ -93,7 +93,6 @@ class LinuxIconGenerator extends IconGenerator {
   Future<void> _generatePackagingFiles(String iconPath) async {
     final loadSize = await utils.sizeImageLoaderFor(
       path.join(context.prefixPath, iconPath),
-      perSize: context.config.svgRasterizePerSize,
       logger: context.logger,
       cache: context.svgRasterCache,
     );

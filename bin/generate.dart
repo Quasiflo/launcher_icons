@@ -90,7 +90,6 @@ const configFileTemplate = '''
 # dart run launcher_icons
 launcher_icons:
   image_path: "assets/icon/icon.png" # png or svg (SVG rasterization in beta, ensure you verify the output looks how you expect!)
-  # svg_rasterize_per_size: true # rasterize svg at every output size (slower)
 
   android:
     generate: true

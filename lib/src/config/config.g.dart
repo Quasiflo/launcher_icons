@@ -24,8 +24,6 @@ Config _$ConfigFromJson(Map json) => $checkedCreate(
               (v) => v == null ? null : MacOSConfig.fromJson(v as Map)),
           linuxConfig: $checkedConvert('linux',
               (v) => v == null ? null : LinuxConfig.fromJson(v as Map)),
-          svgRasterizePerSize: $checkedConvert(
-              'svg_rasterize_per_size', (v) => v as bool? ?? false),
         );
         return val;
       },
@@ -36,8 +34,7 @@ Config _$ConfigFromJson(Map json) => $checkedCreate(
         'webConfig': 'web',
         'windowsConfig': 'windows',
         'macOSConfig': 'macos',
-        'linuxConfig': 'linux',
-        'svgRasterizePerSize': 'svg_rasterize_per_size'
+        'linuxConfig': 'linux'
       },
     );
 
@@ -49,5 +46,4 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'windows': instance.windowsConfig,
       'macos': instance.macOSConfig,
       'linux': instance.linuxConfig,
-      'svg_rasterize_per_size': instance.svgRasterizePerSize,
     };

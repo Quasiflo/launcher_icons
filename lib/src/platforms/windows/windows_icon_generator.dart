@@ -28,31 +28,21 @@ class WindowsIconGenerator extends IconGenerator {
     context.logger
         .verbose('Decoding and loading image file from $imgFilePath...');
     final bool svgInput = utils.isSvgPath(imgFilePath);
-    final perSize = context.config.svgRasterizePerSize && svgInput;
-    utils.SizeImageLoader loadSize;
-    if (perSize) {
-      loadSize = await utils.sizeImageLoaderFor(
-        imgFilePath,
-        perSize: true,
-        logger: context.logger,
-        cache: context.svgRasterCache,
-      );
-    } else {
-      final imgFile = await utils.decodeImageFile(
-        imgFilePath,
-        cache: context.svgRasterCache,
-      );
+    final imgFile = await utils.decodeImageFile(
+      imgFilePath,
+      cache: context.svgRasterCache,
+    );
 
-      if (!svgInput && imgFile.width < 256) {
-        context.logger.info(
-          'WARNING: Source image is ${imgFile.width}px wide; the 256px ICO '
-          'frame will be linearly upscaled and may look soft. '
-          'Use a source of at least 256px for the crispest icon.',
-        );
-      }
-
-      loadSize = (size) async => utils.createResizedImage(size, imgFile);
+    if (!svgInput && imgFile.width < 256) {
+      context.logger.info(
+        'WARNING: Source image is ${imgFile.width}px wide; the 256px ICO '
+        'frame will be linearly upscaled and may look soft. '
+        'Use a source of at least 256px for the crispest icon.',
+      );
     }
+
+    final utils.SizeImageLoader loadSize =
+        (size) async => utils.createResizedImage(size, imgFile);
 
     context.logger.verbose('Generating icon from $imgFilePath...');
     await _generateIcon(loadSize);

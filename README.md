@@ -63,7 +63,6 @@ SVG sources are supported, but the built-in renderer is beta quality: stick to b
 Top-level `image_path` is the default for every platform; any platform-level `image_path` overrides it. Paths must be local files (PNG, JPG/JPEG/WebP where noted, or SVG — see the beta note in Source Image).
 
 - `image_path` — default source image for every platform (see Source Image for format rules).
-- `svg_rasterize_per_size` — `false` by default: each SVG rasterizes once at 1024px and every output size downscales from that master (fast, and as crisp for icon art). `true` re-rasterizes the vector at every output size (crisper pixel-aligned edges, much slower on large sets like iOS).
 
 ### Android
 

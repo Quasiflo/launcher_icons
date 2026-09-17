@@ -57,7 +57,6 @@ Future<void> createDefaultIcons(
   }
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
-    perSize: config.svgRasterizePerSize,
     logger: logger,
     cache: cache,
   );
@@ -206,7 +205,6 @@ Future<void> createAdaptiveIcons(
   }
   final loadForegroundSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, foregroundImagePath),
-    perSize: config.svgRasterizePerSize,
     logger: logger,
     cache: cache,
   );
@@ -273,7 +271,6 @@ Future<void> createAdaptiveMonochromeIcons(
   }
   final loadMonochromeSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, monochromeImagePath),
-    perSize: config.svgRasterizePerSize,
     logger: logger,
     cache: cache,
   );
@@ -327,7 +324,6 @@ Future<void> createAdaptiveRoundIcons(
   }
   final loadRoundSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, roundImagePath),
-    perSize: config.svgRasterizePerSize,
     logger: logger,
     cache: cache,
   );
@@ -365,7 +361,6 @@ Future<void> createPlayStoreIcon(
   }
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
-    perSize: config.svgRasterizePerSize,
     logger: logger,
     cache: cache,
   );
@@ -600,7 +595,6 @@ Future<void> _createAdaptiveBackgrounds(
   final String filePath = adaptiveIconBackgroundImagePath;
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
-    perSize: config.svgRasterizePerSize,
     cache: cache,
   );
 

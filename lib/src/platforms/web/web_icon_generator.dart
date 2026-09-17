@@ -54,10 +54,8 @@ class WebIconGenerator extends IconGenerator {
     // load and decode the image file
     context.logger
         .verbose('Decoding and loading image file at $imgFilePath...');
-    final perSize = context.config.svgRasterizePerSize;
     final loadBase = await utils.sizeImageLoaderFor(
       imgFilePath,
-      perSize: perSize,
       logger: context.logger,
       cache: context.svgRasterCache,
     );
@@ -72,7 +70,6 @@ class WebIconGenerator extends IconGenerator {
           path.join(context.prefixPath, faviconImagePathOverride);
       loadFavicon = await utils.sizeImageLoaderFor(
         faviconImgFilePath,
-        perSize: perSize,
         logger: context.logger,
         cache: context.svgRasterCache,
       );
@@ -85,7 +82,7 @@ class WebIconGenerator extends IconGenerator {
     // resolve the maskable image: a dedicated source when provided,
     // otherwise the base image with padded derivation at write time.
     // The derivation logo always comes from a 1024 render so the ~80%
-    // downscale starts at full quality in both raster modes.
+    // downscale starts at full quality.
     utils.SizeImageLoader? loadMaskable;
     Image? deriveLogo;
     final maskableImagePathOverride = context.webConfig!.imagePathMaskable;
@@ -98,7 +95,6 @@ class WebIconGenerator extends IconGenerator {
       );
       loadMaskable = await utils.sizeImageLoaderFor(
         maskableImgFilePath,
-        perSize: perSize,
         logger: context.logger,
         cache: context.svgRasterCache,
       );

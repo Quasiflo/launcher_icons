@@ -61,7 +61,6 @@ class MacOSIconGenerator extends IconGenerator {
         .verbose('Decoding and loading image file at $imgFilePath...');
     final loadArtwork = await utils.sizeImageLoaderFor(
       imgFilePath,
-      perSize: context.config.svgRasterizePerSize,
       logger: context.logger,
       cache: context.svgRasterCache,
     );

@@ -139,67 +139,22 @@ Future<void> createIcons(
       logger,
     );
   }
-  // Per-size artwork loaders. SVG sources rasterize at each output size
-  // when `svg_rasterize_per_size` (replaying the master pixel transforms
-  // below); everything else resizes the decoded master.
+  // Artwork loaders resize the decoded master per output size. Master
+  // pixel transforms (remove_alpha matte, tinted desaturation) already ran
+  // on the masters above, so every size downscales the finished art.
+  // SVG sources rasterize once at 1024px through the shared cache.
   Future<Image> Function(int) sizeLoaderFor({
-    required String? sourcePath,
     required Image master,
-    required Image Function(Image) transform,
   }) {
-    return (int size) async {
-      if (config.svgRasterizePerSize &&
-          sourcePath != null &&
-          isSvgPath(sourcePath)) {
-        return transform(
-          await cachedSvgRaster(
-            cache,
-            withPrefix(prefixPath, sourcePath),
-            size,
-            size,
-            logger: logger,
-            message: 'Rasterizing SVG source $sourcePath per output size',
-          ),
-        );
-      }
-      return createResizedImage(size, master);
-    };
+    return (int size) async => createResizedImage(size, master);
   }
 
-  Image matteBase(Image rendered) =>
-      config.iosConfig?.removeAlpha == true && rendered.hasAlpha
-          ? _removeAlphaChannel(rendered, config)
-          : rendered;
-
-  Image transformTinted(Image rendered) {
-    var out = rendered;
-    if (config.iosConfig!.desaturateTintedToGrayscale) {
-      out = grayscale(out);
-    }
-    return matteBase(out);
-  }
-
-  final loadBase = sizeLoaderFor(
-    sourcePath: filePath,
-    master: image,
-    transform: matteBase,
-  );
+  final loadBase = sizeLoaderFor(master: image);
   // Null exactly when the matching master is null (unset source or
   // single-size mode); call sites only run under the same guards.
-  final loadDark = darkImage == null
-      ? null
-      : sizeLoaderFor(
-          sourcePath: darkFilePath,
-          master: darkImage,
-          transform: (rendered) => rendered,
-        );
-  final loadTinted = tintedImage == null
-      ? null
-      : sizeLoaderFor(
-          sourcePath: tintedFilePath,
-          master: tintedImage,
-          transform: transformTinted,
-        );
+  final loadDark = darkImage == null ? null : sizeLoaderFor(master: darkImage);
+  final loadTinted =
+      tintedImage == null ? null : sizeLoaderFor(master: tintedImage);
   final flavorMode = config.iosConfig?.flavorMode ?? 'pbxproj';
   if (flavorMode != 'pbxproj' && flavorMode != 'xcconfig') {
     throw InvalidConfigException(

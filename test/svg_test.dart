@@ -12,8 +12,8 @@ import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-// SVG sources: detection, rasterization, the per-size opt-in, and one
-// end-to-end platform run per raster mode.
+// SVG sources: detection, rasterization (always once at 1024px, then
+// resized), and one end-to-end platform run.
 void main() {
   final assetPath = path.join(Directory.current.path, 'test', 'assets');
 
@@ -141,7 +141,6 @@ void main() {
     test('raster sources decode once and resize', () async {
       final load = await utils.sizeImageLoaderFor(
         path.join(assetPath, 'master-light-1024.png'),
-        perSize: true,
       );
 
       final small = await load(48);
@@ -149,21 +148,9 @@ void main() {
       expect(small.height, equals(48));
     });
 
-    test('svg single-master mode resizes one 1024 raster', () async {
+    test('svg sources rasterize once at 1024 and resize', () async {
       final load = await utils.sizeImageLoaderFor(
         path.join(assetPath, 'vector-opaque-1024.svg'),
-        perSize: false,
-      );
-
-      final small = await load(48);
-      expect(small.width, equals(48));
-      expect(small.getPixel(24, 24).a, equals(255));
-    });
-
-    test('svg per-size mode rasterizes at each size', () async {
-      final load = await utils.sizeImageLoaderFor(
-        path.join(assetPath, 'vector-opaque-1024.svg'),
-        perSize: true,
       );
 
       for (final size in [16, 48, 192]) {
@@ -171,22 +158,14 @@ void main() {
         expect(image.width, equals(size));
         expect(image.height, equals(size));
       }
-    });
-  });
-
-  group('svg_rasterize_per_size flag', () {
-    test('defaults to false and parses when set', () {
-      expect(const Config().svgRasterizePerSize, isFalse);
-      final config = Config.fromJson(<String, dynamic>{
-        'svg_rasterize_per_size': true,
-      });
-      expect(config.svgRasterizePerSize, isTrue);
+      final small = await load(48);
+      expect(small.getPixel(24, 24).a, equals(255));
     });
   });
 
   group('windows end-to-end from svg', () {
-    Future<String> runWithFlag(bool perSize) async {
-      final name = perSize ? 'fli_svg_persize' : 'fli_svg_master';
+    Future<String> runFromSvg() async {
+      const name = 'fli_svg_master';
       await d.dir(name, [
         d.dir('windows/runner/resources'),
         d.file(
@@ -196,10 +175,9 @@ void main() {
         ),
       ]).create();
       final prefix = path.join(d.sandbox, name);
-      final config = Config(
+      const config = Config(
         imagePath: 'icon.svg',
-        windowsConfig: const WindowsConfig(generate: true),
-        svgRasterizePerSize: perSize,
+        windowsConfig: WindowsConfig(generate: true),
       );
       final generator = WindowsIconGenerator(
         IconGeneratorContext(
@@ -227,11 +205,7 @@ void main() {
     }
 
     test('single-master mode emits a 7-frame ico', () async {
-      expect(icoFrameCount(await runWithFlag(false)), equals(7));
-    });
-
-    test('per-size mode emits a 7-frame ico', () async {
-      expect(icoFrameCount(await runWithFlag(true)), equals(7));
+      expect(icoFrameCount(await runFromSvg()), equals(7));
     });
   });
 }
