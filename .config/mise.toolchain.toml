@@ -1,4 +1,5 @@
 [tools]
+"core:java" = "25.0.2"                         # Used for Android builds
 "gem:cocoapods" = "1.17.0"                     # Used for MacOS builds
 "aqua:Kitware/CMake" = "4.4.3"                 # Used for Linux builds
 "aqua:ninja-build/ninja" = "1.13.2"            # Used for Linux builds
@@ -15,6 +16,11 @@ macos-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releas
 macos-arm64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_arm64_{{ version }}-stable.zip", checksum_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_macos.json" }
 windows-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_{{ version }}-stable.zip", checksum_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_windows.json" }
 linux-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_{{ version }}-stable.tar.xz", checksum_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json" }
+
+[env]
+ANDROID_BUILD_TOOLS = "36.0.0"                                  # Should match build tools version flutter uses
+ANDROID_SYSTEM_IMAGE = "android-36;google_apis_ps16k;arm64-v8a" # Image to use for android emulator
+GRADLE_OPTS = "--enable-native-access=ALL-UNNAMED"              # Don't warn about accessing native built binaries outside of JVM
 
 [hooks]
 postinstall = """

@@ -37,7 +37,7 @@
     "rumdl.lint.run": "onSave",
     //* Mise
     "mise.checkForNewMiseVersion": false,
-    "mise.configureExtensionsAutomatically": true,
+    "mise.configureExtensionsAutomatically": false, // TODO fix
     "mise.configureExtensionsUseSymLinks": true,
     "mise.configureExtensionsIncludeGlobalTools": false,
     //! Ignored Values
@@ -53,5 +53,7 @@
         "**/.vscode/mise-tools": true
     },
     "dart.flutterSdkPath": ".vscode/mise-tools/flutter",
-    "cmake.cmakePath": "${workspaceFolder}/.vscode/mise-tools/cmake"
+    "cmake.cmakePath": "${workspaceFolder}/.vscode/mise-tools/cmake",
+    // "java.import.gradle.java.home": "${workspaceFolder}/.vscode/mise-tools/java",
+    // "java.jdt.ls.java.home": "${workspaceFolder}/.vscode/mise-tools/java",
 }

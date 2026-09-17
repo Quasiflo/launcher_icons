@@ -19,7 +19,7 @@ Thanks for helping out! This repo is intentionally easy to work in: plain Dart, 
    mise install
    ```
 
-   This configures mise to use the "toolchain" environment, which includes the extra dependencies from mise.toolchain.toml
+   This configures mise to use the "toolchain" environment, which includes the extra dependencies from [.config/mise.toolchain.toml](.config/mise.toolchain.toml)
 3. Install the git hooks — recommended once per machine (Git 2.54+, silent no-op in repos without hk config):
 
    ```shell
@@ -39,7 +39,7 @@ Thanks for helping out! This repo is intentionally easy to work in: plain Dart, 
 - `hk check --all` verifies everything (format, lints, analyzer, markdown, workflows). It doesn't modify files. `hk fix --all` on the other hand applies what it can — formatting, fixes, and codegen.
 - New config key? Add it to the `:generate` template in `bin/generate.dart` (there is a drift test), document it in `README.md`, and cover it with a test. Behavior changes to an existing platform should also refresh the [flavors example](example/flavors) outputs (`dart run launcher_icons` in `example/flavors`).
 - `dart test` to run the full test suite
-- Fixture artwork (`test/assets`, `example/default_example/assets/images`) is derived from checked-in SVG masters: edit the SVG, then `dart run tool/render_fixtures.dart` (or `--check` to verify the pixel contracts without writing). The renderer gates on the properties the suite asserts (alpha, ring/teal pixels), so run it before committing art changes.
+- Fixture artwork (`test/assets`, `example/default/assets/images`, etc.) is derived from checked-in SVG masters: edit the SVG, then `dart run tool/render_fixtures.dart` (or `--check` to verify the pixel contracts without writing). The renderer gates on the properties the suite asserts (alpha, ring/teal pixels), so run it before committing art changes.
 - `lib/src/version.dart` is bumped by Release-Please, no need to hand edit.
 - Keep it simple: small focused diffs, one concern per commit.
 
