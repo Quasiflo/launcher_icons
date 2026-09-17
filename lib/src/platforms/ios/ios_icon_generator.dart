@@ -43,6 +43,7 @@ class IosIconGenerator extends IconGenerator {
       context.flavor,
       logger: context.logger,
       prefixPath: context.prefixPath,
+      cache: context.svgRasterCache,
     );
   }
 }

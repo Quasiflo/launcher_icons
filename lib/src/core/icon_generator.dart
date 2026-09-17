@@ -7,6 +7,7 @@ import 'package:launcher_icons/src/config/web_config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/logger.dart';
+import 'package:launcher_icons/src/core/utils.dart';
 
 /// A base class to generate icons
 abstract class IconGenerator {
@@ -53,13 +54,19 @@ class IconGeneratorContext {
   /// Value of `--flavor` flag
   final String? flavor;
 
+  /// Single-run memo of SVG rasterizations, shared by every platform
+  /// generator in this run. Owned by the context (one per run) so
+  /// deduplication never leaks across runs.
+  final SvgRasterCache svgRasterCache;
+
   /// Creates an instance of [IconGeneratorContext]
   IconGeneratorContext({
     required this.config,
     required this.logger,
     required this.prefixPath,
     this.flavor,
-  });
+    SvgRasterCache? svgRasterCache,
+  }) : svgRasterCache = svgRasterCache ?? SvgRasterCache();
 
   /// Shortcut for `config.webConfig`
   WebConfig? get webConfig => config.webConfig;

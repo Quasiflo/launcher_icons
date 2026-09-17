@@ -59,6 +59,7 @@ class WebIconGenerator extends IconGenerator {
       imgFilePath,
       perSize: perSize,
       logger: context.logger,
+      cache: context.svgRasterCache,
     );
 
     // resolve the favicon image path and file, which is either one explicitly provided or the same as the image file loaded above
@@ -73,6 +74,7 @@ class WebIconGenerator extends IconGenerator {
         faviconImgFilePath,
         perSize: perSize,
         logger: context.logger,
+        cache: context.svgRasterCache,
       );
     } else {
       // no favicon override, use the fallback image file
@@ -98,6 +100,7 @@ class WebIconGenerator extends IconGenerator {
         maskableImgFilePath,
         perSize: perSize,
         logger: context.logger,
+        cache: context.svgRasterCache,
       );
     } else {
       deriveLogo = await loadBase(utils.svgMasterSize);

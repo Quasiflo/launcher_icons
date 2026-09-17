@@ -55,6 +55,7 @@ Future<void> createIcons(
   String? flavor, {
   LILogger? logger,
   String prefixPath = '.',
+  SvgRasterCache? cache,
 }) async {
   final String? filePath = config.getImagePathIOS();
   final String? darkFilePath = config.iosConfig?.imagePathDarkTransparent;
@@ -71,6 +72,7 @@ Future<void> createIcons(
       prefixPath,
       filePath,
     ),
+    cache: cache,
   );
   // Single-size mode generates only the 1024px marketing icon (fluttercommunity/flutter_launcher_icons#592):
   // dark/tinted variants are skipped entirely (no decode, no I/O).
@@ -84,12 +86,18 @@ Future<void> createIcons(
 
   Image? darkImage;
   if (darkFilePath != null && !singleSize) {
-    darkImage = await decodeImageFile(withPrefix(prefixPath, darkFilePath));
+    darkImage = await decodeImageFile(
+      withPrefix(prefixPath, darkFilePath),
+      cache: cache,
+    );
   }
 
   Image? tintedImage;
   if (tintedFilePath != null && !singleSize) {
-    tintedImage = await decodeImageFile(withPrefix(prefixPath, tintedFilePath));
+    tintedImage = await decodeImageFile(
+      withPrefix(prefixPath, tintedFilePath),
+      cache: cache,
+    );
     if (config.iosConfig!.desaturateTintedToGrayscale) {
       printStatus('Desaturating iOS tinted image to grayscale', logger);
       tintedImage = grayscale(tintedImage);
@@ -142,10 +150,13 @@ Future<void> createIcons(
           sourcePath != null &&
           isSvgPath(sourcePath)) {
         return transform(
-          await rasterizeSvgFile(
+          await cachedSvgRaster(
+            cache,
             withPrefix(prefixPath, sourcePath),
-            width: size,
-            height: size,
+            size,
+            size,
+            logger: logger,
+            message: 'Rasterizing SVG source $sourcePath per output size',
           ),
         );
       }

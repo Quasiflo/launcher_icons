@@ -46,9 +46,16 @@ String generateError(Exception e, String? error) {
 /// Decodes the image at [filePath], throwing [FileSystemException] when
 /// missing and [NoDecoderForImageFormatException] when undecodable.
 /// Never returns null.
-Future<Image> decodeImageFile(String filePath) async {
+Future<Image> decodeImageFile(String filePath, {SvgRasterCache? cache}) async {
   if (isSvgPath(filePath)) {
-    return rasterizeSvgFile(filePath);
+    return cachedSvgRaster(
+      cache,
+      filePath,
+      svgMasterSize,
+      svgMasterSize,
+      logger: null,
+      message: null,
+    );
   }
   final bytes = await File(filePath).readAsBytes();
   final image = decodeImage(bytes);
@@ -207,22 +214,87 @@ Future<SizeImageLoader> sizeImageLoaderFor(
   String imagePath, {
   required bool perSize,
   LILogger? logger,
+  SvgRasterCache? cache,
 }) async {
-  if (isSvgPath(imagePath)) {
-    printStatus(
-      'Rasterizing SVG source $imagePath'
-      '${perSize ? ' per output size' : ' once at ${svgMasterSize}px'}',
-      logger,
-    );
-    if (perSize) {
-      return (int size) =>
-          rasterizeSvgFile(imagePath, width: size, height: size);
-    }
+  if (isSvgPath(imagePath) && perSize) {
+    return (int size) => cachedSvgRaster(
+          cache,
+          imagePath,
+          size,
+          size,
+          logger: logger,
+          message: 'Rasterizing SVG source $imagePath per output size',
+        );
   }
   final master = isSvgPath(imagePath)
-      ? await rasterizeSvgFile(imagePath)
+      ? await cachedSvgRaster(
+          cache,
+          imagePath,
+          svgMasterSize,
+          svgMasterSize,
+          logger: logger,
+          message:
+              'Rasterizing SVG source $imagePath once at ${svgMasterSize}px',
+        )
       : await decodeImageFile(imagePath);
   return (int size) async => createResizedImage(size, master);
+}
+
+/// Single-run memo of SVG rasterizations, keyed by absolute path and
+/// dimensions.
+///
+/// Lives on [IconGeneratorContext] so every platform generator in one CLI
+/// run shares rasters instead of re-rendering the same source per
+/// platform — and so nothing leaks across runs. There is intentionally no
+/// disk or process-wide cache: staleness across runs is impossible by
+/// construction.
+class SvgRasterCache {
+  /// In-flight and completed rasterizations by cache key.
+  final Map<String, Future<Image>> _entries = {};
+
+  /// Cache key for [filePath] rasterized at [width]×[height].
+  static String key(String filePath, int width, int height) =>
+      '${path.normalize(path.absolute(filePath))}:$width:$height';
+
+  /// Whether [key] (see [key]) already has an entry.
+  bool contains(String key) => _entries.containsKey(key);
+
+  /// Returns the entry for [key], running [load] to create it when absent.
+  /// The contains-then-load sequence runs synchronously, so concurrent
+  /// callers share one rasterization.
+  Future<Image> load(String key, Future<Image> Function() load) =>
+      _entries.putIfAbsent(key, load);
+}
+
+/// Rasterizes the SVG at [filePath] to [width]×[height], sharing the
+/// rasterization work through [cache] when provided. Prints [message]
+/// (when non-null) only when a rasterization actually runs, so shared
+/// hits stay silent.
+///
+/// Every caller receives an independent copy: downstream transforms
+/// (`grayscale`, matte blending) mutate in place, so handing out the
+/// canonical instance would corrupt later consumers.
+Future<Image> cachedSvgRaster(
+  SvgRasterCache? cache,
+  String filePath,
+  int width,
+  int height, {
+  required LILogger? logger,
+  required String? message,
+}) {
+  if (cache == null) {
+    if (message != null) {
+      printStatus(message, logger);
+    }
+    return rasterizeSvgFile(filePath, width: width, height: height);
+  }
+  final key = SvgRasterCache.key(filePath, width, height);
+  if (!cache.contains(key) && message != null) {
+    printStatus(message, logger);
+  }
+  return cache
+      .load(key, () => rasterizeSvgFile(filePath, width: width, height: height))
+      .then((master) => master.clone());
 }
 
 /// Joins [prefixPath] with a project-relative [target] path.

@@ -63,6 +63,7 @@ class MacOSIconGenerator extends IconGenerator {
       imgFilePath,
       perSize: context.config.svgRasterizePerSize,
       logger: context.logger,
+      cache: context.svgRasterCache,
     );
 
     context.logger.verbose('Generating icons $imgFilePath...');

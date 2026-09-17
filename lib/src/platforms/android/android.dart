@@ -47,6 +47,7 @@ Future<void> createDefaultIcons(
   String? flavor, {
   LILogger? logger,
   String prefixPath = '.',
+  utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating default icons Android', logger);
   final String? filePath = config.getImagePathAndroid();
@@ -57,6 +58,7 @@ Future<void> createDefaultIcons(
     utils.withPrefix(prefixPath, filePath),
     perSize: config.svgRasterizePerSize,
     logger: logger,
+    cache: cache,
   );
   final File androidManifestFile =
       File(utils.withPrefix(prefixPath, constants.androidManifestFile));
@@ -190,6 +192,7 @@ Future<void> createAdaptiveIcons(
   String? flavor, {
   LILogger? logger,
   String prefixPath = '.',
+  utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating adaptive icons Android', logger);
 
@@ -204,6 +207,7 @@ Future<void> createAdaptiveIcons(
     utils.withPrefix(prefixPath, foregroundImagePath),
     perSize: config.svgRasterizePerSize,
     logger: logger,
+    cache: cache,
   );
 
   final concurrentImageUpdates = <Future<void>>[];
@@ -235,6 +239,7 @@ Future<void> createAdaptiveIcons(
         backgroundConfig,
         flavor,
         prefixPath: prefixPath,
+        cache: cache,
       ),
     );
   } else {
@@ -255,6 +260,7 @@ Future<void> createAdaptiveMonochromeIcons(
   String? flavor, {
   LILogger? logger,
   String prefixPath = '.',
+  utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating adaptive monochrome icons Android', logger);
 
@@ -268,6 +274,7 @@ Future<void> createAdaptiveMonochromeIcons(
     utils.withPrefix(prefixPath, monochromeImagePath),
     perSize: config.svgRasterizePerSize,
     logger: logger,
+    cache: cache,
   );
 
   final concurrentIconUpdates = <Future<void>>[];
@@ -303,6 +310,7 @@ Future<void> createAdaptiveRoundIcons(
   String? flavor, {
   LILogger? logger,
   String prefixPath = '.',
+  utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating adaptive round icons Android', logger);
 
@@ -320,6 +328,7 @@ Future<void> createAdaptiveRoundIcons(
     utils.withPrefix(prefixPath, roundImagePath),
     perSize: config.svgRasterizePerSize,
     logger: logger,
+    cache: cache,
   );
 
   final concurrentIconUpdates = <Future<void>>[];
@@ -347,6 +356,7 @@ Future<void> createPlayStoreIcon(
   Config config,
   String prefixPath, [
   LILogger? logger,
+  utils.SvgRasterCache? cache,
 ]) async {
   final String? filePath = config.getImagePathAndroid();
   if (filePath == null) {
@@ -356,6 +366,7 @@ Future<void> createPlayStoreIcon(
     utils.withPrefix(prefixPath, filePath),
     perSize: config.svgRasterizePerSize,
     logger: logger,
+    cache: cache,
   );
   final bytes = encodePng(await loadSize(512));
   final outFile = await utils.createFileIfNotExist(
@@ -583,11 +594,13 @@ Future<void> _createAdaptiveBackgrounds(
   String adaptiveIconBackgroundImagePath,
   String? flavor, {
   String prefixPath = '.',
+  utils.SvgRasterCache? cache,
 }) async {
   final String filePath = adaptiveIconBackgroundImagePath;
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
     perSize: config.svgRasterizePerSize,
+    cache: cache,
   );
 
   final concurrentImageUpdates = <Future<void>>[];

@@ -53,6 +53,7 @@ class AndroidIconGenerator extends IconGenerator {
           flavor,
           logger: logger,
           prefixPath: prefixPath,
+          cache: context.svgRasterCache,
         ),
       );
     }
@@ -63,6 +64,7 @@ class AndroidIconGenerator extends IconGenerator {
           flavor,
           logger: logger,
           prefixPath: prefixPath,
+          cache: context.svgRasterCache,
         ),
       );
     }
@@ -73,6 +75,7 @@ class AndroidIconGenerator extends IconGenerator {
           flavor,
           logger: logger,
           prefixPath: prefixPath,
+          cache: context.svgRasterCache,
         ),
       );
     }
@@ -83,6 +86,7 @@ class AndroidIconGenerator extends IconGenerator {
           flavor,
           logger: logger,
           prefixPath: prefixPath,
+          cache: context.svgRasterCache,
         ),
       );
     }
@@ -96,7 +100,12 @@ class AndroidIconGenerator extends IconGenerator {
       );
     }
     if (config.androidConfig?.playStoreIcon == true) {
-      await android.createPlayStoreIcon(config, prefixPath, logger);
+      await android.createPlayStoreIcon(
+        config,
+        prefixPath,
+        logger,
+        context.svgRasterCache,
+      );
     }
   }
 }

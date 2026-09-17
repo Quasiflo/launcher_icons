@@ -35,9 +35,13 @@ class WindowsIconGenerator extends IconGenerator {
         imgFilePath,
         perSize: true,
         logger: context.logger,
+        cache: context.svgRasterCache,
       );
     } else {
-      final imgFile = await utils.decodeImageFile(imgFilePath);
+      final imgFile = await utils.decodeImageFile(
+        imgFilePath,
+        cache: context.svgRasterCache,
+      );
 
       if (!svgInput && imgFile.width < 256) {
         context.logger.info(
