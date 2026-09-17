@@ -1,6 +1,6 @@
 import 'package:image/image.dart';
-import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/icon_generator.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:path/path.dart' as path;
 
@@ -73,7 +73,7 @@ class WindowsIconGenerator extends IconGenerator {
     }
 
     final entitesToCheck = [
-      path.join(context.prefixPath, constants.windowsDirPath),
+      path.join(context.prefixPath, paths.windowsDirPath),
       path.join(
         context.prefixPath,
         windowsConfig.imagePath ?? context.config.imagePath,
@@ -107,7 +107,7 @@ class WindowsIconGenerator extends IconGenerator {
     final iconFile = await utils.createFileIfNotExist(
       path.join(
         context.prefixPath,
-        constants.windowsResourcesDirPath,
+        paths.windowsResourcesDirPath,
         context.windowsConfig?.iconFilename ?? 'app_icon.ico',
       ),
     );

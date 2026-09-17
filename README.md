@@ -1,6 +1,9 @@
 # Flutter Launcher Icons
 
 [![pub package](https://img.shields.io/pub/v/launcher_icons.svg)](https://pub.dev/packages/launcher_icons)
+[![pub points](https://img.shields.io/pub/points/launcher_icons?label=pub%20points)](https://pub.dev/packages/launcher_icons/score)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Quasiflo/launcher_icons/blob/main/LICENSE)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Quasiflo/dependency_sorter?utm_source=oss&utm_medium=github&utm_campaign=Quasiflo%2Fdependency_sorter&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 > **A maintained fork of [fluttercommunity/flutter_launcher_icons](https://github.com/fluttercommunity/flutter_launcher_icons).** Thank you to [@MarkOSullivan94](https://github.com/MarkOSullivan94) and all the original contributors for building the tool this continues. Bug reports, ideas, and pull requests are welcome here — see [CONTRIBUTING.md](CONTRIBUTING.md).
 

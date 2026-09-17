@@ -1,44 +1,47 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-
+import 'package:launcher_icons/src/cli.dart';
 import 'package:launcher_icons/src/core/constants.dart';
-import 'package:launcher_icons/src/version.dart';
 
-const _defaultConfigFileName = './launcher_icons.yaml';
-
-/// The function will be called from command line
-/// using the following command:
+/// The function will be called from command line using the following command:
 /// ```sh
 /// dart run launcher_icons:generate
 /// ```
-///
-/// Calling this function will generate a launcher_icons.yaml file
-/// with a default config template.
-///
-/// This command can take 2 optional arguments:
-/// - --override: This will override the current `launcher_icons.yaml`
-/// file if it exists, if not provided, the file will not be overridden and
-/// a message will be printed to the console.
-///
-/// - --fileName: This flag will take a file name as an argument and
-/// will generate the config format in that file instead of the default
-/// `launcher_icons.yaml` file, if not provided,
-/// the default file will be used.
+/// Calling this function will generate a launcher_icons.yaml file with a default config template.
 void main(List<String> arguments) {
-  print(introMessage(packageVersion));
+  print(introMessage());
 
   final parser = ArgParser()
-    ..addFlag('override', abbr: 'o', defaultsTo: false)
+    ..addFlag(
+      helpFlag,
+      abbr: 'h',
+      help: 'Usage Help',
+      negatable: false,
+    )
+    ..addFlag(
+      'override',
+      abbr: 'o',
+      help: 'Overwrites an existing $defaultConfigFileName file',
+      defaultsTo: false,
+    )
     ..addOption(
       'fileName',
       abbr: 'f',
-      defaultsTo: _defaultConfigFileName,
+      help:
+          'Use an alternate config file name like launcher_icons-staging.yaml',
+      defaultsTo: defaultConfigFileName,
     );
 
   final results = parser.parse(arguments);
   final override = results['override'] as bool;
   final fileName = results['fileName'] as String;
+
+  if (results.flag(helpFlag)) {
+    print('Generates template configuration file');
+    print(parser.usage);
+    exit(0);
+  }
 
   // Check if fileName is valid and has a .yaml extension
   if (!fileName.endsWith('.yaml')) {
@@ -74,7 +77,7 @@ void _generateConfigFile(File configFile) {
     print(
       'You can now use this new config file by using the command below:\n\n'
       'dart run launcher_icons'
-      '${configFile.path == _defaultConfigFileName ? '' : ' -f ${configFile.path}'}\n',
+      '${configFile.path == defaultConfigFileName ? '' : ' -f ${configFile.path}'}\n',
     );
   } on Exception catch (e) {
     print('Error generating config file: $e');
@@ -82,14 +85,11 @@ void _generateConfigFile(File configFile) {
 }
 
 /// Default `launcher_icons.yaml` template.
-///
-/// Public so tests can assert it covers every schema key the loader
-/// validates (see `test/generate_template_test.dart`): add new config keys
-/// here when they are introduced.
+/// Public so tests can assert it covers every schema key the loader validates (see `test/generate_template_test.dart`): add new config keys here when they are introduced.
 const configFileTemplate = '''
 # dart run launcher_icons
 launcher_icons:
-  image_path: "assets/icon/icon.png" # png or svg (svg rasterizes crisply)
+  image_path: "assets/icon/icon.png" # png or svg (SVG rasterization in beta, ensure you verify the output looks how you expect!)
   # svg_rasterize_per_size: true # rasterize svg at every output size (slower)
 
   android:

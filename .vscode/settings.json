@@ -13,7 +13,7 @@
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.expand": false,
     "explorer.fileNesting.patterns": {
-        "pubspec.yaml": "pubspec.lock,pubspec_overrides.yaml,.packages,.flutter-plugins,.flutter-plugins-dependencies,.metadata,analysis_options.yaml,dart_test.yaml,.pubignore",
+        "pubspec.yaml": "pubspec.lock,pubspec_overrides.yaml,.packages,.flutter-plugins,.flutter-plugins-dependencies,.metadata,analysis_options.yaml,dart_test.yaml,.pubignore,build.yaml",
         "*.dart": "${capture}.g.dart",
         ".gitignore": ".gitattributes",
         "rp-config.json": "rp-manifest.json",

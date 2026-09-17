@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:launcher_icons/src/config/config.dart';
-import 'package:launcher_icons/src/core/constants.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
@@ -120,7 +120,7 @@ void main() {
 
       await generateLiquidGlassIcon(config, 'AppIcon');
 
-      final assetsDir = Directory(iosLiquidGlassAssetsPath('AppIcon'));
+      final assetsDir = Directory(paths.iosLiquidGlassAssetsPath('AppIcon'));
       for (final name in ['icon.png', 'icon-dark.png', 'icon-tinted.png']) {
         expect(File(path.join(assetsDir.path, name)).existsSync(), isTrue);
       }
@@ -140,7 +140,7 @@ void main() {
 
       expect(
         File(
-          path.join(iosLiquidGlassAssetsPath('AppIcon'), 'icon.svg'),
+          path.join(paths.iosLiquidGlassAssetsPath('AppIcon'), 'icon.svg'),
         ).existsSync(),
         isTrue,
       );

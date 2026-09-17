@@ -4,9 +4,9 @@ import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/ios_config.dart';
 import 'package:launcher_icons/src/config/liquid_glass_layer.dart';
 import 'package:launcher_icons/src/config/macos_config.dart';
-import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/logger.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
@@ -42,12 +42,14 @@ Future<void> generateLiquidGlassIcon(
           (layer.imagePathTinted ?? tintedFallback)!,
       ],
     },
-    iconFolderPath: withPrefix(prefixPath, iosLiquidGlassIconPath(iconName)),
+    iconFolderPath:
+        withPrefix(prefixPath, paths.iosLiquidGlassIconPath(iconName)),
     assetsFolderPath:
-        withPrefix(prefixPath, iosLiquidGlassAssetsPath(iconName)),
-    configFilePath: withPrefix(prefixPath, iosLiquidGlassConfigPath(iconName)),
+        withPrefix(prefixPath, paths.iosLiquidGlassAssetsPath(iconName)),
+    configFilePath:
+        withPrefix(prefixPath, paths.iosLiquidGlassConfigPath(iconName)),
     iconConfig: generateIconConfig(config),
-    iconFolderDisplayPath: iosLiquidGlassIconPath(iconName),
+    iconFolderDisplayPath: paths.iosLiquidGlassIconPath(iconName),
     logger: logger,
     prefixPath: prefixPath,
   );
@@ -81,13 +83,14 @@ Future<void> generateMacOSLiquidGlassIcon(
         if (layer.imagePathTinted != null) layer.imagePathTinted!,
       ],
     },
-    iconFolderPath: withPrefix(prefixPath, macOSLiquidGlassIconPath(iconName)),
+    iconFolderPath:
+        withPrefix(prefixPath, paths.macOSLiquidGlassIconPath(iconName)),
     assetsFolderPath:
-        withPrefix(prefixPath, macOSLiquidGlassAssetsPath(iconName)),
+        withPrefix(prefixPath, paths.macOSLiquidGlassAssetsPath(iconName)),
     configFilePath:
-        withPrefix(prefixPath, macOSLiquidGlassConfigPath(iconName)),
+        withPrefix(prefixPath, paths.macOSLiquidGlassConfigPath(iconName)),
     iconConfig: generateMacOSIconConfig(config),
-    iconFolderDisplayPath: macOSLiquidGlassIconPath(iconName),
+    iconFolderDisplayPath: paths.macOSLiquidGlassIconPath(iconName),
     logger: logger,
     prefixPath: prefixPath,
   );

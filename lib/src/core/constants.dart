@@ -1,9 +1,7 @@
-// Project-relative path builders live in paths.dart and shared error
-// strings in errors.dart; both are re-exported here so existing
-// `constants.X` references keep working. New code should import
-// `paths.dart` / `errors.dart` directly.
-export 'errors.dart';
-export 'paths.dart';
+import 'package:launcher_icons/src/version.dart';
+
+/// Default launcher_icons config file name
+const String defaultConfigFileName = 'launcher_icons.yaml';
 
 /// Default Android legacy icon file name
 const String androidFileName = 'ic_launcher.png';
@@ -36,8 +34,8 @@ const String iosDefaultIconName = 'Icon-App';
 const int kFaviconSize = 16;
 
 /// CLI banner with the current package version.
-String introMessage(String currentVersion) => '''
+String introMessage() => '''
   ════════════════════════════════════════════
-     LAUNCHER ICONS (v$currentVersion)                               
+     LAUNCHER ICONS (v$packageVersion)
   ════════════════════════════════════════════
   ''';

@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:launcher_icons/src/config/config.dart';
-import 'package:launcher_icons/src/core/constants.dart' as constants;
-import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
+import 'package:launcher_icons/src/core/errors.dart' as errors;
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/android/android_icon_generator.dart';
 import 'package:launcher_icons/src/platforms/ios/ios_icon_generator.dart';
@@ -65,7 +65,18 @@ String? explicitFlavorFromArgs(ArgResults argResults) {
 Future<void> createIconsFromArguments(List<String> arguments) async {
   final ArgParser parser = ArgParser(allowTrailingOptions: true);
   parser
-    ..addFlag(helpFlag, abbr: 'h', help: 'Usage help', negatable: false)
+    ..addFlag(
+      helpFlag,
+      abbr: 'h',
+      help: 'Usage Help',
+      negatable: false,
+    )
+    ..addFlag(
+      verboseFlag,
+      abbr: 'v',
+      help: 'Verbose output',
+      defaultsTo: false,
+    )
     // Make default null to differentiate when it is explicitly set
     ..addOption(
       fileOption,
@@ -73,7 +84,6 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
       help: 'Path to config file',
       defaultsTo: defaultConfigFile,
     )
-    ..addFlag(verboseFlag, abbr: 'v', help: 'Verbose output', defaultsTo: false)
     ..addOption(
       prefixOption,
       abbr: 'p',
@@ -91,7 +101,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
           'or a launcher_icons-<flavor>.yaml file)',
     );
 
-  final ArgResults argResults = parser.parse(arguments);
+  final argResults = parser.parse(arguments);
   // creating logger based on -v flag
   final logger = LILogger(argResults.flag(verboseFlag));
 
@@ -169,7 +179,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
       ),
     );
   } else {
-    for (final file in [defaultConfigFile, constants.pubspecFilePath]) {
+    for (final file in [defaultConfigFile, paths.pubspecFilePath]) {
       for (final entry
           in Config.loadFlavorConfigsFromPath(file, prefixPath).entries) {
         keyFlavors.putIfAbsent(entry.key, () => entry.value);
@@ -212,7 +222,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     );
     if (flutterLauncherIconsConfigs == null) {
       throw NoConfigFoundException(
-        'No configuration found in $defaultConfigFile or in ${constants.pubspecFilePath}. '
+        'No configuration found in $defaultConfigFile or in ${paths.pubspecFilePath}. '
         'In case file exists in different directory use --file option',
       );
     }
@@ -337,7 +347,7 @@ Future<void> createIconsFromConfig(
   String? flavor,
 ]) async {
   if (!flutterConfigs.hasEnabledPlatform) {
-    throw const InvalidConfigException(errorNoPlatformEnabled);
+    throw const InvalidConfigException(errors.errorNoPlatformEnabled);
   }
 
   // Generates Icons for given platform

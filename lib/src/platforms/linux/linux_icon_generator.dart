@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:image/image.dart';
-import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
@@ -312,8 +312,8 @@ parts:
     final iconPath = runtimeIconPath(sourcePath);
 
     final entitesToCheck = [
-      path.join(context.prefixPath, constants.linuxDirPath),
-      path.join(context.prefixPath, constants.linuxMyApplicationFile),
+      path.join(context.prefixPath, paths.linuxDirPath),
+      path.join(context.prefixPath, paths.linuxMyApplicationFile),
       path.join(context.prefixPath, sourcePath),
     ];
 
@@ -432,13 +432,13 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
 
   Future<void> _updateMyApplicationFile(String iconPath) async {
     final myAppFile =
-        File(path.join(context.prefixPath, constants.linuxMyApplicationFile));
+        File(path.join(context.prefixPath, paths.linuxMyApplicationFile));
 
     if (!myAppFile.existsSync()) {
       context.logger.error(
-        'my_application.cc file not found at ${constants.linuxMyApplicationFile}',
+        'my_application.cc file not found at ${paths.linuxMyApplicationFile}',
       );
-      throw FileNotFoundException(constants.linuxMyApplicationFile);
+      throw FileNotFoundException(paths.linuxMyApplicationFile);
     }
 
     var content = await myAppFile.readAsString();

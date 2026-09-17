@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:image/image.dart';
-import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/icon_generator.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
 import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dart';
@@ -37,10 +37,10 @@ class MacOSIconGenerator extends IconGenerator {
   String _iconsDirPath() {
     final flavor = context.flavor;
     if (flavor == null) {
-      return constants.macOSIconsDirPath;
+      return paths.macOSIconsDirPath;
     }
     return path.join(
-      constants.macOSDirPath,
+      paths.macOSDirPath,
       'Runner',
       'Assets.xcassets',
       'AppIcon-$flavor.appiconset',
@@ -83,7 +83,7 @@ class MacOSIconGenerator extends IconGenerator {
     );
     await ios.removeOrphanedCatalogs(
       assetFolderRelative: path.join(
-        constants.macOSDirPath,
+        paths.macOSDirPath,
         'Runner',
         'Assets.xcassets',
       ),
@@ -199,8 +199,8 @@ class MacOSIconGenerator extends IconGenerator {
     // The asset catalog must exist; the (flavor) icon set inside it is
     // created on demand, so a new flavor bootstraps from the CLI.
     final enitiesToCheck = [
-      path.join(context.prefixPath, constants.macOSDirPath),
-      path.join(context.prefixPath, constants.macOSAssetsDirPath),
+      path.join(context.prefixPath, paths.macOSDirPath),
+      path.join(context.prefixPath, paths.macOSAssetsDirPath),
     ];
 
     final failedEntityPath = utils.areFSEntiesExist(enitiesToCheck);

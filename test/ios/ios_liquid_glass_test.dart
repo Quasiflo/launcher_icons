@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:launcher_icons/src/config/config.dart';
-import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
@@ -325,11 +325,12 @@ void main() {
 
         await generateLiquidGlassIcon(config, 'AppIcon');
 
-        final assetsImage =
-            File(iosLiquidGlassAssetsPath('AppIcon') + 'master-light-1024.png');
+        final assetsImage = File(
+          paths.iosLiquidGlassAssetsPath('AppIcon') + 'master-light-1024.png',
+        );
         expect(assetsImage.existsSync(), isTrue);
 
-        final configFile = File(iosLiquidGlassConfigPath('AppIcon'));
+        final configFile = File(paths.iosLiquidGlassConfigPath('AppIcon'));
         expect(configFile.existsSync(), isTrue);
 
         final iconJson =
@@ -364,7 +365,7 @@ void main() {
 
         // Simulate a PNG -> SVG source switch: the stale copy must go.
         final stale = File(
-          iosLiquidGlassAssetsPath('AppIcon') + 'stale-layer.png',
+          paths.iosLiquidGlassAssetsPath('AppIcon') + 'stale-layer.png',
         );
         await stale.writeAsBytes([1, 2, 3]);
 
@@ -372,8 +373,9 @@ void main() {
 
         expect(stale.existsSync(), isFalse);
         expect(
-          File(iosLiquidGlassAssetsPath('AppIcon') + 'master-light-1024.png')
-              .existsSync(),
+          File(
+            paths.iosLiquidGlassAssetsPath('AppIcon') + 'master-light-1024.png',
+          ).existsSync(),
           isTrue,
         );
       });

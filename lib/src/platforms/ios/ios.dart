@@ -6,7 +6,9 @@ import 'package:image/image.dart' hide decodeImageFile;
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
+import 'package:launcher_icons/src/core/errors.dart' as errors;
 import 'package:launcher_icons/src/core/logger.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart';
 import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dart';
 import 'package:path/path.dart' as path;
@@ -62,7 +64,7 @@ Future<void> createIcons(
   final String? tintedFilePath = config.iosConfig?.imagePathTintedGrayscale;
 
   if (filePath == null) {
-    throw const InvalidConfigException(errorMissingImagePath);
+    throw const InvalidConfigException(errors.errorMissingImagePath);
   }
 
   // decodeImageFile throws on missing/undecodable files, so a specified
@@ -439,7 +441,7 @@ Future<void> createIcons(
   // Sweep catalogs orphaned by flavor renames. Reference-checked so the
   // build cannot break; the default set is always kept.
   await removeOrphanedCatalogs(
-    assetFolderRelative: iosAssetFolder,
+    assetFolderRelative: paths.iosAssetFolder,
     currentCatalog: catalogName,
     referenceTexts: await iosCatalogReferenceTexts(
       config.iosConfig?.xcodeprojPath,
@@ -512,7 +514,7 @@ Future<void> overwriteDefaultIcons(
   await File(
     withPrefix(
       prefixPath,
-      iosDefaultIconFolder +
+      paths.iosDefaultIconFolder +
           iosDefaultIconName +
           iconNameSuffix +
           template.name +
@@ -530,7 +532,8 @@ Future<void> saveNewIcons({
   required String iconName,
   String prefixPath = '.',
 }) async {
-  final String newIconFolder = iosAssetFolder + catalogName + '.appiconset/';
+  final String newIconFolder =
+      paths.iosAssetFolder + catalogName + '.appiconset/';
   final Image newImage = createResizedImage(template.size, image);
   final newFile = await createFileIfNotExist(
     withPrefix(prefixPath, newIconFolder + iconName + template.name + '.png'),
@@ -546,7 +549,7 @@ Future<void> addLiquidGlassIconToProject(
   String prefixPath = '.',
 ]) async {
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ??
-      withPrefix(prefixPath, iosConfigFile);
+      withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   if (!iOSConfigFile.existsSync()) {
     printStatus(
@@ -747,7 +750,7 @@ String? resolveIosPbxprojPath([
   if (xcodeprojPath != null) {
     return '$xcodeprojPath/project.pbxproj';
   }
-  final standardPath = withPrefix(prefixPath, iosConfigFile);
+  final standardPath = withPrefix(prefixPath, paths.iosConfigFile);
   if (File(standardPath).existsSync()) {
     return standardPath;
   }
@@ -780,7 +783,7 @@ Future<void> changeIosLauncherIcon(
   // Falls back to the standard location so a missing project still fails
   // with the historical PathNotFoundException.
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ??
-      withPrefix(prefixPath, iosConfigFile);
+      withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   final List<String> lines = await iOSConfigFile.readAsLines();
 
@@ -876,7 +879,7 @@ Future<int> clearIosFlavorAppIconLines(
   // Falls back to the standard location so a missing project still fails
   // with the historical PathNotFoundException.
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ??
-      withPrefix(prefixPath, iosConfigFile);
+      withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   final List<String> lines = await iOSConfigFile.readAsLines();
 
@@ -1040,7 +1043,7 @@ Future<void> modifyContentsFile(
 ]) async {
   final String newContentsFilename = withPrefix(
     prefixPath,
-    iosAssetFolder + newIconName + '.appiconset/Contents.json',
+    paths.iosAssetFolder + newIconName + '.appiconset/Contents.json',
   );
   final contentsJsonFile = await createFileIfNotExist(newContentsFilename);
   final String contentsFileContent = generateContentsFileAsString(
@@ -1062,7 +1065,7 @@ Future<void> modifyDefaultContentsFile(
 ]) async {
   final String newIconFolder = withPrefix(
     prefixPath,
-    iosAssetFolder + 'AppIcon.appiconset/Contents.json',
+    paths.iosAssetFolder + 'AppIcon.appiconset/Contents.json',
   );
   final contentsJsonFile = await createFileIfNotExist(newIconFolder);
   final String contentsFileContent = generateContentsFileAsString(

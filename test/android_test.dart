@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/logger.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
@@ -81,7 +82,7 @@ void main() {
     expect(android.isCorrectMipmapDirectoryForAdaptiveIcon(path2), false);
     expect(
       android.isCorrectMipmapDirectoryForAdaptiveIcon(
-        androidAdaptiveXmlFolder(null),
+        paths.androidAdaptiveXmlFolder(null),
       ),
       true,
     );
@@ -191,14 +192,17 @@ void main() {
         );
       }
       expect(
-        File(androidColorsFile(null)).existsSync(),
+        File(paths.androidColorsFile(null)).existsSync(),
         isFalse,
         reason: 'colors.xml should not be written for an image background',
       );
 
       await android.createMipmapXmlFile(config, null);
       final mipmapXml = File(
-        path.join(androidAdaptiveXmlFolder(null), androidDefaultIconName) +
+        path.join(
+              paths.androidAdaptiveXmlFolder(null),
+              androidDefaultIconName,
+            ) +
             '.xml',
       ).readAsStringSync();
       expect(mipmapXml, contains('@drawable/ic_launcher_background'));
@@ -235,7 +239,7 @@ void main() {
 
       await android.createAdaptiveIcons(config, null);
 
-      final colorsFile = File(androidColorsFile(null));
+      final colorsFile = File(paths.androidColorsFile(null));
       expect(colorsFile.existsSync(), isTrue);
       expect(colorsFile.readAsStringSync(), contains('#ffffff'));
       expect(
@@ -247,7 +251,10 @@ void main() {
 
       await android.createMipmapXmlFile(config, null);
       final mipmapXml = File(
-        path.join(androidAdaptiveXmlFolder(null), androidDefaultIconName) +
+        path.join(
+              paths.androidAdaptiveXmlFolder(null),
+              androidDefaultIconName,
+            ) +
             '.xml',
       ).readAsStringSync();
       expect(mipmapXml, contains('@color/ic_launcher_background'));
@@ -266,7 +273,7 @@ void main() {
 
       await android.createAdaptiveIcons(config, null);
 
-      final colorsFile = File(androidColorsFile(null));
+      final colorsFile = File(paths.androidColorsFile(null));
       expect(colorsFile.existsSync(), isTrue);
       expect(
         colorsFile.readAsStringSync(),
@@ -288,11 +295,14 @@ void main() {
       });
 
       await android.createAdaptiveIcons(config, null);
-      expect(File(androidColorsFile(null)).existsSync(), isFalse);
+      expect(File(paths.androidColorsFile(null)).existsSync(), isFalse);
 
       await android.createMipmapXmlFile(config, null);
       final mipmapXml = File(
-        path.join(androidAdaptiveXmlFolder(null), androidDefaultIconName) +
+        path.join(
+              paths.androidAdaptiveXmlFolder(null),
+              androidDefaultIconName,
+            ) +
             '.xml',
       ).readAsStringSync();
       expect(
@@ -308,7 +318,10 @@ void main() {
         'removes stale adaptive artifacts without adaptive config (fluttercommunity/flutter_launcher_icons#328)',
         () async {
       final staleXml = File(
-        path.join(androidAdaptiveXmlFolder(null), androidDefaultIconName) +
+        path.join(
+              paths.androidAdaptiveXmlFolder(null),
+              androidDefaultIconName,
+            ) +
             '.xml',
       );
       await staleXml.create(recursive: true);
@@ -365,7 +378,10 @@ void main() {
     });
 
     String mipmapXmlPath() =>
-        path.join(androidAdaptiveXmlFolder(null), androidDefaultIconName) +
+        path.join(
+          paths.androidAdaptiveXmlFolder(null),
+          androidDefaultIconName,
+        ) +
         '.xml';
 
     Future<String> mipmapXmlFor(Map<String, dynamic> androidSection) async {

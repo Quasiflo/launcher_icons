@@ -8,8 +8,8 @@ import 'package:launcher_icons/src/config/linux_config.dart';
 import 'package:launcher_icons/src/config/macos_config.dart';
 import 'package:launcher_icons/src/config/web_config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
-import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:path/path.dart' as path;
 
@@ -60,7 +60,7 @@ class Config {
   static Config? loadConfigFromPubSpec(String prefix) {
     return _getConfigFromPubspecYaml(
       prefix: prefix,
-      pathToPubspecYamlFile: constants.pubspecFilePath,
+      pathToPubspecYamlFile: paths.pubspecFilePath,
     );
   }
 

@@ -1,7 +1,7 @@
 // Developer tool: re-renders derived fixture artwork from the SVG masters.
 //
 // The PNG/JPG/WebP inputs under test/assets and
-// example/default_example/assets/images are build artifacts of the SVG
+// example/default/assets/icon are build artifacts of the SVG
 // masters checked in next to them. Edit the SVG, then run:
 //
 //   dart run tool/render_fixtures.dart [--check]
@@ -124,43 +124,50 @@ Future<void> main(List<String> arguments) async {
       gate: (image) => _opaque(image, 'adaptive-bg-1024.svg'),
     ),
     const _Job(
-      svg: 'example/default_example/assets/images/icon-master-1024.svg',
-      out: 'example/default_example/assets/images/icon-master-1024.png',
+      svg: 'example/minimal/assets/icon/icon-master-1024.svg',
+      out: 'example/minimal/assets/icon/icon-master-1024.png',
       width: 1024,
       height: 1024,
       encode: encodePng,
     ),
     const _Job(
-      svg: 'example/default_example/assets/images/icon-android-710x599.svg',
-      out: 'example/default_example/assets/images/icon-android-710x599.png',
+      svg: 'example/default/assets/icon/icon-master-1024.svg',
+      out: 'example/default/assets/icon/icon-master-1024.png',
+      width: 1024,
+      height: 1024,
+      encode: encodePng,
+    ),
+    const _Job(
+      svg: 'example/default/assets/icon/icon-android-710x599.svg',
+      out: 'example/default/assets/icon/icon-android-710x599.png',
       width: 710,
       height: 599,
       encode: encodePng,
     ),
     const _Job(
-      svg: 'example/default_example/assets/images/icon-ios-710x599.svg',
-      out: 'example/default_example/assets/images/icon-ios-710x599.png',
+      svg: 'example/default/assets/icon/icon-ios-710x599.svg',
+      out: 'example/default/assets/icon/icon-ios-710x599.png',
       width: 710,
       height: 599,
       encode: encodePng,
     ),
     const _Job(
-      svg: 'example/default_example/assets/images/icon-foreground-432.svg',
-      out: 'example/default_example/assets/images/icon-foreground-432.png',
+      svg: 'example/default/assets/icon/icon-foreground-432.svg',
+      out: 'example/default/assets/icon/icon-foreground-432.png',
       width: 432,
       height: 432,
       encode: encodePng,
     ),
     const _Job(
-      svg: 'example/default_example/assets/images/icon-monochrome-432.svg',
-      out: 'example/default_example/assets/images/icon-monochrome-432.png',
+      svg: 'example/default/assets/icon/icon-monochrome-432.svg',
+      out: 'example/default/assets/icon/icon-monochrome-432.png',
       width: 432,
       height: 432,
       encode: encodePng,
     ),
     const _Job(
-      svg: 'example/default_example/assets/images/bg-christmas-620x420.svg',
-      out: 'example/default_example/assets/images/bg-christmas-620x420.png',
+      svg: 'example/default/assets/icon/bg-christmas-620x420.svg',
+      out: 'example/default/assets/icon/bg-christmas-620x420.png',
       width: 620,
       height: 420,
       encode: encodePng,

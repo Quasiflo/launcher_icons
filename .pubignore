@@ -1,5 +1,7 @@
+/.config/*
+/.github/*
+/.vscode/*
+/build/*
 /test/*
 /tool/*
-/.config/*
-/.vscode/*
-/.github/*
+/example/flavors/*
