@@ -32,8 +32,7 @@ void main() {
       Directory.current = originalDir;
     });
 
-    test('semi-transparent red over green matte blends to yellow-brown',
-        () async {
+    test('semi-transparent red over green matte blends to yellow-brown', () async {
       // Uniform semi-transparent red source.
       final source = Image(width: 8, height: 8, numChannels: 4);
       for (final frame in source.frames) {
@@ -54,8 +53,7 @@ void main() {
           'AppIcon.appiconset',
         ),
       ).create(recursive: true);
-      final pbxproj =
-          File(path.join('ios', 'Runner.xcodeproj', 'project.pbxproj'));
+      final pbxproj = File(path.join('ios', 'Runner.xcodeproj', 'project.pbxproj'));
       await pbxproj.create(recursive: true);
       await pbxproj.writeAsString('// !\$*UTF8*\$!\n{}\n');
 

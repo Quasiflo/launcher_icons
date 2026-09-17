@@ -153,8 +153,7 @@ Future<void> createIcons(
   // Null exactly when the matching master is null (unset source or
   // single-size mode); call sites only run under the same guards.
   final loadDark = darkImage == null ? null : sizeLoaderFor(master: darkImage);
-  final loadTinted =
-      tintedImage == null ? null : sizeLoaderFor(master: tintedImage);
+  final loadTinted = tintedImage == null ? null : sizeLoaderFor(master: tintedImage);
   final flavorMode = config.iosConfig?.flavorMode ?? 'pbxproj';
   if (flavorMode != 'pbxproj' && flavorMode != 'xcconfig') {
     throw InvalidConfigException(
@@ -351,8 +350,7 @@ Future<void> createIcons(
       for (IosIconTemplate template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadDark!(template.size).then(
-            (sized) =>
-                overwriteDefaultIcons(template, sized, '-Dark', prefixPath),
+            (sized) => overwriteDefaultIcons(template, sized, '-Dark', prefixPath),
           ),
         );
       }
@@ -366,8 +364,7 @@ Future<void> createIcons(
       for (IosIconTemplate template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadTinted!(template.size).then(
-            (sized) =>
-                overwriteDefaultIcons(template, sized, '-Tinted', prefixPath),
+            (sized) => overwriteDefaultIcons(template, sized, '-Tinted', prefixPath),
           ),
         );
       }
@@ -469,11 +466,7 @@ Future<void> overwriteDefaultIcons(
   await File(
     withPrefix(
       prefixPath,
-      paths.iosDefaultIconFolder +
-          iosDefaultIconName +
-          iconNameSuffix +
-          template.name +
-          '.png',
+      paths.iosDefaultIconFolder + iosDefaultIconName + iconNameSuffix + template.name + '.png',
     ),
   ).writeAsBytes(encodePng(newImage));
 }
@@ -487,8 +480,7 @@ Future<void> saveNewIcons({
   required String iconName,
   String prefixPath = '.',
 }) async {
-  final String newIconFolder =
-      paths.iosAssetFolder + catalogName + '.appiconset/';
+  final String newIconFolder = paths.iosAssetFolder + catalogName + '.appiconset/';
   final Image newImage = createResizedImage(template.size, image);
   final newFile = await createFileIfNotExist(
     withPrefix(prefixPath, newIconFolder + iconName + template.name + '.png'),
@@ -503,8 +495,7 @@ Future<void> addLiquidGlassIconToProject(
   LILogger? logger,
   String prefixPath = '.',
 ]) async {
-  final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ??
-      withPrefix(prefixPath, paths.iosConfigFile);
+  final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   if (!iOSConfigFile.existsSync()) {
     printStatus(
@@ -543,10 +534,8 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
   }
 
   // Generate unique IDs for the .icon file references
-  final String fileRefId =
-      _generateUniqueId('fileRef$iconName', pbxprojContent);
-  final String buildFileId =
-      _generateUniqueId('buildRef$iconName', pbxprojContent);
+  final String fileRefId = _generateUniqueId('fileRef$iconName', pbxprojContent);
+  final String buildFileId = _generateUniqueId('buildRef$iconName', pbxprojContent);
 
   // Find insertion points
   int? fileRefInsertIndex;
@@ -557,12 +546,10 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
     final String line = lines[i];
 
     // Find PBXFileReference section
-    if (line.contains('/* Begin PBXFileReference section */') &&
-        fileRefInsertIndex == null) {
+    if (line.contains('/* Begin PBXFileReference section */') && fileRefInsertIndex == null) {
       // Insert after the first existing file reference
       for (int j = i + 1; j < lines.length; j++) {
-        if (lines[j].trim().endsWith('};') &&
-            lines[j].contains('isa = PBXFileReference')) {
+        if (lines[j].trim().endsWith('};') && lines[j].contains('isa = PBXFileReference')) {
           fileRefInsertIndex = j + 1;
           break;
         }
@@ -570,12 +557,10 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
     }
 
     // Find PBXBuildFile section
-    if (line.contains('/* Begin PBXBuildFile section */') &&
-        buildFileInsertIndex == null) {
+    if (line.contains('/* Begin PBXBuildFile section */') && buildFileInsertIndex == null) {
       // Insert after the first existing build file
       for (int j = i + 1; j < lines.length; j++) {
-        if (lines[j].trim().endsWith('};') &&
-            lines[j].contains('isa = PBXBuildFile')) {
+        if (lines[j].trim().endsWith('};') && lines[j].contains('isa = PBXBuildFile')) {
           buildFileInsertIndex = j + 1;
           break;
         }
@@ -583,8 +568,7 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
     }
 
     // Find Resources section
-    if (line.contains('/* Begin PBXResourcesBuildPhase section */') &&
-        resourcesBuildphaseInsertIndex == null) {
+    if (line.contains('/* Begin PBXResourcesBuildPhase section */') && resourcesBuildphaseInsertIndex == null) {
       for (int j = i + 1; j < lines.length; j++) {
         if (lines[j].trim().contains('files = (')) {
           resourcesBuildphaseInsertIndex = j + 1;
@@ -592,8 +576,7 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
         }
       }
     }
-    if (line.contains('/* Begin PBXGroup section */') &&
-        resourcesPBXGroupInsertIndex == null) {
+    if (line.contains('/* Begin PBXGroup section */') && resourcesPBXGroupInsertIndex == null) {
       for (int j = i + 1; j < lines.length; j++) {
         if (lines[j].trim().contains('/* Runner */ = {')) {
           for (int h = j + 1; h < lines.length; h++) {
@@ -620,10 +603,7 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
 
   // Add PBXBuildFile entry
   if (buildFileInsertIndex != null) {
-    final adjustedIndex = buildFileInsertIndex +
-        (fileRefInsertIndex != null && buildFileInsertIndex > fileRefInsertIndex
-            ? 1
-            : 0);
+    final adjustedIndex = buildFileInsertIndex + (fileRefInsertIndex != null && buildFileInsertIndex > fileRefInsertIndex ? 1 : 0);
     lines.insert(
       adjustedIndex,
       '\t\t$buildFileId /* $iconPath in Resources */ = '
@@ -633,34 +613,14 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
 
   // Add to Resources section
   if (resourcesBuildphaseInsertIndex != null) {
-    final int adjustedIndex = resourcesBuildphaseInsertIndex +
-        (fileRefInsertIndex != null &&
-                resourcesBuildphaseInsertIndex > fileRefInsertIndex
-            ? 1
-            : 0) +
-        (buildFileInsertIndex != null &&
-                resourcesBuildphaseInsertIndex > buildFileInsertIndex
-            ? 1
-            : 0);
+    final int adjustedIndex = resourcesBuildphaseInsertIndex + (fileRefInsertIndex != null && resourcesBuildphaseInsertIndex > fileRefInsertIndex ? 1 : 0) + (buildFileInsertIndex != null && resourcesBuildphaseInsertIndex > buildFileInsertIndex ? 1 : 0);
     lines.insert(
       adjustedIndex,
       '\t\t\t\t$buildFileId /* $iconPath in Resources */,',
     );
   }
   if (resourcesPBXGroupInsertIndex != null) {
-    final int adjustedIndex = resourcesPBXGroupInsertIndex +
-        (fileRefInsertIndex != null &&
-                resourcesPBXGroupInsertIndex > fileRefInsertIndex
-            ? 1
-            : 0) +
-        (buildFileInsertIndex != null &&
-                resourcesPBXGroupInsertIndex > buildFileInsertIndex
-            ? 1
-            : 0) +
-        (resourcesBuildphaseInsertIndex != null &&
-                resourcesPBXGroupInsertIndex > resourcesBuildphaseInsertIndex
-            ? 1
-            : 0);
+    final int adjustedIndex = resourcesPBXGroupInsertIndex + (fileRefInsertIndex != null && resourcesPBXGroupInsertIndex > fileRefInsertIndex ? 1 : 0) + (buildFileInsertIndex != null && resourcesPBXGroupInsertIndex > buildFileInsertIndex ? 1 : 0) + (resourcesBuildphaseInsertIndex != null && resourcesPBXGroupInsertIndex > resourcesBuildphaseInsertIndex ? 1 : 0);
     lines.insert(
       adjustedIndex,
       '\t\t\t\t$fileRefId /* $iconPath */,',
@@ -711,12 +671,7 @@ String? resolveIosPbxprojPath([
   }
   final iosDir = Directory(withPrefix(prefixPath, 'ios'));
   if (iosDir.existsSync()) {
-    final candidates = iosDir
-        .listSync()
-        .whereType<Directory>()
-        .where((dir) => dir.path.endsWith('.xcodeproj'))
-        .toList()
-      ..sort((a, b) => a.path.compareTo(b.path));
+    final candidates = iosDir.listSync().whereType<Directory>().where((dir) => dir.path.endsWith('.xcodeproj')).toList()..sort((a, b) => a.path.compareTo(b.path));
     for (final dir in candidates) {
       final candidate = '${dir.path}/project.pbxproj';
       if (File(candidate).existsSync()) {
@@ -737,8 +692,7 @@ Future<void> changeIosLauncherIcon(
 ]) async {
   // Falls back to the standard location so a missing project still fails
   // with the historical PathNotFoundException.
-  final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ??
-      withPrefix(prefixPath, paths.iosConfigFile);
+  final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   final List<String> lines = await iOSConfigFile.readAsLines();
 
@@ -769,20 +723,13 @@ Future<void> changeIosLauncherIcon(
       if (match != null) {
         // A shared base xcconfig must not clobber a flavored block header
         // (the common Flutter-flavors shape reuses Debug.xcconfig).
-        final headerIsOurs = currentConfig != null &&
-            flavor != null &&
-            (currentConfig == flavor || currentConfig.endsWith('-$flavor'));
+        final headerIsOurs = currentConfig != null && flavor != null && (currentConfig == flavor || currentConfig.endsWith('-$flavor'));
         if (!headerIsOurs) {
           currentConfig = match.group(1);
         }
       }
 
-      if (currentConfig != null &&
-          (flavor == null ||
-              currentConfig == flavor ||
-              currentConfig.endsWith('-$flavor')) &&
-          line.contains('ASSETCATALOG') &&
-          line.contains('APPICON_NAME')) {
+      if (currentConfig != null && (flavor == null || currentConfig == flavor || currentConfig.endsWith('-$flavor')) && line.contains('ASSETCATALOG') && line.contains('APPICON_NAME')) {
         // Targeted replacement: only the APPICON_NAME pair, leaving any
         // other settings on the line untouched.
         lines[x] = line.replaceFirst(
@@ -833,8 +780,7 @@ Future<int> clearIosFlavorAppIconLines(
 ]) async {
   // Falls back to the standard location so a missing project still fails
   // with the historical PathNotFoundException.
-  final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ??
-      withPrefix(prefixPath, paths.iosConfigFile);
+  final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   final List<String> lines = await iOSConfigFile.readAsLines();
 
@@ -865,10 +811,7 @@ Future<int> clearIosFlavorAppIconLines(
           currentConfig = match.group(1);
         }
       }
-      if (currentConfig != null &&
-          _isFlavorConfig(currentConfig, flavor) &&
-          line.contains('ASSETCATALOG') &&
-          line.contains('APPICON_NAME')) {
+      if (currentConfig != null && _isFlavorConfig(currentConfig, flavor) && line.contains('ASSETCATALOG') && line.contains('APPICON_NAME')) {
         removed++;
         continue;
       }
@@ -906,9 +849,7 @@ Future<void> writeIosFlavorXcconfigs(
     final file = File(withPrefix(prefixPath, relativePath));
     final existed = file.existsSync();
     final target = existed ? file : await file.create(recursive: true);
-    var xcconfigLines = existed
-        ? await target.readAsLines()
-        : ['#include "Generated.xcconfig"'];
+    var xcconfigLines = existed ? await target.readAsLines() : ['#include "Generated.xcconfig"'];
     var replaced = false;
     for (var i = 0; i < xcconfigLines.length; i++) {
       if (xcconfigLines[i].split('=').first.trim() == setting) {
@@ -1039,9 +980,7 @@ String generateContentsFileAsString(
   String? tintedIconName, [
   bool singleSize = false,
 ]) {
-  final imageList = singleSize
-      ? createSingleSizeImageList(newIconName)
-      : createImageList(newIconName, darkIconName, tintedIconName);
+  final imageList = singleSize ? createSingleSizeImageList(newIconName) : createImageList(newIconName, darkIconName, tintedIconName);
   final Map<String, dynamic> contentJson = <String, dynamic>{
     'images': imageList,
     'info': ContentsInfoObject(version: 1, author: 'xcode').toJson(),
@@ -1110,8 +1049,7 @@ class ContentsImageObject {
       'filename': filename,
       'scale': scale,
       if (platform != null) 'platform': platform,
-      if (appearances != null)
-        'appearances': appearances!.map((e) => e.toJson()).toList(),
+      if (appearances != null) 'appearances': appearances!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1248,8 +1186,7 @@ List<Map<String, dynamic>> createImageList(
   // Prevent ios-marketing icon from being tinted or dark
 
   if (darkFileNamePrefix != null) {
-    for (final config
-        in imageConfigurations.where((e) => e['idiom'] == 'universal')) {
+    for (final config in imageConfigurations.where((e) => e['idiom'] == 'universal')) {
       final size = config['size']! as String;
       final idiom = config['idiom']! as String;
       final platform = config['platform'] as String?;
@@ -1277,8 +1214,7 @@ List<Map<String, dynamic>> createImageList(
   }
 
   if (tintedFileNamePrefix != null) {
-    for (final config
-        in imageConfigurations.where((e) => e['idiom'] == 'universal')) {
+    for (final config in imageConfigurations.where((e) => e['idiom'] == 'universal')) {
       final size = config['size']! as String;
       final idiom = config['idiom']! as String;
       final platform = config['platform'] as String?;

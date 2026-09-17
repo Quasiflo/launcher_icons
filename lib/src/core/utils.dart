@@ -118,8 +118,7 @@ void _requireSvgDimensions(String source, String filePath) {
     fail('no root <svg> element.');
   }
   final hasViewBox = RegExp(r'viewBox\s*=').hasMatch(rootTag);
-  final hasWidthAndHeight = RegExp(r'width\s*=').hasMatch(rootTag) &&
-      RegExp(r'height\s*=').hasMatch(rootTag);
+  final hasWidthAndHeight = RegExp(r'width\s*=').hasMatch(rootTag) && RegExp(r'height\s*=').hasMatch(rootTag);
   if (!hasViewBox && !hasWidthAndHeight) {
     fail('the SVG declares no dimensions (add a viewBox or width and height).');
   }
@@ -224,8 +223,7 @@ Future<SizeImageLoader> sizeImageLoaderFor(
           svgMasterSize,
           svgMasterSize,
           logger: logger,
-          message:
-              'Rasterizing SVG source $imagePath once at ${svgMasterSize}px',
+          message: 'Rasterizing SVG source $imagePath once at ${svgMasterSize}px',
         )
       : await decodeImageFile(imagePath);
   return (int size) async => createResizedImage(size, master);
@@ -244,8 +242,7 @@ class SvgRasterCache {
   final Map<String, Future<Image>> _entries = {};
 
   /// Cache key for [filePath] rasterized at [width]×[height].
-  static String key(String filePath, int width, int height) =>
-      '${path.normalize(path.absolute(filePath))}:$width:$height';
+  static String key(String filePath, int width, int height) => '${path.normalize(path.absolute(filePath))}:$width:$height';
 
   /// Whether [key] (see [key]) already has an entry.
   bool contains(String key) => _entries.containsKey(key);
@@ -253,8 +250,7 @@ class SvgRasterCache {
   /// Returns the entry for [key], running [load] to create it when absent.
   /// The contains-then-load sequence runs synchronously, so concurrent
   /// callers share one rasterization.
-  Future<Image> load(String key, Future<Image> Function() load) =>
-      _entries.putIfAbsent(key, load);
+  Future<Image> load(String key, Future<Image> Function() load) => _entries.putIfAbsent(key, load);
 }
 
 /// Rasterizes the SVG at [filePath] to [width]×[height], sharing the
@@ -283,16 +279,13 @@ Future<Image> cachedSvgRaster(
   if (!cache.contains(key) && message != null) {
     printStatus(message, logger);
   }
-  return cache
-      .load(key, () => rasterizeSvgFile(filePath, width: width, height: height))
-      .then((master) => master.clone());
+  return cache.load(key, () => rasterizeSvgFile(filePath, width: width, height: height)).then((master) => master.clone());
 }
 
 /// Joins [prefixPath] with a project-relative [target] path.
 ///
 /// The default `'.'` prefix leaves [target] untouched so default runs keep their historical relative paths; any other prefix is joined normally.
-String withPrefix(String prefixPath, String target) =>
-    prefixPath == '.' ? target : path.join(prefixPath, target);
+String withPrefix(String prefixPath, String target) => prefixPath == '.' ? target : path.join(prefixPath, target);
 
 /// Parses a `#rrggbb` (or `rrggbb`) hex color into its channels.
 ///
@@ -347,8 +340,7 @@ Future<Directory> createDirIfNotExist(String dirPath) async {
 }
 
 /// Returns a prettified json string
-String prettifyJsonEncode(Object? map) =>
-    JsonEncoder.withIndent(' ' * 4).convert(map);
+String prettifyJsonEncode(Object? map) => JsonEncoder.withIndent(' ' * 4).convert(map);
 
 /// Check if give [File] or [Directory] exists at the give [paths],
 /// if not returns the failed [FileSystemEntity] path
@@ -356,8 +348,7 @@ String? areFSEntiesExist(List<String> paths) {
   for (final path in paths) {
     // Using the sync method here due to `avoid_slow_async_io` lint suggestion.
     final fsType = FileSystemEntity.typeSync(path);
-    if (![FileSystemEntityType.directory, FileSystemEntityType.file]
-        .contains(fsType)) {
+    if (![FileSystemEntityType.directory, FileSystemEntityType.file].contains(fsType)) {
       return path;
     }
   }

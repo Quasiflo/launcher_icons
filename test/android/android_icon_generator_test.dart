@@ -51,8 +51,7 @@ void main() {
           ),
         );
 
-    Config configFor(Map<String, dynamic> root) =>
-        Config.fromJson(<String, dynamic>{
+    Config configFor(Map<String, dynamic> root) => Config.fromJson(<String, dynamic>{
           'android': {'generate': true, ...root},
         });
 

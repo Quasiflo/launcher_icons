@@ -43,8 +43,7 @@ class NoDecoderForImageFormatException extends LIException {
 /// A exception to throw when given [fileName] is not found
 class FileNotFoundException extends LIException {
   /// Creates a instance of [FileNotFoundException].
-  const FileNotFoundException(this.fileName)
-      : super('$fileName file not found');
+  const FileNotFoundException(this.fileName) : super('$fileName file not found');
 
   /// Name of the file
   final String fileName;
@@ -55,8 +54,7 @@ class FileNotFoundException extends LIException {
 /// failed platforms are collected here so the CLI can report them together and exit non-zero.
 class IconGenerationException extends LIException {
   /// Constructs instance with the names of the failed platforms
-  IconGenerationException(this.failedPlatforms)
-      : super('Icon generation failed for: ${failedPlatforms.join(', ')}');
+  IconGenerationException(this.failedPlatforms) : super('Icon generation failed for: ${failedPlatforms.join(', ')}');
 
   /// Names of the platforms that failed
   final List<String> failedPlatforms;

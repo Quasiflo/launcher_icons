@@ -16,6 +16,9 @@ analyzer:
     - "**/*.g.dart"
     - "lib/src/version.dart"
 
+formatter:
+  page_width: 999
+
 linter:
   rules:
     # See all available options at https://dart.dev/lints

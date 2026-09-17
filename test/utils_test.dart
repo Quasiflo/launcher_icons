@@ -83,8 +83,7 @@ void main() {
         d.dir('fli_test', [d.dir('dir_exists')]).validate(),
         completes,
       );
-      final result = await utils
-          .createDirIfNotExist(path.join(d.sandbox, 'fli_test', 'dir_exists'));
+      final result = await utils.createDirIfNotExist(path.join(d.sandbox, 'fli_test', 'dir_exists'));
       expect(result.existsSync(), isTrue);
       await expectLater(
         d.dir('fli_test', [d.dir('dir_exists')]).validate(),
@@ -148,8 +147,7 @@ void main() {
   // RangeError in downstream pixel operations on older `image` versions.
   group('#decodeImageFile exotic PNG variants', () {
     test('decodes indexed-color PNG and survives icon ops', () async {
-      final image =
-          await utils.decodeImageFile('test/assets/paletted-opaque-2x2.png');
+      final image = await utils.decodeImageFile('test/assets/paletted-opaque-2x2.png');
       expect(image, isNotNull);
       final pixel = image.getPixel(0, 0);
       expect(pixel.r, equals(255));
@@ -157,8 +155,7 @@ void main() {
     });
 
     test('decodes indexed PNG with tRNS transparency', () async {
-      final image =
-          await utils.decodeImageFile('test/assets/paletted-alpha-2x2.png');
+      final image = await utils.decodeImageFile('test/assets/paletted-alpha-2x2.png');
       expect(image, isNotNull);
       expect(image.getPixel(0, 0).a, equals(255));
       expect(utils.createResizedImage(48, image).width, equals(48));
@@ -177,8 +174,7 @@ void main() {
     });
 
     test('throws NoDecoderForImageFormatException for garbage bytes', () async {
-      final garbage = File(path.join(d.sandbox, 'garbage.png'))
-        ..createSync(recursive: true);
+      final garbage = File(path.join(d.sandbox, 'garbage.png'))..createSync(recursive: true);
       // Plain text: every decoder probe rejects it and decodeImage returns
       // null (short binary blobs can throw inside a probe instead).
       await garbage.writeAsString(

@@ -22,8 +22,7 @@ class LinuxConfig {
   });
 
   /// Creates [LinuxConfig] from [json]
-  factory LinuxConfig.fromJson(Map<dynamic, dynamic> json) =>
-      _$LinuxConfigFromJson(json);
+  factory LinuxConfig.fromJson(Map<dynamic, dynamic> json) => _$LinuxConfigFromJson(json);
 
   /// Creates [Map] from [LinuxConfig]
   Map<String, dynamic> toJson() => _$LinuxConfigToJson(this);

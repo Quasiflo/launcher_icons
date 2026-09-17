@@ -68,8 +68,7 @@ void main() {
         isTrue,
       );
       // The marketing slot stays appearance-free.
-      final marketing =
-          list.where((e) => e['idiom'] == 'ios-marketing').toList();
+      final marketing = list.where((e) => e['idiom'] == 'ios-marketing').toList();
       expect(marketing, hasLength(1));
       expect(marketing.first.containsKey('appearances'), isFalse);
     });

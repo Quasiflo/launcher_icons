@@ -32,8 +32,7 @@ void main() {
         ),
       );
     });
-    test('should execute createIcons() when validateRequiremnts() returns true',
-        () {
+    test('should execute createIcons() when validateRequiremnts() returns true', () {
       when(mockGenerator.validateRequirements()).thenReturn(true);
       generateIconsFor(
         config: mockLIConfig,
@@ -46,9 +45,7 @@ void main() {
       verify(mockGenerator.createIcons()).called(equals(1));
     });
 
-    test(
-        'should not execute createIcons() when validateRequiremnts() returns false',
-        () {
+    test('should not execute createIcons() when validateRequiremnts() returns false', () {
       when(mockGenerator.validateRequirements()).thenReturn(false);
       generateIconsFor(
         config: mockLIConfig,
@@ -76,8 +73,7 @@ void main() {
 
     test('a platform failure throws IconGenerationException', () async {
       when(mockGenerator.validateRequirements()).thenReturn(true);
-      when(mockGenerator.createIcons())
-          .thenThrow(Exception('should-fail-platform'));
+      when(mockGenerator.createIcons()).thenThrow(Exception('should-fail-platform'));
       await expectLater(
         generateIconsFor(
           config: mockLIConfig,
@@ -103,8 +99,7 @@ void main() {
       when(failingGenerator.platformName).thenReturn('Failing');
       when(failingGenerator.isEnabled).thenReturn(true);
       when(failingGenerator.validateRequirements()).thenReturn(true);
-      when(failingGenerator.createIcons())
-          .thenThrow(Exception('should-fail-platform'));
+      when(failingGenerator.createIcons()).thenThrow(Exception('should-fail-platform'));
 
       when(mockGenerator.platformName).thenReturn('Healthy');
       when(mockGenerator.validateRequirements()).thenReturn(true);

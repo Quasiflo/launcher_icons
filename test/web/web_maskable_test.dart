@@ -50,8 +50,7 @@ void main() {
           red.setPixelRgb(x, y, 255, 0, 0);
         }
       }
-      await File(path.join(prefixPath, 'maskable.png'))
-          .writeAsBytes(encodePng(red));
+      await File(path.join(prefixPath, 'maskable.png')).writeAsBytes(encodePng(red));
     });
 
     IconGenerator generatorFor(
@@ -67,8 +66,7 @@ void main() {
         );
 
     Image readIcon(String fileName) => decodeImage(
-          File(path.join(prefixPath, 'web', 'icons', fileName))
-              .readAsBytesSync(),
+          File(path.join(prefixPath, 'web', 'icons', fileName)).readAsBytesSync(),
         )!;
 
     test('uses image_path_maskable when provided', () async {
@@ -107,8 +105,7 @@ void main() {
       expect(corner.b.toInt(), equals(0));
     });
 
-    test('warns when deriving maskable art from a transparent source',
-        () async {
+    test('warns when deriving maskable art from a transparent source', () async {
       final logger = _RecordingLogger();
       final generator = generatorFor(
         <String, dynamic>{

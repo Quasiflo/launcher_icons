@@ -22,9 +22,7 @@ class _RecordingLogger extends LILogger {
 
 // unit tests for android.dart
 void main() {
-  group(
-      'printStatus logger routing (fluttercommunity/flutter_launcher_icons#552)',
-      () {
+  group('printStatus logger routing (fluttercommunity/flutter_launcher_icons#552)', () {
     test('status messages route through the provided logger', () async {
       final logger = _RecordingLogger();
       // Exercise the nested pass-through (updateColorsXmlFile) with a color
@@ -64,8 +62,7 @@ void main() {
         Directory.current = originalDir;
       }
       expect(
-        logger.messages
-            .any((m) => m.contains('Creating adaptive icons Android')),
+        logger.messages.any((m) => m.contains('Creating adaptive icons Android')),
         isTrue,
       );
       expect(
@@ -149,12 +146,9 @@ void main() {
         sandbox.deleteSync(recursive: true);
       }
       sandbox.createSync(recursive: true);
-      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-          .copySync(path.join(sandboxDir, 'master-light-1024.png'));
-      File(path.join(originalDir, 'test', 'assets', 'adaptive-bg-1024.jpg'))
-          .copySync(path.join(sandboxDir, 'adaptive-bg-1024.jpg'));
-      File(path.join(originalDir, 'test', 'assets', 'adaptive-bg-1024.webp'))
-          .copySync(path.join(sandboxDir, 'adaptive-bg-1024.webp'));
+      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'master-light-1024.png'));
+      File(path.join(originalDir, 'test', 'assets', 'adaptive-bg-1024.jpg')).copySync(path.join(sandboxDir, 'adaptive-bg-1024.jpg'));
+      File(path.join(originalDir, 'test', 'assets', 'adaptive-bg-1024.webp')).copySync(path.join(sandboxDir, 'adaptive-bg-1024.webp'));
       Directory.current = sandboxDir;
     });
 
@@ -172,8 +166,7 @@ void main() {
           androidAdaptiveBackgroundFileName,
         );
 
-    test('jpg background generates background PNGs and @drawable mipmap',
-        () async {
+    test('jpg background generates background PNGs and @drawable mipmap', () async {
       final config = Config.fromJson(<String, dynamic>{
         'android': {
           'generate': true,
@@ -243,8 +236,7 @@ void main() {
       expect(colorsFile.existsSync(), isTrue);
       expect(colorsFile.readAsStringSync(), contains('#ffffff'));
       expect(
-        File(backgroundPngPath(android.adaptiveForegroundIcons.first))
-            .existsSync(),
+        File(backgroundPngPath(android.adaptiveForegroundIcons.first)).existsSync(),
         isFalse,
         reason: 'colors should not produce background PNGs',
       );
@@ -260,9 +252,7 @@ void main() {
       expect(mipmapXml, contains('@color/ic_launcher_background'));
     });
 
-    test(
-        'bare hex background gains a # prefix in colors.xml (fluttercommunity/flutter_launcher_icons#673)',
-        () async {
+    test('bare hex background gains a # prefix in colors.xml (fluttercommunity/flutter_launcher_icons#673)', () async {
       final config = Config.fromJson(<String, dynamic>{
         'android': {
           'generate': true,
@@ -283,9 +273,7 @@ void main() {
       );
     });
 
-    test(
-        'transparent background skips colors.xml, uses system color (fluttercommunity/flutter_launcher_icons#535)',
-        () async {
+    test('transparent background skips colors.xml, uses system color (fluttercommunity/flutter_launcher_icons#535)', () async {
       final config = Config.fromJson(<String, dynamic>{
         'android': {
           'generate': true,
@@ -314,9 +302,7 @@ void main() {
       expect(mipmapXml, isNot(contains('@color/ic_launcher_background')));
     });
 
-    test(
-        'removes stale adaptive artifacts without adaptive config (fluttercommunity/flutter_launcher_icons#328)',
-        () async {
+    test('removes stale adaptive artifacts without adaptive config (fluttercommunity/flutter_launcher_icons#328)', () async {
       final staleXml = File(
         path.join(
               paths.androidAdaptiveXmlFolder(null),
@@ -368,8 +354,7 @@ void main() {
         sandbox.deleteSync(recursive: true);
       }
       sandbox.createSync(recursive: true);
-      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-          .copySync(path.join(sandboxDir, 'master-light-1024.png'));
+      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'master-light-1024.png'));
       Directory.current = sandboxDir;
     });
 
@@ -472,10 +457,8 @@ void main() {
   });
 
   test('Transforming manifest without icon must add icon', () async {
-    final String inputManifest =
-        getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
-    final String expectedManifest =
-        getAndroidManifestExample('android:icon="@mipmap/ic_other_icon_name"');
+    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
+    final String expectedManifest = getAndroidManifestExample('android:icon="@mipmap/ic_other_icon_name"');
 
     await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
       androidManifestFile.writeAsStringSync(inputManifest);
@@ -487,13 +470,9 @@ void main() {
     });
   });
 
-  test(
-      'Transforming manifest with icon already in place should leave it unchanged',
-      () async {
-    final String inputManifest =
-        getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
-    final String expectedManifest =
-        getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
+  test('Transforming manifest with icon already in place should leave it unchanged', () async {
+    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
+    final String expectedManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
 
     await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
       androidManifestFile.writeAsStringSync(inputManifest);
@@ -505,11 +484,8 @@ void main() {
     });
   });
 
-  test(
-      'Transforming manifest with trailing newline should keep newline untouched',
-      () async {
-    final String inputManifest =
-        getAndroidManifestExample('android:icon="@mipmap/ic_launcher"') + '\n';
+  test('Transforming manifest with trailing newline should keep newline untouched', () async {
+    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"') + '\n';
     final String expectedManifest = inputManifest;
 
     await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
@@ -522,12 +498,8 @@ void main() {
     });
   });
 
-  test(
-      'Transforming manifest with 3 trailing newlines should keep newlines untouched',
-      () async {
-    final String inputManifest =
-        getAndroidManifestExample('android:icon="@mipmap/ic_launcher"') +
-            '\n\n\n';
+  test('Transforming manifest with 3 trailing newlines should keep newlines untouched', () async {
+    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"') + '\n\n\n';
     final String expectedManifest = inputManifest;
 
     await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
@@ -540,12 +512,8 @@ void main() {
     });
   });
 
-  test(
-      'Transforming manifest with special newline characters should leave special newline characters untouched',
-      () async {
-    final String inputManifest =
-        getAndroidManifestExample('android:icon="@mipmap/ic_launcher"')
-            .replaceAll('\n', '\r\n');
+  test('Transforming manifest with special newline characters should leave special newline characters untouched', () async {
+    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"').replaceAll('\n', '\r\n');
     final String expectedManifest = inputManifest;
 
     await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {

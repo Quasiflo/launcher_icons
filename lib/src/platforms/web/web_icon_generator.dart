@@ -41,8 +41,7 @@ class WebIconGenerator extends IconGenerator {
   String get _iconsDirPath => path.join(_webDirPath, 'icons');
 
   /// Opaque 180x180 apple-touch-icon for iOS Safari, which ignores manifest icons or picks the wrong art without an explicit tag.
-  String get _appleTouchIconFilePath =>
-      path.join(_iconsDirPath, 'apple-touch-icon.png');
+  String get _appleTouchIconFilePath => path.join(_iconsDirPath, 'apple-touch-icon.png');
 
   @override
   Future<void> createIcons() async {
@@ -52,8 +51,7 @@ class WebIconGenerator extends IconGenerator {
     );
 
     // load and decode the image file
-    context.logger
-        .verbose('Decoding and loading image file at $imgFilePath...');
+    context.logger.verbose('Decoding and loading image file at $imgFilePath...');
     final loadBase = await utils.sizeImageLoaderFor(
       imgFilePath,
       logger: context.logger,
@@ -66,8 +64,7 @@ class WebIconGenerator extends IconGenerator {
     final faviconImagePathOverride = context.webConfig!.imagePathFavicon;
     if (faviconImagePathOverride != null) {
       // favicon override was specified, construct the full path and decode
-      faviconImgFilePath =
-          path.join(context.prefixPath, faviconImagePathOverride);
+      faviconImgFilePath = path.join(context.prefixPath, faviconImagePathOverride);
       loadFavicon = await utils.sizeImageLoaderFor(
         faviconImgFilePath,
         logger: context.logger,
@@ -88,8 +85,7 @@ class WebIconGenerator extends IconGenerator {
     final maskableImagePathOverride = context.webConfig!.imagePathMaskable;
     final deriveMaskable = maskableImagePathOverride == null;
     if (maskableImagePathOverride != null) {
-      final maskableImgFilePath =
-          path.join(context.prefixPath, maskableImagePathOverride);
+      final maskableImgFilePath = path.join(context.prefixPath, maskableImagePathOverride);
       context.logger.verbose(
         'Decoding and loading maskable image file at $maskableImgFilePath...',
       );
@@ -262,8 +258,7 @@ class WebIconGenerator extends IconGenerator {
     final manifestFile = await utils.createFileIfNotExist(
       path.join(context.prefixPath, _manifestFilePath),
     );
-    final manifestConfig =
-        jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
+    final manifestConfig = jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
 
     // update background_color
     if (context.webConfig?.backgroundColor != null) {
@@ -278,9 +273,7 @@ class WebIconGenerator extends IconGenerator {
     // replace existing icons to eliminate conflicts
     manifestConfig
       ..remove('icons')
-      ..['icons'] = _webIconSizeTemplates
-          .map<Map<String, dynamic>>((e) => e.iconManifest)
-          .toList();
+      ..['icons'] = _webIconSizeTemplates.map<Map<String, dynamic>>((e) => e.iconManifest).toList();
 
     await manifestFile.writeAsString(utils.prettifyJsonEncode(manifestConfig));
   }
@@ -292,8 +285,7 @@ class WebIconGenerator extends IconGenerator {
   ) async {
     const size = 180;
     final resized = await loadBase(size);
-    final rgba =
-        resized.numChannels == 4 ? resized : resized.convert(numChannels: 4);
+    final rgba = resized.numChannels == 4 ? resized : resized.convert(numChannels: 4);
 
     var bg = (r: 255, g: 255, b: 255);
     final bgRaw = context.webConfig?.backgroundColor;

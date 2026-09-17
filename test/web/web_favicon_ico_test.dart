@@ -14,8 +14,7 @@ import '../templates.dart' as templates;
 List<int> _icoFrameWidths(List<int> bytes) {
   final count = bytes[4] | bytes[5] << 8;
   return [
-    for (var i = 0; i < count; i++)
-      bytes[6 + i * 16] == 0 ? 256 : bytes[6 + i * 16],
+    for (var i = 0; i < count; i++) bytes[6 + i * 16] == 0 ? 256 : bytes[6 + i * 16],
   ];
 }
 

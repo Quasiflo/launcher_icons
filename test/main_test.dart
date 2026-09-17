@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:launcher_icons/src/cli.dart' as main_dart;
-import 'package:launcher_icons/src/cli.dart' show defaultConfigFile;
 import 'package:launcher_icons/src/config/config.dart';
+import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
@@ -13,18 +13,14 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 
 // Unit tests for main.dart
 void main() {
-  test(
-      'iOS single-size list contains one 1024 entry (fluttercommunity/flutter_launcher_icons#592)',
-      () {
+  test('iOS single-size list contains one 1024 entry (fluttercommunity/flutter_launcher_icons#592)', () {
     final list = ios.createSingleSizeImageList('AppIcon');
     expect(list.length, equals(1));
     expect(list.single['size'], equals('1024x1024'));
     expect(list.single['filename'], equals('AppIcon-1024x1024@1x.png'));
   });
 
-  test(
-      'generateContentsFileAsString honors single-size (fluttercommunity/flutter_launcher_icons#592)',
-      () {
+  test('generateContentsFileAsString honors single-size (fluttercommunity/flutter_launcher_icons#592)', () {
     final decoded = jsonDecode(
       ios.generateContentsFileAsString('AppIcon', 'AppIcon-Dark', null, true),
     ) as Map<String, dynamic>;
@@ -35,9 +31,7 @@ void main() {
     expect(ios.iosIcons.length, 20);
   });
 
-  test(
-      'iOS icon list includes 1x switcher sizes (fluttercommunity/flutter_launcher_icons#661)',
-      () {
+  test('iOS icon list includes 1x switcher sizes (fluttercommunity/flutter_launcher_icons#661)', () {
     for (final name in ['-20x20@1x', '-29x29@1x', '-40x40@1x', '-76x76@1x']) {
       expect(
         ios.iosIcons.map((template) => template.name),
@@ -47,9 +41,7 @@ void main() {
     // Both the base and the dark-appearance entries must exist in Contents.
     final contents = ios.createImageList('AppIcon', 'AppIcon-Dark', null);
     for (final size in ['20x20', '29x29', '40x40', '76x76']) {
-      final matches = contents
-          .where((entry) => entry['size'] == size && entry['scale'] == '1x')
-          .toList();
+      final matches = contents.where((entry) => entry['size'] == size && entry['scale'] == '1x').toList();
       expect(matches.length, equals(2), reason: size);
     }
   });
@@ -58,33 +50,25 @@ void main() {
     expect(android.androidIcons.length, 5);
   });
 
-  test(
-      'iOS image list used to generate Contents.json for icon directory is correct size (no dark or tinted icons)',
-      () {
+  test('iOS image list used to generate Contents.json for icon directory is correct size (no dark or tinted icons)', () {
     expect(ios.createImageList('blah', null, null).length, 20 + 1);
   });
 
-  test(
-      'iOS image list used to generate Contents.json for icon directory is correct size (with dark icon)',
-      () {
+  test('iOS image list used to generate Contents.json for icon directory is correct size (with dark icon)', () {
     expect(
       ios.createImageList('blah', 'dark-blah', null).length,
       20 * 2 + 1,
     ); // 20 normal, 20 dark icons + 1 marketing icon
   });
 
-  test(
-      'iOS image list used to generate Contents.json for icon directory is correct size (with tinted icon)',
-      () {
+  test('iOS image list used to generate Contents.json for icon directory is correct size (with tinted icon)', () {
     expect(
       ios.createImageList('blah', null, 'tinted-blah').length,
       20 * 2 + 1,
     ); // 20 normal, 20 tinted icons + 1 marketing icon
   });
 
-  test(
-      'iOS image list used to generate Contents.json for icon directory is correct size (with dark and tinted icon)',
-      () {
+  test('iOS image list used to generate Contents.json for icon directory is correct size (with dark and tinted icon)', () {
     expect(
       ios.createImageList('blah', 'dark-blah', 'tinted-blah').length,
       20 * 3 + 1,
@@ -95,13 +79,13 @@ void main() {
     // Create mini parser with only the wanted option, mocking the real one
     final ArgParser parser = ArgParser()
       ..addOption(
-        main_dart.fileOption,
-        abbr: 'f',
-        defaultsTo: defaultConfigFile,
+        main_dart.configOption,
+        abbr: 'c',
+        defaultsTo: constants.defaultConfigFileName,
       )
       ..addOption(
         main_dart.prefixOption,
-        abbr: 'p',
+        abbr: 'r',
         defaultsTo: '.',
       );
 
@@ -125,7 +109,7 @@ launcher_icons:
     generate: false
 '''),
       ]);
-      final ArgResults argResults = parser.parse(<String>['-p', dir]);
+      final ArgResults argResults = parser.parse(<String>['-r', dir]);
       final Config? config = main_dart.loadConfigFileFromArgResults(argResults);
       expect(config, isNotNull);
       expect(config!.androidConfig!.generate, isTrue);
@@ -140,19 +124,17 @@ launcher_icons:
     generate: false
 '''),
       ]);
-      ArgResults argResults = parser.parse(<String>['-p', dir]);
+      ArgResults argResults = parser.parse(<String>['-r', dir]);
       final Config? config = main_dart.loadConfigFileFromArgResults(argResults);
       expect(config, isNotNull);
       expect(config!.iosConfig!.generate, isFalse);
 
       // read pubspec if provided file is not found
-      argResults = parser.parse(<String>['-f', defaultConfigFile, '-p', dir]);
+      argResults = parser.parse(<String>['-c', constants.defaultConfigFileName, '-r', dir]);
       expect(main_dart.loadConfigFileFromArgResults(argResults), isNotNull);
     });
 
-    group(
-        'stale template shadowing (fluttercommunity/flutter_launcher_icons#628)',
-        () {
+    group('stale template shadowing (fluttercommunity/flutter_launcher_icons#628)', () {
       Future<String> writeStaleYamlAndRealPubspec(String name) async {
         return createCase(name, [
           d.file('launcher_icons.yaml', '''
@@ -173,18 +155,16 @@ launcher_icons:
 
       test('prefers pubspec when default file is a stale template', () async {
         final dir = await writeStaleYamlAndRealPubspec('stale_template');
-        final ArgResults argResults = parser.parse(<String>['-p', dir]);
-        final Config? config =
-            main_dart.loadConfigFileFromArgResults(argResults);
+        final ArgResults argResults = parser.parse(<String>['-r', dir]);
+        final Config? config = main_dart.loadConfigFileFromArgResults(argResults);
         expect(config, isNotNull);
         expect(config!.imagePath, equals('real.png'));
       });
 
-      test('explicit -f still honors the given file', () async {
-        final dir =
-            await writeStaleYamlAndRealPubspec('stale_template_explicit');
+      test('explicit -c still honors the given file', () async {
+        final dir = await writeStaleYamlAndRealPubspec('stale_template_explicit');
         final ArgResults argResults = parser.parse(
-          <String>['-f', 'launcher_icons.yaml', '-p', dir],
+          <String>['-c', 'launcher_icons.yaml', '-r', dir],
         );
         final Config? config = main_dart.loadConfigFileFromArgResults(
           argResults,
@@ -211,9 +191,8 @@ launcher_icons:
           d.file('yaml.png', 'png-bytes'),
           d.file('real.png', 'png-bytes'),
         ]);
-        final ArgResults argResults = parser.parse(<String>['-p', dir]);
-        final Config? config =
-            main_dart.loadConfigFileFromArgResults(argResults);
+        final ArgResults argResults = parser.parse(<String>['-r', dir]);
+        final Config? config = main_dart.loadConfigFileFromArgResults(argResults);
         expect(config, isNotNull);
         expect(config!.imagePath, equals('yaml.png'));
       });
@@ -230,60 +209,108 @@ launcher_icons:
 '''),
       ]);
       // if no argument set, should fail
-      ArgResults argResults =
-          parser.parse(<String>['-f', 'custom.yaml', '-p', dir]);
+      ArgResults argResults = parser.parse(<String>['-c', 'custom.yaml', '-r', dir]);
       final Config? config = main_dart.loadConfigFileFromArgResults(argResults);
       expect(config, isNotNull);
       expect(config!.iosConfig!.generate, isTrue);
 
       // should fail if no argument
-      argResults = parser.parse(<String>['-p', dir]);
+      argResults = parser.parse(<String>['-r', dir]);
       expect(main_dart.loadConfigFileFromArgResults(argResults), isNull);
 
       // or missing file
-      argResults =
-          parser.parse(<String>['-f', 'missing_custom.yaml', '-p', dir]);
+      argResults = parser.parse(<String>['-c', 'missing_custom.yaml', '-r', dir]);
       expect(main_dart.loadConfigFileFromArgResults(argResults), isNull);
+    });
+
+    group('config folder mode (-c folder)', () {
+      test('loads launcher_icons.yaml from the folder', () async {
+        final dir = await createCase('folder_yaml', [
+          d.dir('config', [
+            d.file('launcher_icons.yaml', '''
+launcher_icons:
+  image_path: "folder.png"
+  android:
+    generate: true
+'''),
+          ]),
+        ]);
+        final ArgResults argResults = parser.parse(<String>['-c', 'config', '-r', dir]);
+        final Config? config = main_dart.loadConfigFileFromArgResults(argResults);
+        expect(config, isNotNull);
+        expect(config!.imagePath, equals('folder.png'));
+      });
+
+      test('falls back to the project-root pubspec.yaml', () async {
+        final dir = await createCase('folder_pubspec', [
+          d.dir('config', [
+            d.file('other.yaml', 'launcher_icons:\n'),
+          ]),
+          d.file('pubspec.yaml', '''
+launcher_icons:
+  image_path: "root-pubspec.png"
+  android:
+    generate: true
+'''),
+        ]);
+        final ArgResults argResults = parser.parse(<String>['-c', 'config', '-r', dir]);
+        final Config? config = main_dart.loadConfigFileFromArgResults(argResults);
+        expect(config, isNotNull);
+        expect(config!.imagePath, equals('root-pubspec.png'));
+      });
+
+      test('returns null when neither folder nor root has a config', () async {
+        final dir = await createCase('folder_empty', [
+          d.dir('config', [
+            d.file('other.yaml', 'launcher_icons:\n'),
+          ]),
+          d.file('pubspec.yaml', '''
+name: test_app
+'''),
+        ]);
+        final ArgResults argResults = parser.parse(<String>['-c', 'config', '-r', dir]);
+        expect(main_dart.loadConfigFileFromArgResults(argResults), isNull);
+      });
     });
   });
 
   group('explicit flavor from args', () {
     final ArgParser parser = ArgParser()
       ..addOption(
-        main_dart.fileOption,
-        abbr: 'f',
-        defaultsTo: defaultConfigFile,
+        main_dart.configOption,
+        abbr: 'c',
+        defaultsTo: constants.defaultConfigFileName,
       );
 
-    test('returns null when -f is not given', () {
+    test('returns null when -c is not given', () {
       expect(
         main_dart.explicitFlavorFromArgs(parser.parse(<String>[])),
         isNull,
       );
     });
 
-    test('returns null when -f names the default config file', () {
+    test('returns null when -c names the default config file', () {
       expect(
         main_dart.explicitFlavorFromArgs(
-          parser.parse(<String>['-f', defaultConfigFile]),
+          parser.parse(<String>['-c', constants.defaultConfigFileName]),
         ),
         isNull,
       );
     });
 
-    test('returns null when -f names a non-flavor file', () {
+    test('returns null when -c names a non-flavor file', () {
       expect(
         main_dart.explicitFlavorFromArgs(
-          parser.parse(<String>['-f', 'custom.yaml']),
+          parser.parse(<String>['-c', 'custom.yaml']),
         ),
         isNull,
       );
     });
 
-    test('returns the flavor when -f names a flavor file', () {
+    test('returns the flavor when -c names a flavor file', () {
       expect(
         main_dart.explicitFlavorFromArgs(
-          parser.parse(<String>['-f', 'launcher_icons-staging.yaml']),
+          parser.parse(<String>['-c', 'launcher_icons-staging.yaml']),
         ),
         equals('staging'),
       );
@@ -292,23 +319,23 @@ launcher_icons:
     test('matches flavor files in subdirectories by basename', () {
       expect(
         main_dart.explicitFlavorFromArgs(
-          parser.parse(<String>['-f', 'config/launcher_icons-prod.yaml']),
+          parser.parse(<String>['-c', 'config/launcher_icons-prod.yaml']),
         ),
         equals('prod'),
       );
     });
   });
 
-  group('isFileOptionExplicit', () {
-    test('is false when -f is absent', () {
-      expect(main_dart.isFileOptionExplicit([]), isFalse);
-      expect(main_dart.isFileOptionExplicit(['-v']), isFalse);
+  group('isConfigOptionExplicit', () {
+    test('is false when -c is absent', () {
+      expect(main_dart.isConfigOptionExplicit([]), isFalse);
+      expect(main_dart.isConfigOptionExplicit(['-v']), isFalse);
     });
 
-    test('detects -f, --file and --file= forms', () {
-      expect(main_dart.isFileOptionExplicit(['-f', 'x.yaml']), isTrue);
-      expect(main_dart.isFileOptionExplicit(['--file', 'x.yaml']), isTrue);
-      expect(main_dart.isFileOptionExplicit(['--file=x.yaml']), isTrue);
+    test('detects -c, --config and --config= forms', () {
+      expect(main_dart.isConfigOptionExplicit(['-c', 'x.yaml']), isTrue);
+      expect(main_dart.isConfigOptionExplicit(['--config', 'x.yaml']), isTrue);
+      expect(main_dart.isConfigOptionExplicit(['--config=x.yaml']), isTrue);
     });
   });
 

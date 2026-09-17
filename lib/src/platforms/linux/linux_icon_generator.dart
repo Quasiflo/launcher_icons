@@ -37,8 +37,7 @@ class LinuxIconGenerator extends IconGenerator {
 
   @override
   Future<void> createIcons() async {
-    final sourcePath =
-        context.config.resolveImagePath(context.linuxConfig!.imagePath)!;
+    final sourcePath = context.config.resolveImagePath(context.linuxConfig!.imagePath)!;
     final iconPath = runtimeIconPath(sourcePath);
 
     context.logger.verbose('Using Linux icon at $iconPath...');
@@ -236,9 +235,7 @@ Categories=Utility;
     }
     try {
       final content = file.readAsStringSync();
-      final matches = RegExp(r'set\s*\(\s*APPLICATION_ID\s+"([^"]+)"\s*\)')
-          .allMatches(content)
-          .toList();
+      final matches = RegExp(r'set\s*\(\s*APPLICATION_ID\s+"([^"]+)"\s*\)').allMatches(content).toList();
       if (matches.isEmpty) {
         return null;
       }
@@ -350,8 +347,7 @@ parts:
 
     final Map<dynamic, dynamic>? yamlDoc;
     try {
-      yamlDoc =
-          loadYaml(pubspecFile.readAsStringSync()) as Map<dynamic, dynamic>?;
+      yamlDoc = loadYaml(pubspecFile.readAsStringSync()) as Map<dynamic, dynamic>?;
     } catch (_) {
       context.logger.error('Could not parse pubspec.yaml');
       return false;
@@ -392,9 +388,7 @@ parts:
     }
 
     context.logger.error(
-      sourcePath == null
-          ? 'Icon path $iconPath not found in the `assets:` list under `flutter:` in pubspec.yaml. Please add "$iconPath" or "$iconDir" to it.'
-          : 'Icon path $iconPath (rasterized from "$sourcePath" at generation time) not found in the `assets:` list under `flutter:` in pubspec.yaml. Please add "$iconPath" or "$iconDir" to it.',
+      sourcePath == null ? 'Icon path $iconPath not found in the `assets:` list under `flutter:` in pubspec.yaml. Please add "$iconPath" or "$iconDir" to it.' : 'Icon path $iconPath (rasterized from "$sourcePath" at generation time) not found in the `assets:` list under `flutter:` in pubspec.yaml. Please add "$iconPath" or "$iconDir" to it.',
     );
     return false;
   }
@@ -430,8 +424,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
   }
 
   Future<void> _updateMyApplicationFile(String iconPath) async {
-    final myAppFile =
-        File(path.join(context.prefixPath, paths.linuxMyApplicationFile));
+    final myAppFile = File(path.join(context.prefixPath, paths.linuxMyApplicationFile));
 
     if (!myAppFile.existsSync()) {
       context.logger.error(
@@ -496,9 +489,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
         final iconPathMatch = iconPathRegex.firstMatch(existingIconStatement);
         final currentIconPath = iconPathMatch?.group(1);
         context.logger.verbose(
-          currentIconPath == null
-              ? 'Upgrading icon configuration to exe-relative block: $iconPath'
-              : 'Upgrading icon configuration from "$currentIconPath" to "$iconPath"',
+          currentIconPath == null ? 'Upgrading icon configuration to exe-relative block: $iconPath' : 'Upgrading icon configuration from "$currentIconPath" to "$iconPath"',
         );
         var updated = _ensureHelperAndInclude(content);
         updated = _replaceLegacyCall(updated, existingIconRegex, iconPath);
@@ -534,8 +525,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     for (int i = 0; i < lines.length; i++) {
       if (lines[i].contains('gtk_window_set_default_size')) {
         final currentLine = lines[i];
-        final leadingWhitespace =
-            RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
+        final leadingWhitespace = RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
         insertAt(i, leadingWhitespace);
         modified = true;
         break;
@@ -545,12 +535,10 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     // Strategy 2: Find window variable declaration and insert after it
     if (!modified) {
       for (int i = 0; i < lines.length; i++) {
-        if (lines[i].contains('GtkWindow* window =') ||
-            lines[i].contains('GtkWindow *window =')) {
+        if (lines[i].contains('GtkWindow* window =') || lines[i].contains('GtkWindow *window =')) {
           // Find the end of the window declaration (look for semicolon)
           int declarationEndIndex = i;
-          while (declarationEndIndex < lines.length &&
-              !lines[declarationEndIndex].contains(';')) {
+          while (declarationEndIndex < lines.length && !lines[declarationEndIndex].contains(';')) {
             declarationEndIndex++;
           }
 
@@ -559,8 +547,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
 
           // Find proper indentation
           final currentLine = lines[i];
-          final leadingWhitespace =
-              RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
+          final leadingWhitespace = RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
 
           insertAt(insertIndex, leadingWhitespace);
           modified = true;
@@ -572,12 +559,10 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     // Strategy 3: Find gtk_window_show and insert before it
     if (!modified) {
       for (int i = 0; i < lines.length; i++) {
-        if (lines[i].contains('gtk_window_show') ||
-            lines[i].contains('gtk_widget_show')) {
+        if (lines[i].contains('gtk_window_show') || lines[i].contains('gtk_widget_show')) {
           // Find proper indentation
           final currentLine = lines[i];
-          final leadingWhitespace =
-              RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
+          final leadingWhitespace = RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
 
           insertAt(i, leadingWhitespace);
           modified = true;
@@ -589,12 +574,10 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     // Strategy 4: Find any gtk_window function call and insert nearby
     if (!modified) {
       for (int i = 0; i < lines.length; i++) {
-        if (lines[i].contains('gtk_window_') &&
-            !lines[i].contains('gtk_window_set_icon_from_file')) {
+        if (lines[i].contains('gtk_window_') && !lines[i].contains('gtk_window_set_icon_from_file')) {
           // Find proper indentation
           final currentLine = lines[i];
-          final leadingWhitespace =
-              RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
+          final leadingWhitespace = RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
 
           insertAt(i + 1, leadingWhitespace);
           modified = true;
@@ -611,8 +594,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     } else {
       // The 2-line call depends on the asset-path helper and the gio
       // include, so spell out all three pieces for a manual fix.
-      final errorMessage =
-          'Could not find appropriate location to add icon configuration in my_application.cc. '
+      final errorMessage = 'Could not find appropriate location to add icon configuration in my_application.cc. '
           'Please manually update it as follows:\n'
           '1. Add $_gioInclude alongside the other includes (if missing).\n'
           '2. Add this helper before my_application_activate:\n'
@@ -630,8 +612,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     var updated = content;
     if (!updated.contains(_gioInclude)) {
       final lines = updated.split('\n');
-      final lastInclude =
-          lines.lastIndexWhere((l) => l.trimLeft().startsWith('#include'));
+      final lastInclude = lines.lastIndexWhere((l) => l.trimLeft().startsWith('#include'));
       if (lastInclude != -1) {
         lines.insert(lastInclude + 1, _gioInclude);
       } else {
@@ -639,8 +620,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
       }
       updated = lines.join('\n');
     }
-    if (!_helperRefRegex.hasMatch(updated) ||
-        !updated.contains('g_file_read_link("/proc/self/exe"')) {
+    if (!_helperRefRegex.hasMatch(updated) || !updated.contains('g_file_read_link("/proc/self/exe"')) {
       // Insert helper before my_application_activate when possible.
       const anchor = 'static void my_application_activate';
       final anchorIndex = updated.indexOf(anchor);

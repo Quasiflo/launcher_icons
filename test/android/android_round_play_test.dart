@@ -52,10 +52,8 @@ void main() {
       sandbox.createSync(recursive: true);
       prefixPath = sandbox.absolute.path;
       final assets = path.join(Directory.current.path, 'test', 'assets');
-      File(path.join(assets, 'master-light-1024.png'))
-          .copySync(path.join(prefixPath, 'master-light-1024.png'));
-      File(path.join(assets, 'master-light-1024.png'))
-          .copySync(path.join(prefixPath, 'round.png'));
+      File(path.join(assets, 'master-light-1024.png')).copySync(path.join(prefixPath, 'master-light-1024.png'));
+      File(path.join(assets, 'master-light-1024.png')).copySync(path.join(prefixPath, 'round.png'));
       Directory(
         path.join(prefixPath, 'android', 'app', 'src', 'main'),
       ).createSync(recursive: true);
@@ -148,9 +146,7 @@ void main() {
       );
     });
 
-    test(
-        'removes stale round artifacts without round config (fluttercommunity/flutter_launcher_icons#328)',
-        () async {
+    test('removes stale round artifacts without round config (fluttercommunity/flutter_launcher_icons#328)', () async {
       final staleXml = File(
         path.join(
           prefixPath,
@@ -189,8 +185,7 @@ void main() {
       expect(stalePng.existsSync(), isFalse);
     });
 
-    test('warns when a pre-existing roundIcon may shadow themed icons',
-        () async {
+    test('warns when a pre-existing roundIcon may shadow themed icons', () async {
       const shadowManifest = '''
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
@@ -249,8 +244,7 @@ void main() {
       sandbox.createSync(recursive: true);
       prefixPath = sandbox.absolute.path;
       final assets = path.join(Directory.current.path, 'test', 'assets');
-      File(path.join(assets, 'master-light-1024.png'))
-          .copySync(path.join(prefixPath, 'master-light-1024.png'));
+      File(path.join(assets, 'master-light-1024.png')).copySync(path.join(prefixPath, 'master-light-1024.png'));
       Directory(
         path.join(prefixPath, 'android', 'app', 'src', 'main'),
       ).createSync(recursive: true);

@@ -54,16 +54,12 @@ void main() {
         when(mockLogger.isVerbose).thenReturn(false);
         when(mockConfig.macOSConfig).thenReturn(mockMacOSConfig);
         when(mockMacOSConfig.generate).thenReturn(true);
-        when(mockMacOSConfig.imagePath)
-            .thenReturn(path.join(prefixPath, 'master-light-1024.png'));
-        when(mockConfig.imagePath)
-            .thenReturn(path.join(prefixPath, 'master-light-1024.png'));
+        when(mockMacOSConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
+        when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
         // resolveImagePath is mocked: implement the real fallback rule so
         // the unit tests exercise the generators, not the mock default.
         when(mockConfig.resolveImagePath(argThat(anything))).thenAnswer(
-          (invocation) =>
-              (invocation.positionalArguments.first as String?) ??
-              mockConfig.imagePath,
+          (invocation) => (invocation.positionalArguments.first as String?) ?? mockConfig.imagePath,
         );
       });
 
@@ -78,8 +74,7 @@ void main() {
         expect(generator.isEnabled, isFalse);
       });
 
-      test('should return false when macos.image_path and imagePath is null',
-          () {
+      test('should return false when macos.image_path and imagePath is null', () {
         when(mockMacOSConfig.imagePath).thenReturn(null);
         when(mockConfig.imagePath).thenReturn(null);
         expect(generator.validateRequirements(), isFalse);
@@ -199,9 +194,7 @@ void main() {
       );
     });
 
-    test(
-        'should generate flavor icons into AppIcon-<flavor>.appiconset (fluttercommunity/flutter_launcher_icons#638)',
-        () async {
+    test('should generate flavor icons into AppIcon-<flavor>.appiconset (fluttercommunity/flutter_launcher_icons#638)', () async {
       final imageFile = File(path.join(assetPath, 'master-light-1024.png'));
       await d.dir('fli_test_flavor', [
         d.dir('macos/Runner/Assets.xcassets/AppIcon-staging.appiconset', [
@@ -285,9 +278,7 @@ void main() {
         reason: 'Fresh flavor icon set was not bootstrapped',
       );
     });
-    test(
-        'rounded config produces transparent corners end-to-end (fluttercommunity/flutter_launcher_icons#463)',
-        () async {
+    test('rounded config produces transparent corners end-to-end (fluttercommunity/flutter_launcher_icons#463)', () async {
       final imageFile = File(path.join(assetPath, 'master-light-1024.png'));
       await d.dir('fli_test_rounded', [
         d.dir('macos/Runner/Assets.xcassets/AppIcon.appiconset', [

@@ -33,8 +33,7 @@ void main() {
       if (sandbox.existsSync()) {
         sandbox.deleteSync(recursive: true);
       }
-      await Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj'))
-          .create(recursive: true);
+      await Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj')).create(recursive: true);
       // Written before chdir (sandbox-relative); every path below is
       // CWD-relative because the generator resolves against Directory.current.
       await File(
@@ -51,8 +50,7 @@ void main() {
           path.join('ios', 'Runner.xcodeproj', 'project.pbxproj'),
         );
 
-    test('rewrites the matching flavor config without touching the rest',
-        () async {
+    test('rewrites the matching flavor config without touching the rest', () async {
       await ios.changeIosLauncherIcon('AppIcon-production', 'production');
       final content = await pbxprojFile().readAsString();
       expect(
@@ -79,9 +77,7 @@ void main() {
       );
     });
 
-    test(
-        'warns instead of silently skipping a missing flavor key (fluttercommunity/flutter_launcher_icons#341)',
-        () async {
+    test('warns instead of silently skipping a missing flavor key (fluttercommunity/flutter_launcher_icons#341)', () async {
       await ios.changeIosLauncherIcon('AppIcon-staging', 'staging');
       // File content (modulo trailing newline handling) is unchanged.
       final content = await pbxprojFile().readAsString();
@@ -137,9 +133,7 @@ void main() {
       );
     });
 
-    test(
-        'falls back to a renamed project (fluttercommunity/flutter_launcher_icons#543)',
-        () async {
+    test('falls back to a renamed project (fluttercommunity/flutter_launcher_icons#543)', () async {
       await writePbxproj('Renamed.xcodeproj');
       expect(
         ios.resolveIosPbxprojPath(),
@@ -160,9 +154,7 @@ void main() {
       );
     });
 
-    test(
-        'changeIosLauncherIcon works in a renamed project (fluttercommunity/flutter_launcher_icons#543)',
-        () async {
+    test('changeIosLauncherIcon works in a renamed project (fluttercommunity/flutter_launcher_icons#543)', () async {
       final renamed = File(
         path.join('ios', 'Renamed.xcodeproj', 'project.pbxproj'),
       );
@@ -178,12 +170,9 @@ void main() {
       );
     });
 
-    test(
-        'explicit xcodeproj path wins over the default (fluttercommunity/flutter_launcher_icons#637)',
-        () async {
+    test('explicit xcodeproj path wins over the default (fluttercommunity/flutter_launcher_icons#637)', () async {
       await writePbxproj('Runner.xcodeproj');
-      final custom =
-          File(path.join('ios', 'Custom.xcodeproj', 'project.pbxproj'));
+      final custom = File(path.join('ios', 'Custom.xcodeproj', 'project.pbxproj'));
       await custom.parent.create(recursive: true);
       await custom.writeAsString(_fixture);
       await ios.changeIosLauncherIcon(

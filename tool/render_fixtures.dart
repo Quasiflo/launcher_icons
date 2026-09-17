@@ -86,10 +86,7 @@ Future<void> main(List<String> arguments) async {
         _expect(image.getPixel(0, 0).a == 0, 'corner must be transparent');
         final center = image.getPixel(32, 32);
         _expect(
-          (center.r - 0).abs() <= 2 &&
-              (center.g - 188).abs() <= 2 &&
-              (center.b - 212).abs() <= 2 &&
-              center.a == 255,
+          (center.r - 0).abs() <= 2 && (center.g - 188).abs() <= 2 && (center.b - 212).abs() <= 2 && center.a == 255,
           'center must be teal: $center',
         );
       },

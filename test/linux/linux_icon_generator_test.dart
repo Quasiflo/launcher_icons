@@ -52,8 +52,7 @@ void main() {
       await iconFile.parent.create(recursive: true);
       // Real decodable bytes: the generator renders PNGs from the source.
       await iconFile.writeAsBytes(
-        File('${Directory.current.path}/test/assets/master-light-1024.png')
-            .readAsBytesSync(),
+        File('${Directory.current.path}/test/assets/master-light-1024.png').readAsBytesSync(),
       );
 
       final pubspecFile = File('${tempDir.path}/pubspec.yaml');
@@ -120,8 +119,7 @@ flutter:
       expect(testGenerator.validateRequirements(), isFalse);
     });
 
-    test('validateRequirements accepts any pubspec-declared asset path',
-        () async {
+    test('validateRequirements accepts any pubspec-declared asset path', () async {
       const iconPath = 'images/icon.png';
       final linuxDir = Directory('${tempDir.path}/linux');
       await linuxDir.create();
@@ -152,9 +150,7 @@ flutter:
       expect(LinuxIconGenerator(testContext).validateRequirements(), isTrue);
     });
 
-    test(
-        'validateRequirements returns false when linux directory does not exist',
-        () {
+    test('validateRequirements returns false when linux directory does not exist', () {
       expect(generator.validateRequirements(), isFalse);
     });
 
@@ -171,8 +167,7 @@ flutter:
 
       final assetsDir = Directory('${tempDir.path}/assets/images');
       await assetsDir.create(recursive: true);
-      await File('${tempDir.path}/assets/images/icon.png')
-          .writeAsBytes([0]); // dummy data
+      await File('${tempDir.path}/assets/images/icon.png').writeAsBytes([0]); // dummy data
 
       expect(generator.validateRequirements(), isFalse);
       // Fail-fast: the .cc file must be left untouched.
@@ -187,15 +182,13 @@ flutter:
       expect(generator.validateRequirements(), isFalse);
     });
 
-    test('validateRequirements accepts a directory entry in pubspec assets',
-        () async {
+    test('validateRequirements accepts a directory entry in pubspec assets', () async {
       await setUpValidProject(pubspecAssetsEntry: 'assets/images/');
 
       expect(generator.validateRequirements(), isTrue);
     });
 
-    test('validateRequirements returns true when all requirements are met',
-        () async {
+    test('validateRequirements returns true when all requirements are met', () async {
       await setUpValidProject();
 
       expect(generator.validateRequirements(), isTrue);
@@ -228,16 +221,13 @@ flutter:
         await assetsDir.create(recursive: true);
         final iconFile = File('${tempDir.path}/assets/images/icon.png');
         await iconFile.writeAsBytes(
-          File('${Directory.current.path}/test/assets/master-light-1024.png')
-              .readAsBytesSync(),
+          File('${Directory.current.path}/test/assets/master-light-1024.png').readAsBytesSync(),
         );
       });
 
       // Canonical expectations for the default icon path.
-      const canonicalUse =
-          'gtk_window_set_icon_from_file(window, linux_icon_path, NULL);';
-      const helperSignature =
-          'static gchar* get_flutter_asset_path(const gchar* asset_path)';
+      const canonicalUse = 'gtk_window_set_icon_from_file(window, linux_icon_path, NULL);';
+      const helperSignature = 'static gchar* get_flutter_asset_path(const gchar* asset_path)';
       const exeResolution = 'g_file_read_link("/proc/self/exe"';
       const gioInclude = '#include <gio/gio.h>';
 
@@ -253,8 +243,7 @@ flutter:
         expect(content, contains(gioInclude));
       }
 
-      test('adds exe-relative block before gtk_window_set_default_size',
-          () async {
+      test('adds exe-relative block before gtk_window_set_default_size', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -306,10 +295,7 @@ static void my_application_activate(GApplication* application) {
 
         final modifiedContent = await myAppFile.readAsString();
         expectCanonicalBlock(modifiedContent);
-        final includeCount = modifiedContent
-            .split('\n')
-            .where((line) => line.trim() == gioInclude)
-            .length;
+        final includeCount = modifiedContent.split('\n').where((line) => line.trim() == gioInclude).length;
         expect(includeCount, equals(1));
       });
 
@@ -337,8 +323,7 @@ static void my_application_activate(GApplication* application) {
         expect(helperIndex, lessThan(activateIndex));
       });
 
-      test('uses fallback location after window declaration for single line',
-          () async {
+      test('uses fallback location after window declaration for single line', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -356,8 +341,7 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the window declaration line
         final lines = modifiedContent.split('\n');
-        final windowLineIndex =
-            lines.indexWhere((line) => line.contains('GtkWindow* window ='));
+        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow* window ='));
         final iconLineIndex = lines.indexWhere(
           (line) => line.contains('get_flutter_asset_path("'),
         );
@@ -384,8 +368,7 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the multiline window declaration
         final lines = modifiedContent.split('\n');
-        final windowLineIndex =
-            lines.indexWhere((line) => line.contains('GtkWindow* window ='));
+        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow* window ='));
         final iconLineIndex = lines.indexWhere(
           (line) => line.contains('get_flutter_asset_path("'),
         );
@@ -415,8 +398,7 @@ static void my_application_activate(GApplication* application) {
         await iconsDir.create(recursive: true);
         final customIconFile = File('${tempDir.path}/assets/icons/custom.png');
         await customIconFile.writeAsBytes(
-          File('${Directory.current.path}/test/assets/master-light-1024.png')
-              .readAsBytesSync(),
+          File('${Directory.current.path}/test/assets/master-light-1024.png').readAsBytesSync(),
         );
 
         const originalContent = '''
@@ -502,8 +484,7 @@ static void my_application_activate(GApplication* application) {
         expect(modifiedContent, equals(originalContent));
       });
 
-      test('updates path inside canonical block when path is different',
-          () async {
+      test('updates path inside canonical block when path is different', () async {
         const originalContent = '''
 #include "my_application.h"
 #include <gio/gio.h>
@@ -541,8 +522,7 @@ static void my_application_activate(GApplication* application) {
         );
       });
 
-      test('upgrades legacy single-line call to the exe-relative block',
-          () async {
+      test('upgrades legacy single-line call to the exe-relative block', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -568,8 +548,7 @@ static void my_application_activate(GApplication* application) {
         expect(modifiedContent, isNot(contains('old_icon.png')));
       });
 
-      test('upgrades legacy multi-line call to the exe-relative block',
-          () async {
+      test('upgrades legacy multi-line call to the exe-relative block', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -596,8 +575,7 @@ static void my_application_activate(GApplication* application) {
         expect(modifiedContent, isNot(contains('old_icon.png')));
       });
 
-      test('upgrades legacy call with extra whitespace and formatting',
-          () async {
+      test('upgrades legacy call with extra whitespace and formatting', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -622,8 +600,7 @@ static void my_application_activate(GApplication* application) {
         expect(modifiedContent, isNot(contains('old_icon.png')));
       });
 
-      test('uses fallback strategy 3: inserts before gtk_window_show',
-          () async {
+      test('uses fallback strategy 3: inserts before gtk_window_show', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -644,13 +621,11 @@ static void my_application_activate(GApplication* application) {
         final iconLineIndex = lines.indexWhere(
           (line) => line.contains('get_flutter_asset_path("'),
         );
-        final showLineIndex =
-            lines.indexWhere((line) => line.contains('gtk_window_show'));
+        final showLineIndex = lines.indexWhere((line) => line.contains('gtk_window_show'));
         expect(iconLineIndex, lessThan(showLineIndex));
       });
 
-      test('uses fallback strategy 3: inserts before gtk_widget_show',
-          () async {
+      test('uses fallback strategy 3: inserts before gtk_widget_show', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -671,13 +646,11 @@ static void my_application_activate(GApplication* application) {
         final iconLineIndex = lines.indexWhere(
           (line) => line.contains('get_flutter_asset_path("'),
         );
-        final showLineIndex =
-            lines.indexWhere((line) => line.contains('gtk_widget_show'));
+        final showLineIndex = lines.indexWhere((line) => line.contains('gtk_widget_show'));
         expect(iconLineIndex, lessThan(showLineIndex));
       });
 
-      test('uses fallback strategy 4: inserts after any gtk_window function',
-          () async {
+      test('uses fallback strategy 4: inserts after any gtk_window function', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -696,8 +669,7 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after gtk_window_set_title
         final lines = modifiedContent.split('\n');
-        final titleLineIndex =
-            lines.indexWhere((line) => line.contains('gtk_window_set_title'));
+        final titleLineIndex = lines.indexWhere((line) => line.contains('gtk_window_set_title'));
         final iconLineIndex = lines.indexWhere(
           (line) => line.contains('get_flutter_asset_path("'),
         );
@@ -735,8 +707,7 @@ static void my_application_activate(GApplication* application) {
         );
       });
 
-      test('handles window declaration with different pointer syntax',
-          () async {
+      test('handles window declaration with different pointer syntax', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -754,17 +725,14 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the window declaration
         final lines = modifiedContent.split('\n');
-        final windowLineIndex =
-            lines.indexWhere((line) => line.contains('GtkWindow *window ='));
+        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow *window ='));
         final iconLineIndex = lines.indexWhere(
           (line) => line.contains('get_flutter_asset_path("'),
         );
         expect(iconLineIndex, greaterThan(windowLineIndex));
       });
 
-      test(
-          'handles complex multi-line window declaration with multiple GTK calls',
-          () async {
+      test('handles complex multi-line window declaration with multiple GTK calls', () async {
         const originalContent = '''
 #include "my_application.h"
 
@@ -785,20 +753,17 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the complete window declaration
         final lines = modifiedContent.split('\n');
-        final windowLineIndex =
-            lines.indexWhere((line) => line.contains('GtkWindow* window ='));
+        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow* window ='));
         final iconLineIndex = lines.indexWhere(
           (line) => line.contains('get_flutter_asset_path("'),
         );
         expect(iconLineIndex, greaterThan(windowLineIndex));
         // Should be before the show call
-        final showLineIndex =
-            lines.indexWhere((line) => line.contains('gtk_widget_show'));
+        final showLineIndex = lines.indexWhere((line) => line.contains('gtk_widget_show'));
         expect(iconLineIndex, lessThan(showLineIndex));
       });
 
-      test('provides helpful error message when no insertion point found',
-          () async {
+      test('provides helpful error message when no insertion point found', () async {
         const originalContent = '''
 #include "my_application.h"
 

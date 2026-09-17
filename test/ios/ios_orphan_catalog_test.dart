@@ -46,12 +46,9 @@ void main() {
         sandbox.deleteSync(recursive: true);
       }
       sandbox.createSync(recursive: true);
-      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-          .copySync(path.join(sandboxDir, 'icon.png'));
-      Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj'))
-          .createSync(recursive: true);
-      File(path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj'))
-          .writeAsStringSync(_pbxproj);
+      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'icon.png'));
+      Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj')).createSync(recursive: true);
+      File(path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj')).writeAsStringSync(_pbxproj);
       for (final catalog in [
         'AppIcon',
         'AppIcon-staging',

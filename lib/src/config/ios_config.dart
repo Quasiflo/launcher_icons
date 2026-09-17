@@ -143,8 +143,7 @@ class IOSConfig {
   });
 
   /// Creates [IOSConfig] from [json]
-  factory IOSConfig.fromJson(Map<dynamic, dynamic> json) =>
-      _$IOSConfigFromJson(json);
+  factory IOSConfig.fromJson(Map<dynamic, dynamic> json) => _$IOSConfigFromJson(json);
 
   /// Creates [Map] from [IOSConfig]
   Map<String, dynamic> toJson() => _$IOSConfigToJson(this);

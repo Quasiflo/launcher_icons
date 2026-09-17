@@ -48,12 +48,9 @@ launcher_icons-production:
         sandbox.deleteSync(recursive: true);
       }
       sandbox.createSync(recursive: true);
-      await Directory(path.join(sandboxDir, 'windows', 'runner', 'resources'))
-          .create(recursive: true);
-      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-          .copySync(path.join(sandboxDir, 'icon.png'));
-      await File(path.join(sandboxDir, 'launcher_icons.yaml'))
-          .writeAsString(keyedYaml);
+      await Directory(path.join(sandboxDir, 'windows', 'runner', 'resources')).create(recursive: true);
+      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'icon.png'));
+      await File(path.join(sandboxDir, 'launcher_icons.yaml')).writeAsString(keyedYaml);
       Directory.current = sandboxDir;
     });
 
@@ -82,7 +79,7 @@ launcher_icons-production:
           ),
         ).existsSync();
 
-    test('loops over suffixed sections without -f', () async {
+    test('loops over suffixed sections without -c', () async {
       final printed = await runCli([]);
 
       expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
@@ -97,8 +94,7 @@ launcher_icons-production:
 
     test('pubspec-only sections loop without launcher_icons.yaml', () async {
       await File(path.join(sandboxDir, 'launcher_icons.yaml')).delete();
-      await File(path.join(sandboxDir, 'pubspec.yaml'))
-          .writeAsString(keyedYaml);
+      await File(path.join(sandboxDir, 'pubspec.yaml')).writeAsString(keyedYaml);
 
       final printed = await runCli([]);
 
@@ -120,9 +116,7 @@ launcher_icons-production:
       );
       expect(
         printed.any(
-          (line) =>
-              line.contains('Successfully generated launcher icons') &&
-              !line.contains('flavors'),
+          (line) => line.contains('Successfully generated launcher icons') && !line.contains('flavors'),
         ),
         isTrue,
       );
@@ -145,8 +139,7 @@ launcher_icons:
     generate: true
     icon_filename: "file_staging.ico"
 ''';
-      await File(path.join(sandboxDir, 'launcher_icons-staging.yaml'))
-          .writeAsString(fileYaml);
+      await File(path.join(sandboxDir, 'launcher_icons-staging.yaml')).writeAsString(fileYaml);
 
       final printed = await runCli([]);
 
@@ -155,12 +148,11 @@ launcher_icons:
       expect(icoExists('key_staging.ico'), isFalse);
     });
 
-    test('-f flavor file conflicting with --flavor throws', () async {
-      await File(path.join(sandboxDir, 'launcher_icons-staging.yaml'))
-          .writeAsString(keyedYaml);
+    test('-c flavor file conflicting with --flavor throws', () async {
+      await File(path.join(sandboxDir, 'launcher_icons-staging.yaml')).writeAsString(keyedYaml);
 
       await expectLater(
-        runCli(['-f', 'launcher_icons-staging.yaml', '--flavor', 'production']),
+        runCli(['-c', 'launcher_icons-staging.yaml', '--flavor', 'production']),
         throwsA(isA<InvalidConfigException>()),
       );
     });

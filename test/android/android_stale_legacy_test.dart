@@ -37,8 +37,7 @@ void main() {
       sandbox.createSync(recursive: true);
       prefixPath = sandbox.absolute.path;
       final assets = path.join(Directory.current.path, 'test', 'assets');
-      File(path.join(assets, 'master-light-1024.png'))
-          .copySync(path.join(prefixPath, 'master-light-1024.png'));
+      File(path.join(assets, 'master-light-1024.png')).copySync(path.join(prefixPath, 'master-light-1024.png'));
       Directory(
         path.join(prefixPath, 'android', 'app', 'src', 'main'),
       ).createSync(recursive: true);

@@ -53,12 +53,8 @@ Image applyRoundedCorners(Image image) {
 
   final r4 = (radius * radius * radius * radius).toDouble();
   bool inside(int x, int y) {
-    final dx = x < radius
-        ? (radius - 1 - x).toDouble()
-        : (x - (size - radius)).toDouble();
-    final dy = y < radius
-        ? (radius - 1 - y).toDouble()
-        : (y - (size - radius)).toDouble();
+    final dx = x < radius ? (radius - 1 - x).toDouble() : (x - (size - radius)).toDouble();
+    final dy = y < radius ? (radius - 1 - y).toDouble() : (y - (size - radius)).toDouble();
     final nx = x < radius || x >= size - radius ? dx : -1.0;
     final ny = y < radius || y >= size - radius ? dy : -1.0;
     if (nx < 0 && ny < 0) {

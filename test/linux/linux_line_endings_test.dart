@@ -33,8 +33,7 @@ void main() {
         recursive: true,
       );
       await File('${tempDir.path}/assets/images/icon.png').writeAsBytes(
-        File('${Directory.current.path}/test/assets/master-light-1024.png')
-            .readAsBytesSync(),
+        File('${Directory.current.path}/test/assets/master-light-1024.png').readAsBytesSync(),
       );
       await File('${tempDir.path}/pubspec.yaml').writeAsString('''
 name: test_app

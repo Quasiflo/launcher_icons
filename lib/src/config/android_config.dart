@@ -68,8 +68,7 @@ class AndroidConfig {
   });
 
   /// Creates [AndroidConfig] from [json]
-  factory AndroidConfig.fromJson(Map<dynamic, dynamic> json) =>
-      _$AndroidConfigFromJson(json);
+  factory AndroidConfig.fromJson(Map<dynamic, dynamic> json) => _$AndroidConfigFromJson(json);
 
   /// Creates [Map] from [AndroidConfig]
   Map<String, dynamic> toJson() => _$AndroidConfigToJson(this);

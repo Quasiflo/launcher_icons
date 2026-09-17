@@ -6,8 +6,7 @@ import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 /// An implementation of [IconGenerator] for Android.
 class AndroidIconGenerator extends IconGenerator {
   /// Creates an instance of [AndroidIconGenerator].
-  AndroidIconGenerator(IconGeneratorContext context)
-      : super(context, 'Android');
+  AndroidIconGenerator(IconGeneratorContext context) : super(context, 'Android');
 
   @override
   bool get isEnabled => context.config.isNeedingNewAndroidIcon;

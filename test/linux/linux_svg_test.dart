@@ -56,8 +56,7 @@ void main() {
       await Directory('${tempDir.path}/linux/runner').create(
         recursive: true,
       );
-      await File('${tempDir.path}/linux/runner/my_application.cc')
-          .writeAsString('''
+      await File('${tempDir.path}/linux/runner/my_application.cc').writeAsString('''
 #include "my_application.h"
 
 static void my_application_activate(GApplication* application) {
@@ -77,8 +76,7 @@ static void my_application_activate(GApplication* application) {
         recursive: true,
       );
       await File('${tempDir.path}/assets/images/icon.svg').writeAsString(
-        File('${Directory.current.path}/test/assets/vector-opaque-1024.svg')
-            .readAsStringSync(),
+        File('${Directory.current.path}/test/assets/vector-opaque-1024.svg').readAsStringSync(),
       );
       await File('${tempDir.path}/pubspec.yaml').writeAsString('''
 name: test_app
@@ -133,8 +131,7 @@ flutter:
       expect(derivedImage.width, equals(512));
       expect(derivedImage.height, equals(512));
       // my_application.cc wires the raster, not the SVG.
-      final cc = File('${tempDir.path}/linux/runner/my_application.cc')
-          .readAsStringSync();
+      final cc = File('${tempDir.path}/linux/runner/my_application.cc').readAsStringSync();
       expect(
         cc,
         contains('get_flutter_asset_path("assets/images/icon.linux.png")'),
@@ -210,8 +207,7 @@ endif()
 
       await flavorGenerator('development').createIcons();
       expect(
-        File('${tempDir.path}/share/applications/test_app.desktop')
-            .readAsStringSync(),
+        File('${tempDir.path}/share/applications/test_app.desktop').readAsStringSync(),
         contains('StartupWMClass=com.example.dev'),
       );
 
@@ -223,12 +219,10 @@ endif()
       );
 
       // Unflavored runs fall back to the unconditional id.
-      await File('${tempDir.path}/share/applications/test_app.desktop')
-          .delete();
+      await File('${tempDir.path}/share/applications/test_app.desktop').delete();
       await generator().createIcons();
       expect(
-        File('${tempDir.path}/share/applications/test_app.desktop')
-            .readAsStringSync(),
+        File('${tempDir.path}/share/applications/test_app.desktop').readAsStringSync(),
         contains('StartupWMClass=com.example.base'),
       );
     });

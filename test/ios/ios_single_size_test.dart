@@ -38,8 +38,7 @@ void main() {
       }
       sandbox.createSync(recursive: true);
       for (final name in ['icon.png', 'icon-dark.png', 'icon-tinted.png']) {
-        File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-            .copySync(path.join(sandboxDir, name));
+        File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, name));
       }
       Directory.current = sandboxDir;
     });
@@ -74,12 +73,7 @@ void main() {
       final catalog = Directory(
         path.join('ios', 'Runner', 'Assets.xcassets', 'AppIcon.appiconset'),
       );
-      final pngs = catalog
-          .listSync()
-          .whereType<File>()
-          .where((f) => f.path.endsWith('.png'))
-          .map((f) => path.basename(f.path))
-          .toList();
+      final pngs = catalog.listSync().whereType<File>().where((f) => f.path.endsWith('.png')).map((f) => path.basename(f.path)).toList();
       expect(pngs, equals(['Icon-App-1024x1024@1x.png']));
       final contents = jsonDecode(
         File(path.join(catalog.path, 'Contents.json')).readAsStringSync(),

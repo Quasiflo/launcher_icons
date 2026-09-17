@@ -7,8 +7,7 @@ import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
 import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dart';
-import 'package:launcher_icons/src/platforms/macos/macos_icon_effects.dart'
-    as effects;
+import 'package:launcher_icons/src/platforms/macos/macos_icon_effects.dart' as effects;
 import 'package:launcher_icons/src/platforms/macos/macos_icon_template.dart';
 import 'package:path/path.dart' as path;
 
@@ -57,8 +56,7 @@ class MacOSIconGenerator extends IconGenerator {
       context.config.resolveImagePath(context.config.macOSConfig!.imagePath),
     );
 
-    context.logger
-        .verbose('Decoding and loading image file at $imgFilePath...');
+    context.logger.verbose('Decoding and loading image file at $imgFilePath...');
     final loadArtwork = await utils.sizeImageLoaderFor(
       imgFilePath,
       logger: context.logger,
@@ -86,8 +84,7 @@ class MacOSIconGenerator extends IconGenerator {
         'Runner',
         'Assets.xcassets',
       ),
-      currentCatalog:
-          context.flavor == null ? 'AppIcon' : 'AppIcon-${context.flavor}',
+      currentCatalog: context.flavor == null ? 'AppIcon' : 'AppIcon-${context.flavor}',
       referenceTexts: [
         if (pbxprojFile.existsSync()) await pbxprojFile.readAsString(),
       ],
@@ -135,8 +132,7 @@ class MacOSIconGenerator extends IconGenerator {
     // catalog name so Xcode associates it with the icon set; the PNG
     // catalog stays the fallback on macOS older than Tahoe 26.
     if (context.config.hasMacOSLiquidGlassIconConfig) {
-      final glassIconName =
-          context.flavor == null ? 'AppIcon' : 'AppIcon-${context.flavor}';
+      final glassIconName = context.flavor == null ? 'AppIcon' : 'AppIcon-${context.flavor}';
       await generateMacOSLiquidGlassIcon(
         context.config,
         glassIconName,
@@ -237,12 +233,10 @@ class MacOSIconGenerator extends IconGenerator {
   }
 
   void _updateContentsFile() {
-    final contentsFilePath =
-        File(path.join(context.prefixPath, _contentsFilePath()));
+    final contentsFilePath = File(path.join(context.prefixPath, _contentsFilePath()));
     Map<String, dynamic>? contentsConfig;
     try {
-      contentsConfig = jsonDecode(contentsFilePath.readAsStringSync())
-          as Map<String, dynamic>;
+      contentsConfig = jsonDecode(contentsFilePath.readAsStringSync()) as Map<String, dynamic>;
     } on FormatException catch (_) {
       contentsConfig = null;
     } on FileSystemException catch (_) {
@@ -273,10 +267,7 @@ class MacOSIconGenerator extends IconGenerator {
           }
           final idiom = entry['idiom'];
           final size = entry['size'];
-          if (idiom != 'mac' ||
-              size == '8x8' ||
-              size == '64x64' ||
-              size == '1024x1024') {
+          if (idiom != 'mac' || size == '8x8' || size == '64x64' || size == '1024x1024') {
             foreign.add('${size ?? '?'}${idiom == null ? '' : '/$idiom'}');
           }
         }
@@ -290,11 +281,8 @@ class MacOSIconGenerator extends IconGenerator {
     }
     contentsConfig
       ..remove('images')
-      ..['images'] = _iconSizeTemplates
-          .map<Map<String, dynamic>>((e) => e.iconContent)
-          .toList();
+      ..['images'] = _iconSizeTemplates.map<Map<String, dynamic>>((e) => e.iconContent).toList();
 
-    contentsFilePath
-        .writeAsStringSync(utils.prettifyJsonEncode(contentsConfig));
+    contentsFilePath.writeAsStringSync(utils.prettifyJsonEncode(contentsConfig));
   }
 }

@@ -18,8 +18,7 @@ import 'windows_icon_generator_test.mocks.dart';
 
 /// Parses the ICONDIR of a `.ico` file, returning one entry per embedded
 /// image. Width/height of `0` means 256 (per the ICO spec).
-List<({int width, int height, int offset, int size, int planes, int bitCount})>
-    _parseIcoDirectory(
+List<({int width, int height, int offset, int size, int planes, int bitCount})> _parseIcoDirectory(
   List<int> bytes,
 ) {
   if (bytes.length < 6) {
@@ -34,14 +33,8 @@ List<({int width, int height, int offset, int size, int planes, int bitCount})>
       (
         width: bytes[6 + i * 16],
         height: bytes[6 + i * 16 + 1],
-        size: bytes[6 + i * 16 + 8] |
-            bytes[6 + i * 16 + 9] << 8 |
-            bytes[6 + i * 16 + 10] << 16 |
-            bytes[6 + i * 16 + 11] << 24,
-        offset: bytes[6 + i * 16 + 12] |
-            bytes[6 + i * 16 + 13] << 8 |
-            bytes[6 + i * 16 + 14] << 16 |
-            bytes[6 + i * 16 + 15] << 24,
+        size: bytes[6 + i * 16 + 8] | bytes[6 + i * 16 + 9] << 8 | bytes[6 + i * 16 + 10] << 16 | bytes[6 + i * 16 + 11] << 24,
+        offset: bytes[6 + i * 16 + 12] | bytes[6 + i * 16 + 13] << 8 | bytes[6 + i * 16 + 14] << 16 | bytes[6 + i * 16 + 15] << 24,
         planes: bytes[6 + i * 16 + 4] | bytes[6 + i * 16 + 5] << 8,
         bitCount: bytes[6 + i * 16 + 6] | bytes[6 + i * 16 + 7] << 8,
       ),
@@ -96,16 +89,12 @@ void main() {
         when(mockLogger.isVerbose).thenReturn(false);
         when(mockConfig.windowsConfig).thenReturn(mockWindowsConfig);
         when(mockWindowsConfig.generate).thenReturn(true);
-        when(mockWindowsConfig.imagePath)
-            .thenReturn(path.join(prefixPath, 'master-light-1024.png'));
-        when(mockConfig.imagePath)
-            .thenReturn(path.join(prefixPath, 'master-light-1024.png'));
+        when(mockWindowsConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
+        when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
         // resolveImagePath is mocked: implement the real fallback rule so
         // the unit tests exercise the generators, not the mock default.
         when(mockConfig.resolveImagePath(argThat(anything))).thenAnswer(
-          (invocation) =>
-              (invocation.positionalArguments.first as String?) ??
-              mockConfig.imagePath,
+          (invocation) => (invocation.positionalArguments.first as String?) ?? mockConfig.imagePath,
         );
       });
 
@@ -135,8 +124,7 @@ void main() {
         );
       });
 
-      test('should return false when windows.image_path and imagePath is null',
-          () {
+      test('should return false when windows.image_path and imagePath is null', () {
         when(mockWindowsConfig.imagePath).thenReturn(null);
         when(mockConfig.imagePath).thenReturn(null);
         expect(generator.validateRequirements(), isFalse);
@@ -293,8 +281,7 @@ void main() {
 
     test('warns when the source is smaller than 256px', () async {
       final small = Image(width: 64, height: 64, numChannels: 3);
-      await File(path.join(prefixPath, 'small.png'))
-          .writeAsBytes(encodePng(small));
+      await File(path.join(prefixPath, 'small.png')).writeAsBytes(encodePng(small));
       final config = Config.fromJson(<String, dynamic>{
         'windows': {
           'generate': true,

@@ -18,8 +18,7 @@ void main() {
       return groups.first as Map<String, dynamic>;
     }
 
-    Map<String, dynamic> withLayer(Map<String, dynamic> extra) =>
-        <String, dynamic>{
+    Map<String, dynamic> withLayer(Map<String, dynamic> extra) => <String, dynamic>{
           'generate': true,
           'liquid_glass_layers': [
             {'image_path': 'icon.png'},

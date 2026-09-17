@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:launcher_icons/src/config/config.dart';
+import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/errors.dart' as errors;
 import 'package:launcher_icons/src/core/icon_generator.dart';
@@ -16,52 +17,25 @@ import 'package:launcher_icons/src/platforms/web/web_icon_generator.dart';
 import 'package:launcher_icons/src/platforms/windows/windows_icon_generator.dart';
 import 'package:path/path.dart' as path;
 
-/// CLI option name for the config file path (`-f`).
-const String fileOption = 'file';
-
 /// CLI flag name for usage help (`-h`).
 const String helpFlag = 'help';
 
 /// CLI flag name for verbose logging (`-v`).
 const String verboseFlag = 'verbose';
 
-/// CLI option name for the project-root prefix (`-p`).
-const String prefixOption = 'prefix';
+/// CLI option name for the config file or folder (`-c`).
+const String configOption = 'config';
 
-/// Default config file name.
-const String defaultConfigFile = 'launcher_icons.yaml';
+/// CLI option name for the flavor selection (`-f`).
+const String flavorOption = 'flavor';
+
+/// CLI option name for the project-root prefix (`-r`).
+const String prefixOption = 'root';
 
 /// File-name pattern for per-flavor configs (`launcher_icons-<flavor>.yaml`).
 const String flavorConfigFilePattern = r'^launcher_icons-(.*).yaml$';
 
-/// Discovers flavor names by scanning [searchPath] for flavor config files.
-Future<List<String>> getFlavors({String searchPath = '.'}) async {
-  final List<String> flavors = [];
-
-  // Recursively search through directories
-  await for (var item in Directory(searchPath).list(recursive: true)) {
-    if (item is File) {
-      final name = path.basename(item.path);
-      final match = RegExp(flavorConfigFilePattern).firstMatch(name);
-      if (match != null) {
-        flavors.add(match.group(1)!);
-      }
-    }
-  }
-  return flavors;
-}
-
-/// Returns the flavor named by an explicit `-f launcher_icons-<flavor>.yaml` argument, or `null` when `-f` does not point at a flavor config file.
-String? explicitFlavorFromArgs(ArgResults argResults) {
-  final String filePath = argResults[fileOption] as String;
-  final match =
-      RegExp(flavorConfigFilePattern).firstMatch(path.basename(filePath));
-  return match?.group(1);
-}
-
-/// CLI entry point: parses [arguments], loads configs (including the
-/// flavor loop), and generates icons, exiting 0/1/2 on success,
-/// generation failure, or config/CLI failure.
+/// CLI entry point: parses [arguments], loads configs (including the flavor loop), and generates icons, exiting 0/1/2 on success, generation failure, or config/CLI failure.
 Future<void> createIconsFromArguments(List<String> arguments) async {
   final ArgParser parser = ArgParser(allowTrailingOptions: true);
   parser
@@ -74,61 +48,61 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     ..addFlag(
       verboseFlag,
       abbr: 'v',
-      help: 'Verbose output',
+      help: 'Verbose Output',
       defaultsTo: false,
     )
     // Make default null to differentiate when it is explicitly set
     ..addOption(
-      fileOption,
+      configOption,
+      abbr: 'c',
+      help: 'Path to a config file or a folder to search for '
+          'configuration files',
+      defaultsTo: constants.defaultConfigFileName,
+    )
+    ..addOption(
+      flavorOption,
       abbr: 'f',
-      help: 'Path to config file',
-      defaultsTo: defaultConfigFile,
+      help: 'Run a single flavor (from a launcher_icons-<flavor> section '
+          'or a launcher_icons-<flavor>.yaml file)',
     )
     ..addOption(
       prefixOption,
-      abbr: 'p',
-      help: 'Generates icons in the given path (project root by default)',
+      abbr: 'r',
+      help: 'Set a different project root (cwd by default)',
       defaultsTo: '.',
-    )
-    ..addOption(
-      'flavor-path',
-      help: 'Path to search for flavor configuration files',
-      defaultsTo: '.',
-    )
-    ..addOption(
-      'flavor',
-      help: 'Run a single flavor (from a launcher_icons-<flavor> section '
-          'or a launcher_icons-<flavor>.yaml file)',
     );
 
   final argResults = parser.parse(arguments);
-  // creating logger based on -v flag
-  final logger = LILogger(argResults.flag(verboseFlag));
+  final logger = LILogger(argResults.flag(verboseFlag)); // creating logger based on -v flag
 
   logger.verbose('Received args ${argResults.arguments}');
 
   if (argResults.flag(helpFlag)) {
-    logger.info('Generates icons for iOS and Android');
+    logger.info('Generates launcher icons for Flutter projects');
     logger.info(parser.usage);
     exit(0);
   }
 
   // Flavors management
   final String prefixPath = argResults[prefixOption] as String;
+  final String configValue = argResults[configOption] as String;
+  // `-c` names either a config file (assumed flavorless unless its basename matches a flavor file) or a folder searched for default named configs and flavor configs.
+  final bool configIsFolder = Directory(path.join(prefixPath, configValue)).existsSync();
+  final bool configIsExplicitFile = isConfigOptionExplicit(arguments) && !configIsFolder;
 
   // An explicit `-f launcher_icons-<flavor>.yaml` runs only that
   // flavor instead of looping over every discovered flavor (fluttercommunity/flutter_launcher_icons#215). The file is loaded from the given path directly, so flavor configs in subdirectories work too.
-  final onlyFlavor = explicitFlavorFromArgs(argResults);
+  final onlyFlavor = configIsFolder ? null : explicitFlavorFromArgs(argResults);
   if (onlyFlavor != null) {
-    final requestedFlavor = argResults['flavor'] as String?;
+    final requestedFlavor = argResults[flavorOption] as String?;
     if (requestedFlavor != null && requestedFlavor != onlyFlavor) {
       throw InvalidConfigException(
-        'Conflicting flavor selection: -f points at the "$onlyFlavor" '
+        'Conflicting flavor selection: -c points at the "$onlyFlavor" '
         'flavor file while --flavor requests "$requestedFlavor". '
         'Pass only one of them.',
       );
     }
-    final String filePath = argResults[fileOption] as String;
+    final String filePath = argResults[configOption] as String;
     final flutterLauncherIconsConfigs = Config.loadConfigFromPath(
       filePath,
       prefixPath,
@@ -136,7 +110,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     if (flutterLauncherIconsConfigs == null) {
       throw NoConfigFoundException(
         'No configuration found for $onlyFlavor flavor at $filePath. '
-        'To discover flavor files in subdirectories use --flavor-path.',
+        'To discover flavor files in subdirectories pass a folder to -c.',
       );
     }
     try {
@@ -160,28 +134,32 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     return;
   }
 
-  final flavors =
-      await getFlavors(searchPath: argResults['flavor-path'] as String);
-  // An explicit `-f` for a non-flavor file is honored as-is instead of
+  final flavors = await getFlavors(
+    searchPath: configIsFolder ? path.join(prefixPath, configValue) : '.',
+  );
+  // An explicit `-c` file (not a flavor file) is honored as-is instead of
   // looping over discovered flavor files (fluttercommunity/flutter_launcher_icons#426). (An explicit flavor file is already handled by the onlyFlavor branch above.) Suffixed
   // `launcher_icons-<flavor>:` sections inside the pinned file still count:
-  // `-f` pins the file, not the absence of flavors.
-  final hasFileFlavors = flavors.isNotEmpty && !isFileOptionExplicit(arguments);
+  // `-c` pins the file, not the absence of flavors.
+  final hasFileFlavors = flavors.isNotEmpty && !configIsExplicitFile;
 
-  // Suffixed flavor sections live in the pinned file when `-f` names one,
-  // otherwise in launcher_icons.yaml (when present) and pubspec.yaml, with the yaml winning a name conflict.
+  // Suffixed flavor sections live in the pinned file when `-c` names one,
+  // otherwise in the searched folder's launcher_icons.yaml (when `-c`
+  // names a folder) or the default one — plus pubspec.yaml, which always
+  // comes from the project root (-r), never from the searched folder.
+  // The yaml wins a name conflict.
   final Map<String, Config> keyFlavors = {};
-  if (isFileOptionExplicit(arguments)) {
+  if (configIsExplicitFile) {
     keyFlavors.addAll(
       Config.loadFlavorConfigsFromPath(
-        argResults[fileOption] as String,
+        argResults[configOption] as String,
         prefixPath,
       ),
     );
   } else {
-    for (final file in [defaultConfigFile, paths.pubspecFilePath]) {
-      for (final entry
-          in Config.loadFlavorConfigsFromPath(file, prefixPath).entries) {
+    final yamlFile = configIsFolder ? path.join(configValue, constants.defaultConfigFileName) : constants.defaultConfigFileName;
+    for (final file in [yamlFile, paths.pubspecFilePath]) {
+      for (final entry in Config.loadFlavorConfigsFromPath(file, prefixPath).entries) {
         keyFlavors.putIfAbsent(entry.key, () => entry.value);
       }
     }
@@ -195,12 +173,12 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     for (final name in keyFlavors.keys) name: _KeyFlavor(keyFlavors[name]!),
   });
   if (hasFileFlavors) {
-    for (final flavor in flavors) {
-      ordered[flavor] = const _FileFlavor();
+    for (final entry in flavors.entries) {
+      ordered[entry.key] = _FileFlavor(entry.value);
     }
   }
 
-  final requestedFlavor = argResults['flavor'] as String?;
+  final requestedFlavor = argResults[flavorOption] as String?;
   // An unknown --flavor is a CLI usage error: throw before the generation
   // try/catch blocks so it propagates instead of exiting.
   if (requestedFlavor != null && !ordered.containsKey(requestedFlavor)) {
@@ -217,13 +195,13 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
 
     final flutterLauncherIconsConfigs = loadConfigFileFromArgResults(
       argResults,
-      explicitFile: isFileOptionExplicit(arguments),
+      explicitFile: configIsExplicitFile,
       logger: logger,
     );
     if (flutterLauncherIconsConfigs == null) {
       throw NoConfigFoundException(
-        'No configuration found in $defaultConfigFile or in ${paths.pubspecFilePath}. '
-        'In case file exists in different directory use --file option',
+        'No configuration found in ${constants.defaultConfigFileName} or in ${paths.pubspecFilePath}. '
+        'In case file exists in different directory use --config option',
       );
     }
     try {
@@ -279,6 +257,32 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
   }
 }
 
+/// Discovers flavor configs directly inside [searchPath], mapping flavor
+/// name to file path. The search is flat: configs must live directly in
+/// the folder, never nested. Paths are absolute so loading stays correct
+/// regardless of the project-root prefix.
+Future<Map<String, String>> getFlavors({String searchPath = '.'}) async {
+  final flavors = <String, String>{};
+
+  await for (final item in Directory(searchPath).list(recursive: false)) {
+    if (item is File) {
+      final name = path.basename(item.path);
+      final match = RegExp(flavorConfigFilePattern).firstMatch(name);
+      if (match != null) {
+        flavors[match.group(1)!] = path.absolute(item.path);
+      }
+    }
+  }
+  return flavors;
+}
+
+/// Returns the flavor named by an explicit `-f launcher_icons-<flavor>.yaml` argument, or `null` when `-f` does not point at a flavor config file.
+String? explicitFlavorFromArgs(ArgResults argResults) {
+  final String filePath = argResults[configOption] as String;
+  final match = RegExp(flavorConfigFilePattern).firstMatch(path.basename(filePath));
+  return match?.group(1);
+}
+
 /// Where a flavor's config comes from: a suffixed
 /// `launcher_icons-<flavor>:` section or a file.
 sealed class _FlavorSource {
@@ -291,9 +295,10 @@ class _KeyFlavor extends _FlavorSource {
   final Config config;
 }
 
-/// A `launcher_icons-<flavor>.yaml` file.
+/// A `launcher_icons-<flavor>.yaml` file at [filePath].
 class _FileFlavor extends _FlavorSource {
-  const _FileFlavor();
+  const _FileFlavor(this.filePath);
+  final String filePath;
 }
 
 /// Loads the effective config for [flavor] from [source], or null when a
@@ -305,7 +310,7 @@ Config? _loadFlavorConfig(
 ) {
   return switch (source) {
     _KeyFlavor(:final config) => config,
-    _FileFlavor() => Config.loadConfigFromFlavor(flavor, prefixPath),
+    _FileFlavor(:final filePath) => Config.loadConfigFromPath(filePath, prefixPath),
   };
 }
 
@@ -381,15 +386,27 @@ Future<void> createIconsFromConfig(
   );
 }
 
-/// Loads the config named by `-f` (falling back to `pubspec.yaml`),
+/// Loads the config named by `-c` (falling back to `pubspec.yaml`),
 /// preferring pubspec when the default file is an unedited template.
+///
+/// When `-c` names a folder, only that folder's launcher_icons.yaml is
+/// tried; the fallback is always the project-root pubspec.yaml (-r),
+/// never a pubspec inside the folder.
 Config? loadConfigFileFromArgResults(
   ArgResults argResults, {
   bool explicitFile = false,
   LILogger? logger,
 }) {
   final String prefixPath = argResults[prefixOption] as String;
-  final String filePath = argResults[fileOption] as String;
+  final String configValue = argResults[configOption] as String;
+  if (Directory(path.join(prefixPath, configValue)).existsSync()) {
+    return Config.loadConfigFromPath(
+          path.join(configValue, constants.defaultConfigFileName),
+          prefixPath,
+        ) ??
+        Config.loadConfigFromPubSpec(prefixPath);
+  }
+  final String filePath = configValue;
   final flutterLauncherIconsConfigs = Config.loadConfigFromPath(
         filePath,
         prefixPath,
@@ -401,18 +418,16 @@ Config? loadConfigFileFromArgResults(
   // fluttercommunity/flutter_launcher_icons#628: an unedited `:generate` template still points at the phantom
   // `assets/icon/icon.png`. When the default config file is in play (not an
   // explicit `-f`) and none of its images exist while pubspec's do, the stale template is shadowing the real config — warn and prefer pubspec. An explicitly requested file is always honored, with a warning.
-  if (filePath == defaultConfigFile) {
+  if (filePath == constants.defaultConfigFileName) {
     final pubspecConfigs = Config.loadConfigFromPubSpec(prefixPath);
-    if (pubspecConfigs != null &&
-        !_hasExistingImage(flutterLauncherIconsConfigs, prefixPath) &&
-        _hasExistingImage(pubspecConfigs, prefixPath)) {
+    if (pubspecConfigs != null && !_hasExistingImage(flutterLauncherIconsConfigs, prefixPath) && _hasExistingImage(pubspecConfigs, prefixPath)) {
       utils.printStatus(
-        'Warning: $defaultConfigFile looks like an unedited generated template '
+        'Warning: ${constants.defaultConfigFileName} looks like an unedited generated template '
                 '(its icon files were not found) while pubspec.yaml declares icons that exist. ' +
             (explicitFile
-                ? 'Continuing with $defaultConfigFile as requested.'
+                ? 'Continuing with ${constants.defaultConfigFileName} as requested.'
                 : 'Using pubspec.yaml instead. '
-                    'Delete $defaultConfigFile or pass -f to be explicit.'),
+                    'Delete ${constants.defaultConfigFileName} or pass -f to be explicit.'),
         logger,
       );
       if (!explicitFile) {
@@ -423,14 +438,10 @@ Config? loadConfigFileFromArgResults(
   return flutterLauncherIconsConfigs;
 }
 
-/// Whether `-f`/`--file` was explicitly passed on the command line.
-bool isFileOptionExplicit(List<String> arguments) {
+/// Whether `-c`/`--config` was explicitly passed on the command line.
+bool isConfigOptionExplicit(List<String> arguments) {
   return arguments.any(
-    (arg) =>
-        arg == '-f' ||
-        arg == '--file' ||
-        arg.startsWith('--file=') ||
-        arg.startsWith('-f='),
+    (arg) => arg == '-c' || arg == '--config' || arg.startsWith('--config=') || arg.startsWith('-c='),
   );
 }
 
@@ -445,7 +456,5 @@ bool _hasExistingImage(Config config, String prefixPath) {
     config.macOSConfig?.imagePath,
     config.linuxConfig?.imagePath,
   ];
-  return candidates
-      .whereType<String>()
-      .any((image) => File(path.join(prefixPath, image)).existsSync());
+  return candidates.whereType<String>().any((image) => File(path.join(prefixPath, image)).existsSync());
 }

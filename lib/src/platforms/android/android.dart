@@ -8,8 +8,7 @@ import 'package:launcher_icons/src/core/errors.dart' as errors;
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
-import 'package:launcher_icons/src/platforms/android/xml_templates.dart'
-    as xml_template;
+import 'package:launcher_icons/src/platforms/android/xml_templates.dart' as xml_template;
 
 /// A legacy launcher icon density target: [directoryName] under the
 /// flavor-aware res folder, rendered at [size] px square.
@@ -60,8 +59,7 @@ Future<void> createDefaultIcons(
     logger: logger,
     cache: cache,
   );
-  final File androidManifestFile =
-      File(utils.withPrefix(prefixPath, paths.androidManifestFile));
+  final File androidManifestFile = File(utils.withPrefix(prefixPath, paths.androidManifestFile));
   final concurrentIconUpdates = <Future<void>>[];
   if (config.isCustomAndroidFile) {
     utils.printStatus('Adding a new Android launcher icon', logger);
@@ -91,9 +89,7 @@ Future<void> createDefaultIcons(
     await overwriteAndroidManifestWithNewLauncherIcon(
       iconName,
       androidManifestFile,
-      roundIconName: config.hasAndroidAdaptiveRoundConfig
-          ? androidAdaptiveRoundXmlName(config)
-          : null,
+      roundIconName: config.hasAndroidAdaptiveRoundConfig ? androidAdaptiveRoundXmlName(config) : null,
       logger: logger,
     );
   } else {
@@ -124,9 +120,7 @@ Future<void> createDefaultIcons(
     await overwriteAndroidManifestWithNewLauncherIcon(
       constants.androidDefaultIconName,
       androidManifestFile,
-      roundIconName: config.hasAndroidAdaptiveRoundConfig
-          ? androidAdaptiveRoundXmlName(config)
-          : null,
+      roundIconName: config.hasAndroidAdaptiveRoundConfig ? androidAdaptiveRoundXmlName(config) : null,
       logger: logger,
     );
   }
@@ -149,19 +143,14 @@ Future<void> removeStaleLegacyIconsForSwitch(
   final content = await androidManifestFile.readAsString();
   final match = RegExp(r'android:icon="@mipmap/([^"]+)"').firstMatch(content);
   final oldIconName = match?.group(1);
-  if (oldIconName == null ||
-      oldIconName == newIconName ||
-      oldIconName == constants.androidDefaultIconName) {
+  if (oldIconName == null || oldIconName == newIconName || oldIconName == constants.androidDefaultIconName) {
     return;
   }
   for (final template in androidIcons) {
     final file = File(
       utils.withPrefix(
         prefixPath,
-        paths.androidResFolder(flavor) +
-            template.directoryName +
-            '/' +
-            '$oldIconName.png',
+        paths.androidResFolder(flavor) + template.directoryName + '/' + '$oldIconName.png',
       ),
     );
     if (file.existsSync()) {
@@ -264,8 +253,7 @@ Future<void> createAdaptiveMonochromeIcons(
   utils.printStatus('Creating adaptive monochrome icons Android', logger);
 
   // Retrieve the necessary Flutter Launcher Icons configuration from the pubspec.yaml file
-  final String? monochromeImagePath =
-      config.androidConfig!.adaptiveIconMonochrome;
+  final String? monochromeImagePath = config.androidConfig!.adaptiveIconMonochrome;
   if (monochromeImagePath == null) {
     throw const InvalidConfigException(errors.errorMissingImagePath);
   }
@@ -297,9 +285,7 @@ Future<void> createAdaptiveMonochromeIcons(
 /// `ic_launcher_round` otherwise.
 String androidAdaptiveRoundXmlName(Config config) {
   final customName = config.androidConfig?.iconName;
-  return customName != null
-      ? '${customName}_round'
-      : constants.androidAdaptiveRoundIconName;
+  return customName != null ? '${customName}_round' : constants.androidAdaptiveRoundIconName;
 }
 
 /// Creates the opt-in adaptive round icons.
@@ -395,9 +381,7 @@ Future<void> createMipmapXmlFile(
   // `adaptive_icon_background` and `adaptive_icon_foreground` or
   // `adaptive_icon_monochrome` are specified (The `image_path` is not
   // automatically taken as foreground)
-  if (!config.hasAndroidAdaptiveConfig &&
-      !config.hasAndroidAdaptiveMonochromeConfig &&
-      !config.hasAndroidAdaptiveRoundConfig) {
+  if (!config.hasAndroidAdaptiveConfig && !config.hasAndroidAdaptiveMonochromeConfig && !config.hasAndroidAdaptiveRoundConfig) {
     // No adaptive icons requested: clear leftovers from a previous adaptive
     // configuration so they cannot shadow the fresh icons (fluttercommunity/flutter_launcher_icons#328).
     await _removeStaleAdaptiveIcons(
@@ -417,14 +401,11 @@ Future<void> createMipmapXmlFile(
   if (config.hasAndroidAdaptiveConfig) {
     final background = androidConfig.adaptiveIconBackground!;
     if (isTransparentAdaptiveBackground(background)) {
-      xmlContent +=
-          '  <background android:drawable="@android:color/transparent"/>\n';
+      xmlContent += '  <background android:drawable="@android:color/transparent"/>\n';
     } else if (isAdaptiveIconConfigImageFile(background)) {
-      xmlContent +=
-          '  <background android:drawable="@drawable/ic_launcher_background"/>\n';
+      xmlContent += '  <background android:drawable="@drawable/ic_launcher_background"/>\n';
     } else {
-      xmlContent +=
-          '  <background android:drawable="@color/ic_launcher_background"/>\n';
+      xmlContent += '  <background android:drawable="@color/ic_launcher_background"/>\n';
     }
 
     xmlContent += '''
@@ -441,8 +422,7 @@ Future<void> createMipmapXmlFile(
     if (monochromeInset == 0) {
       // Canonical form per developer.android.com: a direct drawable
       // attribute with no <inset> wrapper.
-      xmlContent +=
-          '  <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n';
+      xmlContent += '  <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n';
     } else {
       xmlContent += '''
   <monochrome>
@@ -459,18 +439,14 @@ Future<void> createMipmapXmlFile(
     mipmapXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) +
-            androidConfig.iconName! +
-            '.xml',
+        paths.androidAdaptiveXmlFolder(flavor) + androidConfig.iconName! + '.xml',
       ),
     );
   } else {
     mipmapXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) +
-            constants.androidDefaultIconName +
-            '.xml',
+        paths.androidAdaptiveXmlFolder(flavor) + constants.androidDefaultIconName + '.xml',
       ),
     );
   }
@@ -485,9 +461,7 @@ Future<void> createMipmapXmlFile(
     final roundXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) +
-            androidAdaptiveRoundXmlName(config) +
-            '.xml',
+        paths.androidAdaptiveXmlFolder(flavor) + androidAdaptiveRoundXmlName(config) + '.xml',
       ),
     );
     await roundXmlFile.writeAsString(
@@ -531,10 +505,7 @@ Future<void> _removeStaleAdaptiveIcons(
       ])
         utils.withPrefix(
           prefixPath,
-          paths.androidResFolder(flavor) +
-              template.directoryName +
-              '/' +
-              fileName,
+          paths.androidResFolder(flavor) + template.directoryName + '/' + fileName,
         ),
   ];
   for (final filePath in stalePaths) {
@@ -558,8 +529,7 @@ Future<void> updateColorsXmlFile(
   LILogger? logger,
   String prefixPath = '.',
 }) async {
-  final File colorsXml =
-      File(utils.withPrefix(prefixPath, paths.androidColorsFile(flavor)));
+  final File colorsXml = File(utils.withPrefix(prefixPath, paths.androidColorsFile(flavor)));
   // Using the sync method here due to `avoid_slow_async_io` lint suggestion.
   if (colorsXml.existsSync()) {
     utils.printStatus(
@@ -694,17 +664,14 @@ Future<void> overwriteAndroidManifestWithNewLauncherIcon(
   LILogger? logger,
 }) async {
   // we do not use `file.readAsLines()` here because that always gets rid of the last empty newline
-  final List<String> oldManifestLines =
-      (await androidManifestFile.readAsString()).split('\n');
-  final List<String> transformedLines =
-      _transformAndroidManifestWithNewLauncherIcon(
+  final List<String> oldManifestLines = (await androidManifestFile.readAsString()).split('\n');
+  final List<String> transformedLines = _transformAndroidManifestWithNewLauncherIcon(
     oldManifestLines,
     iconName,
     roundIconName,
   );
   await androidManifestFile.writeAsString(transformedLines.join('\n'));
-  if (roundIconName == null &&
-      oldManifestLines.any((line) => line.contains('android:roundIcon'))) {
+  if (roundIconName == null && oldManifestLines.any((line) => line.contains('android:roundIcon'))) {
     utils.printStatus(
       'WARNING: AndroidManifest.xml has a pre-existing android:roundIcon '
       'that may shadow themed icons. Configure `android.adaptive_icon_round` '
@@ -748,8 +715,7 @@ List<String> _transformAndroidManifestWithNewLauncherIcon(
         final roundAttr = ' android:roundIcon="@mipmap/$roundIconName"';
         if (result.trimRight().endsWith('>')) {
           final idx = result.lastIndexOf('>');
-          result =
-              '${result.substring(0, idx)}$roundAttr${result.substring(idx)}';
+          result = '${result.substring(0, idx)}$roundAttr${result.substring(idx)}';
         } else {
           result = '$result$roundAttr';
         }
@@ -762,11 +728,7 @@ List<String> _transformAndroidManifestWithNewLauncherIcon(
 /// Returns true if the adaptive icon configuration is an image file.
 bool isAdaptiveIconConfigImageFile(String backgroundFile) {
   final normalizedPath = backgroundFile.toLowerCase();
-  return normalizedPath.endsWith('.png') ||
-      normalizedPath.endsWith('.jpg') ||
-      normalizedPath.endsWith('.jpeg') ||
-      normalizedPath.endsWith('.webp') ||
-      normalizedPath.endsWith('.svg');
+  return normalizedPath.endsWith('.png') || normalizedPath.endsWith('.jpg') || normalizedPath.endsWith('.jpeg') || normalizedPath.endsWith('.webp') || normalizedPath.endsWith('.svg');
 }
 
 /// Returns true when the adaptive background is the `transparent` keyword (case-insensitive), meaning `@android:color/transparent` with no colors.xml entry (fluttercommunity/flutter_launcher_icons#535).

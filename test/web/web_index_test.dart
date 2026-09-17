@@ -41,8 +41,7 @@ void main() {
           ),
         );
 
-    test('emits opaque 180px apple-touch-icon and manages index block',
-        () async {
+    test('emits opaque 180px apple-touch-icon and manages index block', () async {
       final generator = generatorFor(<String, dynamic>{
         'generate': true,
         'image_path': 'master-light-1024.png',

@@ -56,11 +56,9 @@ final RegExp _buildFileRegExp = RegExp(
 );
 final RegExp _xcodeIdRegExp = RegExp(r'^[0-9A-F]{24}$');
 
-String _fileRefId(String content) =>
-    _fileRefRegExp.firstMatch(content)!.group(1)!;
+String _fileRefId(String content) => _fileRefRegExp.firstMatch(content)!.group(1)!;
 
-String _buildFileId(String content) =>
-    _buildFileRegExp.firstMatch(content)!.group(1)!;
+String _buildFileId(String content) => _buildFileRegExp.firstMatch(content)!.group(1)!;
 
 // Unit tests for the liquid glass project.pbxproj manipulation
 void main() {
@@ -128,11 +126,7 @@ void main() {
     });
 
     test('regenerates the id when the initial hash already exists', () {
-      final collidingId = sha256
-          .convert(utf8.encode('fileRefAppIcon'))
-          .toString()
-          .substring(0, 24)
-          .toUpperCase();
+      final collidingId = sha256.convert(utf8.encode('fileRefAppIcon')).toString().substring(0, 24).toUpperCase();
       final collidingContent = _pbxProjFixture.replaceFirst(
         '000000000000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference',
         '$collidingId /* OldIcon.icon */ = {isa = PBXFileReference',

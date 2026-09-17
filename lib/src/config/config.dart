@@ -85,8 +85,7 @@ class Config {
         (Map<dynamic, dynamic>? json) {
           final flavors = <String, Config>{};
           json?.forEach((key, value) {
-            final match =
-                RegExp(flavorConfigKeyPattern).firstMatch(key.toString());
+            final match = RegExp(flavorConfigKeyPattern).firstMatch(key.toString());
             if (match != null) {
               final name = match.group(1)!;
               if (value is! Map) {
@@ -197,15 +196,11 @@ class Config {
   }
 
   /// whether or not there is configuration for adaptive icons for android
-  bool get hasAndroidAdaptiveConfig =>
-      isNeedingNewAndroidIcon &&
-      androidConfig?.adaptiveIconForeground != null &&
-      androidConfig?.adaptiveIconBackground != null;
+  bool get hasAndroidAdaptiveConfig => isNeedingNewAndroidIcon && androidConfig?.adaptiveIconForeground != null && androidConfig?.adaptiveIconBackground != null;
 
   /// whether or not there is configuration for monochrome icons for android
   bool get hasAndroidAdaptiveMonochromeConfig {
-    return isNeedingNewAndroidIcon &&
-        androidConfig?.adaptiveIconMonochrome != null;
+    return isNeedingNewAndroidIcon && androidConfig?.adaptiveIconMonochrome != null;
   }
 
   /// whether or not there is configuration for round icons for android
@@ -216,12 +211,7 @@ class Config {
   /// Checks if at least one platform section has `generate: true`.
   /// Presence alone is not intent: an all-`generate: false` config must fail loudly instead of exiting successfully with no work done.
   bool get hasEnabledPlatform {
-    return isNeedingNewAndroidIcon ||
-        isNeedingNewIOSIcon ||
-        (webConfig?.generate ?? false) ||
-        (windowsConfig?.generate ?? false) ||
-        (macOSConfig?.generate ?? false) ||
-        (linuxConfig?.generate ?? false);
+    return isNeedingNewAndroidIcon || isNeedingNewIOSIcon || (webConfig?.generate ?? false) || (windowsConfig?.generate ?? false) || (macOSConfig?.generate ?? false) || (linuxConfig?.generate ?? false);
   }
 
   /// Whether or not configuration for generating Android icons exist
@@ -252,19 +242,16 @@ class Config {
   bool get isNeedingNewIOSIcon => iosConfig?.generate ?? false;
 
   /// Whether or not configuration for generating liquid glass .icon exists
-  bool get hasLiquidGlassIconConfig =>
-      iosConfig?.liquidGlassLayers?.isNotEmpty ?? false;
+  bool get hasLiquidGlassIconConfig => iosConfig?.liquidGlassLayers?.isNotEmpty ?? false;
 
   /// Whether or not configuration for generating a macOS liquid glass .icon
   /// exists
-  bool get hasMacOSLiquidGlassIconConfig =>
-      macOSConfig?.liquidGlassLayers?.isNotEmpty ?? false;
+  bool get hasMacOSLiquidGlassIconConfig => macOSConfig?.liquidGlassLayers?.isNotEmpty ?? false;
 
   /// Resolves the effective image path for a platform: the platform-level
   /// `image_path` wins, falling back to the top-level `image_path`.
   /// Returns null when neither is set — callers throw [errorMissingImagePath].
-  String? resolveImagePath(String? platformImagePath) =>
-      platformImagePath ?? imagePath;
+  String? resolveImagePath(String? platformImagePath) => platformImagePath ?? imagePath;
 
   /// Method for the retrieval of the Android icon path
   /// If android.image_path is found, this will be prioritised over the image_path value.

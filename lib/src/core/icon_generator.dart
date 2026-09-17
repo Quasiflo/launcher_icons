@@ -109,8 +109,7 @@ Future<void> generateIconsFor({
         logger.info('${platform.platformName} skipped in the config');
         continue;
       }
-      final progress =
-          logger.progress('Creating Icons for ${platform.platformName}');
+      final progress = logger.progress('Creating Icons for ${platform.platformName}');
       logger.verbose(
         'Validating platform requirements for ${platform.platformName}',
       );

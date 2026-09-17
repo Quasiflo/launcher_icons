@@ -22,8 +22,7 @@ void main() {
       }
 
       final key = SvgRasterCache.key('assets/icon.svg', 1024, 1024);
-      final results =
-          await Future.wait([cache.load(key, load), cache.load(key, load)]);
+      final results = await Future.wait([cache.load(key, load), cache.load(key, load)]);
 
       expect(loads, equals(1));
       expect(identical(results[0], results[1]), isTrue);
@@ -31,8 +30,7 @@ void main() {
 
     test('keys distinguish dimensions and normalize paths', () {
       expect(
-        SvgRasterCache.key('a.svg', 16, 16) ==
-            SvgRasterCache.key('a.svg', 32, 32),
+        SvgRasterCache.key('a.svg', 16, 16) == SvgRasterCache.key('a.svg', 32, 32),
         isFalse,
       );
       expect(

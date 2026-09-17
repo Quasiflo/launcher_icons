@@ -42,13 +42,10 @@ void main() {
             'generate': true,
             'image_path': 'assets/images/icon-710x599-android.png',
             'icon_name': null,
-            'adaptive_icon_foreground':
-                'assets/images/icon-foreground-432x432.png',
+            'adaptive_icon_foreground': 'assets/images/icon-foreground-432x432.png',
             'adaptive_icon_foreground_inset': 16,
-            'adaptive_icon_background':
-                'assets/images/christmas-adaptive-bg-1024.png',
-            'adaptive_icon_monochrome':
-                'assets/images/icon-monochrome-432x432.png',
+            'adaptive_icon_background': 'assets/images/christmas-adaptive-bg-1024.png',
+            'adaptive_icon_monochrome': 'assets/images/icon-monochrome-432x432.png',
             'adaptive_icon_round': null,
             'play_store_icon': false,
           }),
@@ -238,13 +235,10 @@ void main() {
             'generate': true,
             'image_path': 'assets/images/icon-710x599-android.png',
             'icon_name': null,
-            'adaptive_icon_foreground':
-                'assets/images/icon-foreground-432x432.png',
+            'adaptive_icon_foreground': 'assets/images/icon-foreground-432x432.png',
             'adaptive_icon_foreground_inset': 16,
-            'adaptive_icon_background':
-                'assets/images/christmas-adaptive-bg-1024.png',
-            'adaptive_icon_monochrome':
-                'assets/images/icon-monochrome-432x432.png',
+            'adaptive_icon_background': 'assets/images/christmas-adaptive-bg-1024.png',
+            'adaptive_icon_monochrome': 'assets/images/icon-monochrome-432x432.png',
             'adaptive_icon_round': null,
             'play_store_icon': false,
           }),

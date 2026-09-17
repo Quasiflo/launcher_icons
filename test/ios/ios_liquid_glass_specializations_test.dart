@@ -14,8 +14,7 @@ void main() {
     Map<String, dynamic> layerFor(Map<String, dynamic> ios) {
       final config = Config.fromJson(<String, dynamic>{'ios': ios});
       final groups = generateIconConfig(config)['groups'] as List;
-      return (groups.first as Map<String, dynamic>)['layers'].first
-          as Map<String, dynamic>;
+      return (groups.first as Map<String, dynamic>)['layers'].first as Map<String, dynamic>;
     }
 
     test('emits image-name-specializations for dark and tinted sources', () {
@@ -92,11 +91,9 @@ void main() {
       }
       sandbox.createSync(recursive: true);
       for (final name in ['icon.png', 'icon-dark.png', 'icon-tinted.png']) {
-        File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-            .copySync(path.join(sandboxDir, name));
+        File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, name));
       }
-      File(path.join(sandboxDir, 'icon.svg'))
-          .writeAsStringSync('<svg xmlns="http://www.w3.org/2000/svg"/>');
+      File(path.join(sandboxDir, 'icon.svg')).writeAsStringSync('<svg xmlns="http://www.w3.org/2000/svg"/>');
       Directory.current = sandboxDir;
     });
 

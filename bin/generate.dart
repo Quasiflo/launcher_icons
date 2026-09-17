@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:launcher_icons/src/cli.dart';
 import 'package:launcher_icons/src/core/constants.dart';
 
 /// The function will be called from command line using the following command:
@@ -14,7 +13,7 @@ void main(List<String> arguments) {
 
   final parser = ArgParser()
     ..addFlag(
-      helpFlag,
+      'help',
       abbr: 'h',
       help: 'Usage Help',
       negatable: false,
@@ -26,10 +25,9 @@ void main(List<String> arguments) {
       defaultsTo: false,
     )
     ..addOption(
-      'fileName',
-      abbr: 'f',
-      help:
-          'Use an alternate config file name like launcher_icons-staging.yaml',
+      'config',
+      abbr: 'c',
+      help: 'Use an alternate config file name like launcher_icons-staging.yaml',
       defaultsTo: defaultConfigFileName,
     );
 
@@ -37,7 +35,7 @@ void main(List<String> arguments) {
   final override = results['override'] as bool;
   final fileName = results['fileName'] as String;
 
-  if (results.flag(helpFlag)) {
+  if (results.flag('help')) {
     print('Generates template configuration file');
     print(parser.usage);
     exit(0);

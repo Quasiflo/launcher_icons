@@ -27,8 +27,7 @@ void main() {
       await Directory('${tempDir.path}/linux/runner').create(
         recursive: true,
       );
-      await File('${tempDir.path}/linux/runner/my_application.cc')
-          .writeAsString('''
+      await File('${tempDir.path}/linux/runner/my_application.cc').writeAsString('''
 #include "my_application.h"
 
 static void my_application_activate(GApplication* application) {

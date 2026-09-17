@@ -7,8 +7,7 @@ import 'package:path/path.dart' as path;
 /// A Implementation of [IconGenerator] for Windows
 class WindowsIconGenerator extends IconGenerator {
   /// Creates a instance of [WindowsIconGenerator]
-  WindowsIconGenerator(IconGeneratorContext context)
-      : super(context, 'Windows');
+  WindowsIconGenerator(IconGeneratorContext context) : super(context, 'Windows');
 
   // Minimal, sensible defaults for Windows ICOs: the Win32 required sets
   // (app icons + Classic Mode) plus 40/64 for classic-set completeness
@@ -25,8 +24,7 @@ class WindowsIconGenerator extends IconGenerator {
       context.config.resolveImagePath(context.windowsConfig!.imagePath),
     );
 
-    context.logger
-        .verbose('Decoding and loading image file from $imgFilePath...');
+    context.logger.verbose('Decoding and loading image file from $imgFilePath...');
     final bool svgInput = utils.isSvgPath(imgFilePath);
     final imgFile = await utils.decodeImageFile(
       imgFilePath,
@@ -41,8 +39,7 @@ class WindowsIconGenerator extends IconGenerator {
       );
     }
 
-    final utils.SizeImageLoader loadSize =
-        (size) async => utils.createResizedImage(size, imgFile);
+    final utils.SizeImageLoader loadSize = (size) async => utils.createResizedImage(size, imgFile);
 
     context.logger.verbose('Generating icon from $imgFilePath...');
     await _generateIcon(loadSize);

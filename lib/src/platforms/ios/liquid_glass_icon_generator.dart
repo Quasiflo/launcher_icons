@@ -36,18 +36,13 @@ Future<void> generateLiquidGlassIcon(
     sources: {
       for (final layer in layers) ...[
         layer.imagePath,
-        if ((layer.imagePathDark ?? darkFallback) != null)
-          (layer.imagePathDark ?? darkFallback)!,
-        if ((layer.imagePathTinted ?? tintedFallback) != null)
-          (layer.imagePathTinted ?? tintedFallback)!,
+        if ((layer.imagePathDark ?? darkFallback) != null) (layer.imagePathDark ?? darkFallback)!,
+        if ((layer.imagePathTinted ?? tintedFallback) != null) (layer.imagePathTinted ?? tintedFallback)!,
       ],
     },
-    iconFolderPath:
-        withPrefix(prefixPath, paths.iosLiquidGlassIconPath(iconName)),
-    assetsFolderPath:
-        withPrefix(prefixPath, paths.iosLiquidGlassAssetsPath(iconName)),
-    configFilePath:
-        withPrefix(prefixPath, paths.iosLiquidGlassConfigPath(iconName)),
+    iconFolderPath: withPrefix(prefixPath, paths.iosLiquidGlassIconPath(iconName)),
+    assetsFolderPath: withPrefix(prefixPath, paths.iosLiquidGlassAssetsPath(iconName)),
+    configFilePath: withPrefix(prefixPath, paths.iosLiquidGlassConfigPath(iconName)),
     iconConfig: generateIconConfig(config),
     iconFolderDisplayPath: paths.iosLiquidGlassIconPath(iconName),
     logger: logger,
@@ -83,12 +78,9 @@ Future<void> generateMacOSLiquidGlassIcon(
         if (layer.imagePathTinted != null) layer.imagePathTinted!,
       ],
     },
-    iconFolderPath:
-        withPrefix(prefixPath, paths.macOSLiquidGlassIconPath(iconName)),
-    assetsFolderPath:
-        withPrefix(prefixPath, paths.macOSLiquidGlassAssetsPath(iconName)),
-    configFilePath:
-        withPrefix(prefixPath, paths.macOSLiquidGlassConfigPath(iconName)),
+    iconFolderPath: withPrefix(prefixPath, paths.macOSLiquidGlassIconPath(iconName)),
+    assetsFolderPath: withPrefix(prefixPath, paths.macOSLiquidGlassAssetsPath(iconName)),
+    configFilePath: withPrefix(prefixPath, paths.macOSLiquidGlassConfigPath(iconName)),
     iconConfig: generateMacOSIconConfig(config),
     iconFolderDisplayPath: paths.macOSLiquidGlassIconPath(iconName),
     logger: logger,
@@ -128,8 +120,7 @@ Future<void> _writeLiquidGlassBundle({
   // Sweep layers orphaned by source switches (e.g. PNG replaced by SVG):
   // the Assets folder is fully tool-owned.
   for (final entity in Directory(assetsFolderPath).listSync()) {
-    if (entity is File &&
-        !wantedBasenames.contains(path.basename(entity.path))) {
+    if (entity is File && !wantedBasenames.contains(path.basename(entity.path))) {
       printStatus(
         'Removing orphaned liquid glass asset ${path.basename(entity.path)}',
         logger,
@@ -258,8 +249,7 @@ Map<String, dynamic> buildLiquidGlassDocument({
   final displayP3Color = convertHexToDisplayP3(backgroundColor);
 
   // Validate shadow kind
-  if (shadowKind.toLowerCase() != 'neutral' &&
-      shadowKind.toLowerCase() != 'chromatic') {
+  if (shadowKind.toLowerCase() != 'neutral' && shadowKind.toLowerCase() != 'chromatic') {
     throw InvalidConfigException(
       '$platform.liquid_glass_shadow_kind must be either "Neutral" or "Chromatic", got: $shadowKind',
     );
@@ -287,9 +277,7 @@ Map<String, dynamic> buildLiquidGlassDocument({
       'strength': refractivityStrength,
     };
   }
-  if (specularPlacement != null &&
-      specularPlacement != 'inside' &&
-      specularPlacement != 'outside') {
+  if (specularPlacement != null && specularPlacement != 'inside' && specularPlacement != 'outside') {
     throw InvalidConfigException(
       '$platform.liquid_glass_specular_highlight_placement must be either "inside" or "outside", got: $specularPlacement',
     );
@@ -324,14 +312,11 @@ Map<String, dynamic> buildLiquidGlassDocument({
         'layers': layersJson,
         if (refractivity != null) 'refractivity': refractivity,
         'shadow': {
-          'kind': shadowKind.toLowerCase() == 'chromatic'
-              ? 'layer-color'
-              : shadowKind.toLowerCase(),
+          'kind': shadowKind.toLowerCase() == 'chromatic' ? 'layer-color' : shadowKind.toLowerCase(),
           'opacity': shadowOpacity,
         },
         'specular': specular,
-        if (specularPlacement != null)
-          'specular-highlight-placement': specularPlacement,
+        if (specularPlacement != null) 'specular-highlight-placement': specularPlacement,
         'translucency': {
           'enabled': !removeGlass,
           'value': translucency ?? 0.5,

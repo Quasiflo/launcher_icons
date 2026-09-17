@@ -455,8 +455,7 @@ void main() {
         );
         expect(configFile.existsSync(), isTrue);
 
-        final iconJson =
-            jsonDecode(configFile.readAsStringSync()) as Map<String, dynamic>;
+        final iconJson = jsonDecode(configFile.readAsStringSync()) as Map<String, dynamic>;
         expect(
           iconJson['fill'],
           <String, dynamic>{

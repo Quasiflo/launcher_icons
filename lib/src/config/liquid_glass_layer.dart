@@ -89,8 +89,7 @@ class LiquidGlassLayer {
   });
 
   /// Creates [LiquidGlassLayer] from [json].
-  factory LiquidGlassLayer.fromJson(Map<dynamic, dynamic> json) =>
-      _$LiquidGlassLayerFromJson(json);
+  factory LiquidGlassLayer.fromJson(Map<dynamic, dynamic> json) => _$LiquidGlassLayerFromJson(json);
 
   /// Creates [Map] from [LiquidGlassLayer].
   Map<String, dynamic> toJson() => _$LiquidGlassLayerToJson(this);

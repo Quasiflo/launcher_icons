@@ -32,8 +32,7 @@ class WindowsConfig {
   });
 
   /// Creates [WindowsConfig] from [json]
-  factory WindowsConfig.fromJson(Map<dynamic, dynamic> json) =>
-      _$WindowsConfigFromJson(json);
+  factory WindowsConfig.fromJson(Map<dynamic, dynamic> json) => _$WindowsConfigFromJson(json);
 
   /// Creates [Map] from [WindowsConfig]
   Map<String, dynamic> toJson() => _$WindowsConfigToJson(this);

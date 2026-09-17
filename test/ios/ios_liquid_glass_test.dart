@@ -228,13 +228,11 @@ void main() {
         },
       });
       final groups = generateIconConfig(config)['groups'] as List;
-      final shadow = (groups.first as Map<String, dynamic>)['shadow']
-          as Map<String, dynamic>;
+      final shadow = (groups.first as Map<String, dynamic>)['shadow'] as Map<String, dynamic>;
       expect(shadow['kind'], 'layer-color');
     });
 
-    test('disables glass and translucency when remove_liquid_glass is true',
-        () {
+    test('disables glass and translucency when remove_liquid_glass is true', () {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
@@ -246,8 +244,7 @@ void main() {
       });
       final groups = generateIconConfig(config)['groups'] as List;
       final firstGroup = groups.first as Map<String, dynamic>;
-      final layer =
-          (firstGroup['layers'] as List).first as Map<String, dynamic>;
+      final layer = (firstGroup['layers'] as List).first as Map<String, dynamic>;
       final translucency = firstGroup['translucency'] as Map<String, dynamic>;
       expect(layer['glass'], isFalse);
       expect(translucency['enabled'], isFalse);
@@ -303,8 +300,7 @@ void main() {
           sandbox.deleteSync(recursive: true);
         }
         sandbox.createSync(recursive: true);
-        File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-            .copySync(path.join(sandboxDir, 'master-light-1024.png'));
+        File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'master-light-1024.png'));
         Directory.current = sandboxDir;
       });
 
@@ -333,8 +329,7 @@ void main() {
         final configFile = File(paths.iosLiquidGlassConfigPath('AppIcon'));
         expect(configFile.existsSync(), isTrue);
 
-        final iconJson =
-            jsonDecode(configFile.readAsStringSync()) as Map<String, dynamic>;
+        final iconJson = jsonDecode(configFile.readAsStringSync()) as Map<String, dynamic>;
         expect(
           iconJson['fill'],
           <String, dynamic>{

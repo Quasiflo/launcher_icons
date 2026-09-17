@@ -69,8 +69,7 @@ class WebConfig {
   });
 
   /// Creates [WebConfig] from [json]
-  factory WebConfig.fromJson(Map<dynamic, dynamic> json) =>
-      _$WebConfigFromJson(json);
+  factory WebConfig.fromJson(Map<dynamic, dynamic> json) => _$WebConfigFromJson(json);
 
   /// Creates [Map] from [WebConfig]
   Map<String, dynamic> toJson() => _$WebConfigToJson(this);

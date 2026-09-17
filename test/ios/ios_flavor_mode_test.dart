@@ -57,10 +57,8 @@ void main() {
       if (sandbox.existsSync()) {
         sandbox.deleteSync(recursive: true);
       }
-      Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj'))
-          .createSync(recursive: true);
-      File(path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj'))
-          .writeAsStringSync(_pbxproj);
+      Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj')).createSync(recursive: true);
+      File(path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj')).writeAsStringSync(_pbxproj);
       Directory.current = sandboxDir;
     });
 
@@ -95,8 +93,7 @@ void main() {
 
     test('rewrite stops at the first semicolon', () async {
       const tricky = 'ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; FOO = x;';
-      File(path.join('ios', 'Runner.xcodeproj', 'project.pbxproj'))
-          .writeAsStringSync(
+      File(path.join('ios', 'Runner.xcodeproj', 'project.pbxproj')).writeAsStringSync(
         _pbxproj.replaceAll(
           'ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;',
           tricky,
@@ -144,8 +141,7 @@ void main() {
 /* End XCBuildConfiguration section */
 }
 ''';
-      File(path.join('ios', 'Runner.xcodeproj', 'project.pbxproj'))
-          .writeAsStringSync(shared);
+      File(path.join('ios', 'Runner.xcodeproj', 'project.pbxproj')).writeAsStringSync(shared);
 
       await ios.changeIosLauncherIcon('AppIcon-staging', 'staging');
 
@@ -178,12 +174,9 @@ void main() {
         sandbox.deleteSync(recursive: true);
       }
       sandbox.createSync(recursive: true);
-      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-          .copySync(path.join(sandboxDir, 'icon.png'));
-      Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj'))
-          .createSync(recursive: true);
-      File(path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj'))
-          .writeAsStringSync(_pbxproj);
+      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'icon.png'));
+      Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj')).createSync(recursive: true);
+      File(path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj')).writeAsStringSync(_pbxproj);
       Directory.current = sandboxDir;
     });
 
@@ -191,8 +184,7 @@ void main() {
       Directory.current = originalDir;
     });
 
-    Config xcconfig([Map<String, dynamic> extra = const {}]) =>
-        Config.fromJson(<String, dynamic>{
+    Config xcconfig([Map<String, dynamic> extra = const {}]) => Config.fromJson(<String, dynamic>{
           'ios': {
             'generate': true,
             'image_path': 'icon.png',
@@ -223,8 +215,7 @@ void main() {
       ).readAsStringSync();
       expect(pbxprojContent, isNot(contains('AppIcon-staging')));
       expect(
-        'ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;'
-            .allMatches(pbxprojContent),
+        'ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;'.allMatches(pbxprojContent),
         hasLength(2),
       );
       // One override file per mode, seeded with the Generated include.

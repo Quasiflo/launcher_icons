@@ -35,8 +35,7 @@ void main() {
         sandbox.deleteSync(recursive: true);
       }
       sandbox.createSync(recursive: true);
-      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-          .copySync(path.join(sandboxDir, 'icon.png'));
+      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'icon.png'));
       Directory.current = sandboxDir;
     });
 

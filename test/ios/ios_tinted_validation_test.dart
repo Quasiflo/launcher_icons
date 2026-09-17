@@ -58,16 +58,14 @@ void main() {
         sandbox.deleteSync(recursive: true);
       }
       sandbox.createSync(recursive: true);
-      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png'))
-          .copySync(path.join(sandboxDir, 'icon.png'));
+      File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'icon.png'));
       final red = Image(width: 16, height: 16, numChannels: 3);
       for (var y = 0; y < 16; y++) {
         for (var x = 0; x < 16; x++) {
           red.setPixelRgb(x, y, 200, 50, 50);
         }
       }
-      File(path.join(sandboxDir, 'tinted.png'))
-          .writeAsBytesSync(encodePng(red));
+      File(path.join(sandboxDir, 'tinted.png')).writeAsBytesSync(encodePng(red));
       Directory.current = sandboxDir;
     });
 
