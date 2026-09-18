@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:launcher_icons/src/config/config.dart';
+import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
@@ -12,14 +13,9 @@ import 'package:launcher_icons/src/platforms/linux/linux_icon_generator.dart';
 import 'package:launcher_icons/src/platforms/macos/macos_icon_generator.dart';
 import 'package:launcher_icons/src/platforms/web/web_icon_generator.dart';
 import 'package:launcher_icons/src/platforms/windows/windows_icon_generator.dart';
+import 'package:launcher_icons/src/version.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
-
-/// CLI flag name for usage help (`-h`).
-const String helpFlag = 'help';
-
-/// CLI flag name for verbose logging (`-v`).
-const String verboseFlag = 'verbose';
 
 /// CLI option name for the folder of config files (`-c`).
 const String configOption = 'config';
@@ -38,13 +34,18 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
   final ArgParser parser = ArgParser(allowTrailingOptions: true);
   parser
     ..addFlag(
-      helpFlag,
+      'help',
       abbr: 'h',
       help: 'Usage Help',
       negatable: false,
     )
     ..addFlag(
-      verboseFlag,
+      'version',
+      help: 'Tool Version',
+      negatable: false,
+    )
+    ..addFlag(
+      'verbose',
       abbr: 'v',
       help: 'Verbose Output',
       defaultsTo: false,
@@ -68,11 +69,18 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     );
 
   final argResults = parser.parse(arguments);
-  final logger = LILogger(argResults.flag(verboseFlag)); // creating logger based on -v flag
+  final logger = LILogger(argResults.flag('verbose')); // creating logger based on -v flag
 
   logger.verbose('Received args ${argResults.arguments}');
 
-  if (argResults.flag(helpFlag)) {
+  if (argResults.flag('version')) {
+    print(packageVersion);
+    exit(0);
+  }
+
+  print(introMessage());
+
+  if (argResults.flag('help')) {
     logger.info('Generates launcher icons for Flutter projects');
     logger.info(parser.usage);
     exit(0);

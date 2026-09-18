@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/paths.dart';
+import 'package:launcher_icons/src/version.dart';
 
 /// The function will be called from command line using the following command:
 /// ```sh
@@ -10,13 +11,16 @@ import 'package:launcher_icons/src/core/paths.dart';
 /// ```
 /// Calling this function will generate a launcher_icons.yaml file with a default config template.
 void main(List<String> arguments) {
-  print(introMessage());
-
   final parser = ArgParser()
     ..addFlag(
       'help',
       abbr: 'h',
       help: 'Usage Help',
+      negatable: false,
+    )
+    ..addFlag(
+      'version',
+      help: 'Tool Version',
       negatable: false,
     )
     ..addFlag(
@@ -35,6 +39,13 @@ void main(List<String> arguments) {
   final results = parser.parse(arguments);
   final override = results['override'] as bool;
   final fileName = results['config'] as String;
+
+  if (results.flag('version')) {
+    print(packageVersion);
+    exit(0);
+  }
+
+  print(introMessage());
 
   if (results.flag('help')) {
     print('Generates template configuration file');
