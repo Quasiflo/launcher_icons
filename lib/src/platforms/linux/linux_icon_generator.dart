@@ -37,9 +37,8 @@ class LinuxIconGenerator extends IconGenerator {
 
   @override
   Future<void> createIcons() async {
-    final sourcePath = context.config.resolveImagePath(context.linuxConfig!.imagePath)!;
+    final sourcePath = context.config.resolveImageFile(context.linuxConfig!.imagePath, context.prefixPath);
     final iconPath = runtimeIconPath(sourcePath);
-
     context.logger.verbose('Using Linux icon at $iconPath...');
 
     // SVG sources can't be loaded by the runner: derive the runtime
@@ -294,23 +293,21 @@ parts:
     context.logger.verbose('Validating Linux config...');
     final linuxConfig = context.linuxConfig!;
 
-    final sourcePath = context.config.resolveImagePath(linuxConfig.imagePath);
-    if (sourcePath == null) {
-      context.logger.error(
-        'Invalid config. Either provide linux.image_path or image_path',
-      );
+    final String sourcePath;
+    try {
+      sourcePath = context.config.resolveImageFile(linuxConfig.imagePath, context.prefixPath);
+    } on InvalidConfigException catch (e) {
+      context.logger.error(e.message);
       return false;
     }
 
     // SVG sources derive a sibling raster at generation time (see
-    // [_linuxRuntimeSize]): the pubspec must bundle the derived file, and
-    // existence is checked on the configured source.
+    // [_linuxRuntimeSize]): the pubspec must bundle the derived file.
     final iconPath = runtimeIconPath(sourcePath);
 
     final entitesToCheck = [
       path.join(context.prefixPath, paths.linuxDirPath),
       path.join(context.prefixPath, paths.linuxMyApplicationFile),
-      path.join(context.prefixPath, sourcePath),
     ];
 
     final failedEntityPath = utils.areFSEntiesExist(entitesToCheck);

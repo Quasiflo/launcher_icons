@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/platforms/windows/windows_icon_generator.dart';
@@ -91,10 +92,18 @@ void main() {
         when(mockWindowsConfig.generate).thenReturn(true);
         when(mockWindowsConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
         when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
-        // resolveImagePath is mocked: implement the real fallback rule so
-        // the unit tests exercise the generators, not the mock default.
-        when(mockConfig.resolveImagePath(argThat(anything))).thenAnswer(
-          (invocation) => (invocation.positionalArguments.first as String?) ?? mockConfig.imagePath,
+        // resolveImageFile is mocked: implement the real rule (platform
+        // path wins, top-level fallback, missing file throws) so the unit
+        // tests exercise the generators, not the mock default.
+        when(mockConfig.resolveImageFile(argThat(anything), prefixPath)).thenAnswer(
+          (invocation) {
+            final platformPath = invocation.positionalArguments.first as String?;
+            final resolved = platformPath ?? mockConfig.imagePath;
+            if (resolved == null || !File(path.join(prefixPath, resolved)).existsSync()) {
+              throw InvalidConfigException('Missing "image_path" within configuration, or the referenced image file does not exist${resolved == null ? '' : ': "$resolved"'}');
+            }
+            return resolved;
+          },
         );
       });
 

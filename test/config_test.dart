@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:launcher_icons/src/config/config.dart';
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
+import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
 
@@ -19,14 +21,9 @@ void main() {
         final configs = parseTemplateSection(templates.liConfigTemplate);
         expect(configs, isNotNull);
         // android configs
-        expect(configs.hasAndroidConfig, isTrue);
-        expect(configs.isNeedingNewAndroidIcon, isTrue);
-        expect(configs.isCustomAndroidFile, isFalse);
+        expect(configs.androidEnabled, isTrue);
+        expect(android.isCustomAndroidFile(configs), isFalse);
         expect(configs.imagePath, isNotNull);
-        expect(
-          configs.getImagePathAndroid(),
-          equals('assets/images/icon-710x599-android.png'),
-        );
         expect(configs.androidConfig!.adaptiveIconBackground, isNotNull);
         expect(configs.androidConfig!.adaptiveIconForeground, isNotNull);
         expect(
@@ -44,12 +41,7 @@ void main() {
           }),
         );
         // ios configs
-        expect(configs.hasIOSConfig, isTrue);
-        expect(configs.isNeedingNewIOSIcon, isTrue);
-        expect(
-          configs.getImagePathIOS(),
-          equals('assets/images/icon-1024x1024.png'),
-        );
+        expect(configs.iosEnabled, isTrue);
         expect(configs.iosConfig!.removeAlpha, isFalse);
         expect(
           configs.iosConfig!.toJson(),
@@ -138,7 +130,7 @@ void main() {
           }),
         );
         // linux
-        expect(configs.hasLinuxConfig, isTrue);
+        expect(configs.linuxEnabled, isTrue);
         expect(configs.linuxConfig, isNotNull);
         expect(configs.linuxConfig!.generate, isNotNull);
         expect(configs.linuxConfig!.imagePath, isNotNull);
@@ -160,17 +152,13 @@ void main() {
         const String imagePath = 'assets/images/icon-710x599.png';
         expect(configs.imagePath, equals(imagePath));
         // android configs
-        expect(configs.hasAndroidConfig, isTrue);
-        expect(configs.isNeedingNewAndroidIcon, isTrue);
+        expect(configs.androidEnabled, isTrue);
         expect(configs.androidConfig!.imagePath, isNull);
-        expect(configs.getImagePathAndroid(), equals(imagePath));
         expect(configs.androidConfig!.adaptiveIconBackground, isNull);
         expect(configs.androidConfig!.adaptiveIconForeground, isNull);
         // ios configs
-        expect(configs.hasIOSConfig, isTrue);
-        expect(configs.isNeedingNewIOSIcon, isTrue);
+        expect(configs.iosEnabled, isTrue);
         expect(configs.iosConfig!.imagePath, isNull);
-        expect(configs.getImagePathIOS(), equals(imagePath));
         expect(configs.iosConfig!.removeAlpha, isFalse);
         // web configs
         expect(configs.webConfig, isNull);
@@ -179,7 +167,7 @@ void main() {
         // macos
         expect(configs.macOSConfig, isNull);
         // linux
-        expect(configs.hasLinuxConfig, isFalse);
+        expect(configs.linuxEnabled, isFalse);
         expect(configs.linuxConfig, isNull);
       });
     });
@@ -188,14 +176,9 @@ void main() {
         final configs = parseTemplateSection(templates.pubspecTemplate);
         expect(configs, isNotNull);
         // android configs
-        expect(configs.hasAndroidConfig, isTrue);
-        expect(configs.isNeedingNewAndroidIcon, isTrue);
-        expect(configs.isCustomAndroidFile, isFalse);
+        expect(configs.androidEnabled, isTrue);
+        expect(android.isCustomAndroidFile(configs), isFalse);
         expect(configs.imagePath, isNotNull);
-        expect(
-          configs.getImagePathAndroid(),
-          equals('assets/images/icon-710x599-android.png'),
-        );
         expect(configs.androidConfig!.adaptiveIconBackground, isNotNull);
         expect(configs.androidConfig!.adaptiveIconForeground, isNotNull);
         expect(
@@ -213,12 +196,7 @@ void main() {
           }),
         );
         // ios configs
-        expect(configs.hasIOSConfig, isTrue);
-        expect(configs.isNeedingNewIOSIcon, isTrue);
-        expect(
-          configs.getImagePathIOS(),
-          equals('assets/images/icon-1024x1024.png'),
-        );
+        expect(configs.iosEnabled, isTrue);
         expect(configs.iosConfig!.removeAlpha, isFalse);
         expect(
           configs.iosConfig!.toJson(),
@@ -307,7 +285,7 @@ void main() {
           }),
         );
         // linux
-        expect(configs.hasLinuxConfig, isTrue);
+        expect(configs.linuxEnabled, isTrue);
         expect(configs.linuxConfig, isNotNull);
         expect(configs.linuxConfig!.generate, isNotNull);
         expect(configs.linuxConfig!.imagePath, isNotNull);
@@ -323,15 +301,13 @@ void main() {
     group('#loadConfigFromFlavor', () {
       test('should return valid config', () {
         final configs = parseTemplateSection(templates.flavorLIConfigTemplate);
-        expect(configs.hasAndroidConfig, isTrue);
-        expect(configs.isNeedingNewAndroidIcon, isTrue);
+        expect(configs.androidEnabled, isTrue);
         expect(configs.imagePath, isNotNull);
         expect(configs.androidConfig!.imagePath, isNotNull);
         expect(configs.androidConfig!.adaptiveIconBackground, isNotNull);
         expect(configs.androidConfig!.adaptiveIconForeground, isNotNull);
         // ios configs
-        expect(configs.hasIOSConfig, isTrue);
-        expect(configs.isNeedingNewIOSIcon, isTrue);
+        expect(configs.iosEnabled, isTrue);
         expect(configs.iosConfig!.imagePath, isNotNull);
         // web configs
         expect(configs.webConfig, isNotNull);
@@ -392,7 +368,7 @@ void main() {
           }),
         );
         // linux
-        expect(configs.hasLinuxConfig, isTrue);
+        expect(configs.linuxEnabled, isTrue);
         expect(configs.linuxConfig, isNotNull);
         expect(configs.linuxConfig!.generate, isNotNull);
         expect(configs.linuxConfig!.imagePath, isNotNull);
@@ -406,20 +382,53 @@ void main() {
       });
     });
 
-    group('#resolveImagePath', () {
+    group('#resolveImageFile', () {
+      late Directory dir;
+
+      setUp(() async {
+        dir = await Directory.systemTemp.createTemp('resolve_image_file');
+        await Directory('${dir.path}/android').create();
+        await File('${dir.path}/top.png').writeAsBytes([0]);
+        await File('${dir.path}/android/icon.png').writeAsBytes([0]);
+      });
+
+      tearDown(() async {
+        await dir.delete(recursive: true);
+      });
+
       test('platform path wins over the top-level path', () {
-        const config = Config(imagePath: 'global.png');
-        expect(config.resolveImagePath('platform.png'), equals('platform.png'));
+        const config = Config(imagePath: 'top.png');
+        expect(
+          config.resolveImageFile('android/icon.png', dir.path),
+          equals('android/icon.png'),
+        );
       });
 
       test('falls back to the top-level path when platform path is null', () {
-        const config = Config(imagePath: 'global.png');
-        expect(config.resolveImagePath(null), equals('global.png'));
+        const config = Config(imagePath: 'top.png');
+        expect(config.resolveImageFile(null, dir.path), equals('top.png'));
       });
 
-      test('returns null when neither path is set', () {
+      test('throws when neither path is set', () {
         const config = Config();
-        expect(config.resolveImagePath(null), isNull);
+        expect(
+          () => config.resolveImageFile(null, dir.path),
+          throwsA(isA<InvalidConfigException>()),
+        );
+      });
+
+      test('throws when the file does not exist', () {
+        const config = Config(imagePath: 'top.png');
+        expect(
+          () => config.resolveImageFile('missing.png', dir.path),
+          throwsA(
+            isA<InvalidConfigException>().having(
+              (e) => e.message,
+              'message',
+              contains('missing.png'),
+            ),
+          ),
+        );
       });
     });
   });

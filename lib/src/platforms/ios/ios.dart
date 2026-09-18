@@ -6,7 +6,6 @@ import 'package:image/image.dart' hide decodeImageFile;
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
-import 'package:launcher_icons/src/core/errors.dart' as errors;
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart';
@@ -59,13 +58,9 @@ Future<void> createIcons(
   String prefixPath = '.',
   SvgRasterCache? cache,
 }) async {
-  final String? filePath = config.getImagePathIOS();
+  final String filePath = config.resolveImageFile(config.iosConfig?.imagePath, prefixPath);
   final String? darkFilePath = config.iosConfig?.imagePathDarkTransparent;
   final String? tintedFilePath = config.iosConfig?.imagePathTintedGrayscale;
-
-  if (filePath == null) {
-    throw const InvalidConfigException(errors.errorMissingImagePath);
-  }
 
   // decodeImageFile throws on missing/undecodable files, so a specified
   // but bad path is a hard error rather than a silent skip.
@@ -404,7 +399,7 @@ Future<void> createIcons(
   );
 
   // Generate liquid glass .icon if configured
-  if (config.hasLiquidGlassIconConfig) {
+  if (config.iosConfig?.liquidGlassLayers?.isNotEmpty ?? false) {
     await generateLiquidGlassIcon(
       config,
       catalogName,

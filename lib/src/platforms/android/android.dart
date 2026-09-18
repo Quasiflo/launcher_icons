@@ -4,7 +4,6 @@ import 'package:image/image.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
-import 'package:launcher_icons/src/core/errors.dart' as errors;
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
@@ -41,6 +40,27 @@ List<AndroidIconTemplate> androidIcons = <AndroidIconTemplate>[
   AndroidIconTemplate(directoryName: 'mipmap-xxxhdpi', size: 192),
 ];
 
+/// Whether [config] requests the adaptive pair: enabled with both background and foreground layers. Only Android reads these keys, so the rule lives here rather than on Config.
+bool hasAndroidAdaptiveConfig(Config config) {
+  final androidConfig = config.androidConfig;
+  return config.androidEnabled && androidConfig?.adaptiveIconForeground != null && androidConfig?.adaptiveIconBackground != null;
+}
+
+/// Whether [config] requests Android 13+ monochrome icons: enabled with a monochrome layer.
+bool hasAndroidAdaptiveMonochromeConfig(Config config) {
+  final androidConfig = config.androidConfig;
+  return config.androidEnabled && androidConfig?.adaptiveIconMonochrome != null;
+}
+
+/// Whether [config] requests the opt-in round icon: enabled with a round layer (which itself requires the adaptive pair).
+bool hasAndroidAdaptiveRoundConfig(Config config) {
+  final androidConfig = config.androidConfig;
+  return config.androidEnabled && androidConfig?.adaptiveIconRound != null;
+}
+
+/// Whether a custom Android `icon_name` was specified. When set, a new launcher icon is generated without removing the old default existing Flutter launcher icon.
+bool isCustomAndroidFile(Config config) => config.androidConfig?.iconName != null;
+
 /// Creates the legacy mipmap icons (overwriting defaults, or adding a new icon when `android.icon_name` is set) and wires the manifest.
 Future<void> createDefaultIcons(
   Config config,
@@ -50,10 +70,7 @@ Future<void> createDefaultIcons(
   utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating default icons Android', logger);
-  final String? filePath = config.getImagePathAndroid();
-  if (filePath == null) {
-    throw const InvalidConfigException(errors.errorMissingImagePath);
-  }
+  final String filePath = config.resolveImageFile(config.androidConfig?.imagePath, prefixPath);
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
     logger: logger,
@@ -61,7 +78,7 @@ Future<void> createDefaultIcons(
   );
   final File androidManifestFile = File(utils.withPrefix(prefixPath, paths.androidManifestFile));
   final concurrentIconUpdates = <Future<void>>[];
-  if (config.isCustomAndroidFile) {
+  if (isCustomAndroidFile(config)) {
     utils.printStatus('Adding a new Android launcher icon', logger);
     final String iconName = config.androidConfig!.iconName!;
     isAndroidIconNameCorrectFormat(iconName);
@@ -89,7 +106,7 @@ Future<void> createDefaultIcons(
     await overwriteAndroidManifestWithNewLauncherIcon(
       iconName,
       androidManifestFile,
-      roundIconName: config.hasAndroidAdaptiveRoundConfig ? androidAdaptiveRoundXmlName(config) : null,
+      roundIconName: hasAndroidAdaptiveRoundConfig(config) ? androidAdaptiveRoundXmlName(config) : null,
       logger: logger,
     );
   } else {
@@ -120,7 +137,7 @@ Future<void> createDefaultIcons(
     await overwriteAndroidManifestWithNewLauncherIcon(
       constants.androidDefaultIconName,
       androidManifestFile,
-      roundIconName: config.hasAndroidAdaptiveRoundConfig ? androidAdaptiveRoundXmlName(config) : null,
+      roundIconName: hasAndroidAdaptiveRoundConfig(config) ? androidAdaptiveRoundXmlName(config) : null,
       logger: logger,
     );
   }
@@ -168,7 +185,7 @@ bool isAndroidIconNameCorrectFormat(String iconName) {
   // assure the icon only consists of lowercase letters, numbers and underscore
   if (!RegExp(r'^[a-z0-9_]+$').hasMatch(iconName)) {
     throw const InvalidAndroidIconNameException(
-      errors.errorIncorrectIconName,
+      'The icon name must contain only lowercase a-z, 0-9, or underscore: E.g. "ic_my_new_icon"',
     );
   }
   return true;
@@ -190,7 +207,7 @@ Future<void> createAdaptiveIcons(
   final String? backgroundConfig = androidConfig.adaptiveIconBackground;
   final String? foregroundImagePath = androidConfig.adaptiveIconForeground;
   if (backgroundConfig == null || foregroundImagePath == null) {
-    throw const InvalidConfigException(errors.errorMissingImagePath);
+    throw const InvalidConfigException('Missing "adaptive_icon_background" and "adaptive_icon_foreground" within android configuration.');
   }
   final loadForegroundSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, foregroundImagePath),
@@ -255,7 +272,7 @@ Future<void> createAdaptiveMonochromeIcons(
   // Retrieve the necessary Flutter Launcher Icons configuration from the pubspec.yaml file
   final String? monochromeImagePath = config.androidConfig!.adaptiveIconMonochrome;
   if (monochromeImagePath == null) {
-    throw const InvalidConfigException(errors.errorMissingImagePath);
+    throw const InvalidConfigException('Missing "adaptive_icon_monochrome" within android configuration.');
   }
   final loadMonochromeSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, monochromeImagePath),
@@ -300,9 +317,9 @@ Future<void> createAdaptiveRoundIcons(
 
   final String? roundImagePath = config.androidConfig?.adaptiveIconRound;
   if (roundImagePath == null) {
-    throw const InvalidConfigException(errors.errorMissingImagePath);
+    throw const InvalidConfigException('Missing "adaptive_icon_round" within android configuration.');
   }
-  if (!config.hasAndroidAdaptiveConfig) {
+  if (!hasAndroidAdaptiveConfig(config)) {
     throw const InvalidConfigException(
       'Invalid `adaptive_icon_round`: requires `adaptive_icon_background` '
       'and `adaptive_icon_foreground`.',
@@ -341,10 +358,7 @@ Future<void> createPlayStoreIcon(
   LILogger? logger,
   utils.SvgRasterCache? cache,
 ]) async {
-  final String? filePath = config.getImagePathAndroid();
-  if (filePath == null) {
-    throw const InvalidConfigException(errors.errorMissingImagePath);
-  }
+  final String filePath = config.resolveImageFile(config.androidConfig?.imagePath, prefixPath);
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
     logger: logger,
@@ -381,7 +395,7 @@ Future<void> createMipmapXmlFile(
   // `adaptive_icon_background` and `adaptive_icon_foreground` or
   // `adaptive_icon_monochrome` are specified (The `image_path` is not
   // automatically taken as foreground)
-  if (!config.hasAndroidAdaptiveConfig && !config.hasAndroidAdaptiveMonochromeConfig && !config.hasAndroidAdaptiveRoundConfig) {
+  if (!hasAndroidAdaptiveConfig(config) && !hasAndroidAdaptiveMonochromeConfig(config) && !hasAndroidAdaptiveRoundConfig(config)) {
     // No adaptive icons requested: clear leftovers from a previous adaptive
     // configuration so they cannot shadow the fresh icons (fluttercommunity/flutter_launcher_icons#328).
     await _removeStaleAdaptiveIcons(
@@ -398,7 +412,7 @@ Future<void> createMipmapXmlFile(
   String xmlContent = '';
   final androidConfig = config.androidConfig!;
 
-  if (config.hasAndroidAdaptiveConfig) {
+  if (hasAndroidAdaptiveConfig(config)) {
     final background = androidConfig.adaptiveIconBackground!;
     if (isTransparentAdaptiveBackground(background)) {
       xmlContent += '  <background android:drawable="@android:color/transparent"/>\n';
@@ -417,7 +431,7 @@ Future<void> createMipmapXmlFile(
 ''';
   }
 
-  if (config.hasAndroidAdaptiveMonochromeConfig) {
+  if (hasAndroidAdaptiveMonochromeConfig(config)) {
     final int monochromeInset = androidConfig.adaptiveIconForegroundInset;
     if (monochromeInset == 0) {
       // Canonical form per developer.android.com: a direct drawable
@@ -435,7 +449,7 @@ Future<void> createMipmapXmlFile(
   }
 
   late File mipmapXmlFile;
-  if (config.isCustomAndroidFile) {
+  if (isCustomAndroidFile(config)) {
     mipmapXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
@@ -455,7 +469,7 @@ Future<void> createMipmapXmlFile(
     xml_template.mipmapXmlFile.replaceAll('{{CONTENT}}', xmlContent),
   );
 
-  if (config.hasAndroidAdaptiveRoundConfig) {
+  if (hasAndroidAdaptiveRoundConfig(config)) {
     // The round icon is a separate adaptive-icon resource with the same
     // layers, wired via android:roundIcon.
     final roundXmlFile = await utils.createFileIfNotExist(

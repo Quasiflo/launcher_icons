@@ -1,3 +1,4 @@
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
@@ -8,7 +9,7 @@ class IosIconGenerator extends IconGenerator {
   IosIconGenerator(IconGeneratorContext context) : super(context, 'iOS');
 
   @override
-  bool get isEnabled => context.config.isNeedingNewIOSIcon;
+  bool get isEnabled => context.config.iosEnabled;
 
   @override
   bool validateRequirements() {
@@ -16,10 +17,10 @@ class IosIconGenerator extends IconGenerator {
     // config preconditions are checked here.
     context.logger.verbose('Validating iOS config...');
     final config = context.config;
-    if (config.getImagePathIOS() == null) {
-      context.logger.error(
-        'Invalid config. Either provide ios.image_path or image_path',
-      );
+    try {
+      config.resolveImageFile(config.iosConfig?.imagePath, context.prefixPath);
+    } on InvalidConfigException catch (e) {
+      context.logger.error(e.message);
       return false;
     }
 

@@ -4,7 +4,6 @@ import 'package:args/args.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
-import 'package:launcher_icons/src/core/errors.dart' as errors;
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
@@ -143,11 +142,36 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
       logger.info('\nFlavor: $flavor');
     }
     try {
-      await createIconsFromConfig(
-        entry.value,
-        logger,
-        prefixPath,
-        flavor,
+      if (!entry.value.hasEnabledPlatform) {
+        throw const InvalidConfigException('No platform enabled within config to generate icons for. Set "generate: true" for at least one platform.');
+      }
+      await generateIconsFor(
+        config: entry.value,
+        logger: logger,
+        prefixPath: prefixPath,
+        flavor: flavor,
+        platforms: (context) {
+          final platforms = <IconGenerator>[];
+          if (entry.value.androidEnabled) {
+            platforms.add(AndroidIconGenerator(context));
+          }
+          if (entry.value.iosEnabled) {
+            platforms.add(IosIconGenerator(context));
+          }
+          if (entry.value.webEnabled) {
+            platforms.add(WebIconGenerator(context));
+          }
+          if (entry.value.windowsEnabled) {
+            platforms.add(WindowsIconGenerator(context));
+          }
+          if (entry.value.macOSEnabled) {
+            platforms.add(MacOSIconGenerator(context));
+          }
+          if (entry.value.linuxEnabled) {
+            platforms.add(LinuxIconGenerator(context));
+          }
+          return platforms;
+        },
       );
     } on IconGenerationException catch (e) {
       logger.error('\n✕ Could not generate launcher icons');
@@ -215,46 +239,4 @@ void mergeConfigs(Map<String, Config> configs, Map<String, Map<dynamic, dynamic>
     }
     configs[entry.key] = Config.fromJson(entry.value);
   }
-}
-
-/// Generates icons for every enabled platform in [flutterConfigs], throwing when no platform is enabled or a platform run fails.
-Future<void> createIconsFromConfig(
-  Config flutterConfigs,
-  LILogger logger,
-  String prefixPath, [
-  String? flavor,
-]) async {
-  if (!flutterConfigs.hasEnabledPlatform) {
-    throw const InvalidConfigException(errors.errorNoPlatformEnabled);
-  }
-
-  // Generates Icons for given platform
-  await generateIconsFor(
-    config: flutterConfigs,
-    logger: logger,
-    prefixPath: prefixPath,
-    flavor: flavor,
-    platforms: (context) {
-      final platforms = <IconGenerator>[];
-      if (flutterConfigs.hasAndroidConfig) {
-        platforms.add(AndroidIconGenerator(context));
-      }
-      if (flutterConfigs.hasIOSConfig) {
-        platforms.add(IosIconGenerator(context));
-      }
-      if (flutterConfigs.hasWebConfig) {
-        platforms.add(WebIconGenerator(context));
-      }
-      if (flutterConfigs.hasWindowsConfig) {
-        platforms.add(WindowsIconGenerator(context));
-      }
-      if (flutterConfigs.hasMacOSConfig) {
-        platforms.add(MacOSIconGenerator(context));
-      }
-      if (flutterConfigs.hasLinuxConfig) {
-        platforms.add(LinuxIconGenerator(context));
-      }
-      return platforms;
-    },
-  );
 }

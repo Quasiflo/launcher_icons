@@ -425,7 +425,7 @@ void main() {
       'ios': {'generate': true},
     };
     expect(
-      Config.fromJson(flutterIconsConfig).isCustomAndroidFile,
+      android.isCustomAndroidFile(Config.fromJson(flutterIconsConfig)),
       isFalse,
     );
 
@@ -435,24 +435,8 @@ void main() {
       'ios': {'generate': true},
     };
     expect(
-      Config.fromJson(flutterIconsNewIconConfig).isCustomAndroidFile,
+      android.isCustomAndroidFile(Config.fromJson(flutterIconsNewIconConfig)),
       isTrue,
-    );
-  });
-
-  test('Prioritise android.image_path over image_path', () {
-    final Map<String, dynamic> flutterIconsNewIconConfig = <String, dynamic>{
-      'image_path': 'assets/images/icon-710x599.png',
-      'android': {
-        'generate': true,
-        'icon_name': 'New Icon',
-        'image_path': 'assets/images/icon-android.png',
-      },
-      'ios': {'generate': true},
-    };
-    expect(
-      Config.fromJson(flutterIconsNewIconConfig).getImagePathAndroid(),
-      equals('assets/images/icon-android.png'),
     );
   });
 

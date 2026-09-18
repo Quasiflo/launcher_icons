@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:image/image.dart';
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
@@ -53,7 +54,7 @@ class MacOSIconGenerator extends IconGenerator {
   Future<void> createIcons() async {
     final imgFilePath = path.join(
       context.prefixPath,
-      context.config.resolveImagePath(context.config.macOSConfig!.imagePath),
+      context.config.resolveImageFile(context.config.macOSConfig!.imagePath, context.prefixPath),
     );
 
     context.logger.verbose('Decoding and loading image file at $imgFilePath...');
@@ -131,7 +132,7 @@ class MacOSIconGenerator extends IconGenerator {
     // Generate liquid glass .icon if configured. The bundle shares the
     // catalog name so Xcode associates it with the icon set; the PNG
     // catalog stays the fallback on macOS older than Tahoe 26.
-    if (context.config.hasMacOSLiquidGlassIconConfig) {
+    if (context.config.macOSConfig?.liquidGlassLayers?.isNotEmpty ?? false) {
       final glassIconName = context.flavor == null ? 'AppIcon' : 'AppIcon-${context.flavor}';
       await generateMacOSLiquidGlassIcon(
         context.config,
@@ -183,10 +184,10 @@ class MacOSIconGenerator extends IconGenerator {
     context.logger.verbose('Checking $platformName config...');
     final macOSConfig = context.macOSConfig!;
 
-    if (context.config.resolveImagePath(macOSConfig.imagePath) == null) {
-      context.logger.error(
-        'Missing image_path. Either provide "launcher_icons.macos.image_path" or "launcher_icons.image_path"',
-      );
+    try {
+      context.config.resolveImageFile(macOSConfig.imagePath, context.prefixPath);
+    } on InvalidConfigException catch (e) {
+      context.logger.error(e.message);
 
       return false;
     }

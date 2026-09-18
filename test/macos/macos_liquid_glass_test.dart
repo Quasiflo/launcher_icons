@@ -60,8 +60,8 @@ const _pbxproj = r'''
 
 // Unit tests for macOS liquid glass support (lib/src/platforms/macos).
 void main() {
-  group('hasMacOSLiquidGlassIconConfig', () {
-    test('is true when macos.liquid_glass_layers is non-empty', () {
+  group('liquid glass layers presence', () {
+    test('layers present when macos.liquid_glass_layers is non-empty', () {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
@@ -70,19 +70,19 @@ void main() {
           ],
         },
       });
-      expect(config.hasMacOSLiquidGlassIconConfig, isTrue);
+      expect(config.macOSConfig!.liquidGlassLayers, hasLength(1));
     });
 
-    test('is false when macos.liquid_glass_layers is not set', () {
+    test('layers null when macos.liquid_glass_layers is not set', () {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {'generate': true},
       });
-      expect(config.hasMacOSLiquidGlassIconConfig, isFalse);
+      expect(config.macOSConfig!.liquidGlassLayers, isNull);
     });
 
-    test('is false without a macos section', () {
+    test('layers null without a macos section', () {
       final config = Config.fromJson(<String, dynamic>{});
-      expect(config.hasMacOSLiquidGlassIconConfig, isFalse);
+      expect(config.macOSConfig?.liquidGlassLayers, isNull);
     });
   });
 

@@ -1,3 +1,4 @@
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/core/utils.dart' as utils;
@@ -9,7 +10,7 @@ class AndroidIconGenerator extends IconGenerator {
   AndroidIconGenerator(IconGeneratorContext context) : super(context, 'Android');
 
   @override
-  bool get isEnabled => context.config.isNeedingNewAndroidIcon;
+  bool get isEnabled => context.config.androidEnabled;
 
   @override
   bool validateRequirements() {
@@ -17,10 +18,10 @@ class AndroidIconGenerator extends IconGenerator {
     // config preconditions are checked here.
     context.logger.verbose('Validating Android config...');
     final config = context.config;
-    if (config.getImagePathAndroid() == null) {
-      context.logger.error(
-        'Invalid config. Either provide android.image_path or image_path',
-      );
+    try {
+      config.resolveImageFile(config.androidConfig?.imagePath, context.prefixPath);
+    } on InvalidConfigException catch (e) {
+      context.logger.error(e.message);
       return false;
     }
 
@@ -45,7 +46,7 @@ class AndroidIconGenerator extends IconGenerator {
     final LILogger logger = context.logger;
 
     final concurrentIconCreation = <Future<void>>[];
-    if (config.isNeedingNewAndroidIcon) {
+    if (config.androidEnabled) {
       concurrentIconCreation.add(
         android.createDefaultIcons(
           config,
@@ -56,7 +57,7 @@ class AndroidIconGenerator extends IconGenerator {
         ),
       );
     }
-    if (config.hasAndroidAdaptiveConfig) {
+    if (android.hasAndroidAdaptiveConfig(config)) {
       concurrentIconCreation.add(
         android.createAdaptiveIcons(
           config,
@@ -67,7 +68,7 @@ class AndroidIconGenerator extends IconGenerator {
         ),
       );
     }
-    if (config.hasAndroidAdaptiveMonochromeConfig) {
+    if (android.hasAndroidAdaptiveMonochromeConfig(config)) {
       concurrentIconCreation.add(
         android.createAdaptiveMonochromeIcons(
           config,
@@ -78,7 +79,7 @@ class AndroidIconGenerator extends IconGenerator {
         ),
       );
     }
-    if (config.hasAndroidAdaptiveRoundConfig) {
+    if (android.hasAndroidAdaptiveRoundConfig(config)) {
       concurrentIconCreation.add(
         android.createAdaptiveRoundIcons(
           config,
@@ -90,7 +91,7 @@ class AndroidIconGenerator extends IconGenerator {
       );
     }
     await Future.wait(concurrentIconCreation);
-    if (config.isNeedingNewAndroidIcon) {
+    if (config.androidEnabled) {
       await android.createMipmapXmlFile(
         config,
         flavor,

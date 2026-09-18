@@ -1,4 +1,5 @@
 import 'package:image/image.dart';
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
@@ -21,7 +22,7 @@ class WindowsIconGenerator extends IconGenerator {
   Future<void> createIcons() async {
     final imgFilePath = path.join(
       context.prefixPath,
-      context.config.resolveImagePath(context.windowsConfig!.imagePath),
+      context.config.resolveImageFile(context.windowsConfig!.imagePath, context.prefixPath),
     );
 
     context.logger.verbose('Decoding and loading image file from $imgFilePath...');
@@ -52,19 +53,15 @@ class WindowsIconGenerator extends IconGenerator {
     context.logger.verbose('Validating windows config...');
     final windowsConfig = context.windowsConfig!;
 
-    if (context.config.resolveImagePath(windowsConfig.imagePath) == null) {
-      context.logger.error(
-        'Invalid config. Either provide windows.image_path or image_path',
-      );
+    try {
+      context.config.resolveImageFile(windowsConfig.imagePath, context.prefixPath);
+    } on InvalidConfigException catch (e) {
+      context.logger.error(e.message);
       return false;
     }
 
     final entitesToCheck = [
       path.join(context.prefixPath, paths.windowsDirPath),
-      path.join(
-        context.prefixPath,
-        windowsConfig.imagePath ?? context.config.imagePath,
-      ),
     ];
 
     final failedEntityPath = utils.areFSEntiesExist(entitesToCheck);

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:launcher_icons/src/config/android_config.dart';
 import 'package:launcher_icons/src/config/ios_config.dart';
@@ -5,6 +7,8 @@ import 'package:launcher_icons/src/config/linux_config.dart';
 import 'package:launcher_icons/src/config/macos_config.dart';
 import 'package:launcher_icons/src/config/web_config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
+import 'package:path/path.dart' as path;
 
 part 'config.g.dart';
 
@@ -53,70 +57,37 @@ class Config {
   @JsonKey(name: 'linux')
   final LinuxConfig? linuxConfig;
 
-  /// Checks if at least one platform section has `generate: true`.
-  /// Presence alone is not intent: an all-`generate: false` config must fail loudly instead of exiting successfully with no work done.
+  /// Whether Android icon generation is enabled (`android.generate`)
+  bool get androidEnabled => androidConfig?.generate ?? false;
+
+  /// Whether iOS icon generation is enabled (`ios.generate`)
+  bool get iosEnabled => iosConfig?.generate ?? false;
+
+  /// Whether web icon generation is enabled (`web.generate`)
+  bool get webEnabled => webConfig?.generate ?? false;
+
+  /// Whether Windows icon generation is enabled (`windows.generate`)
+  bool get windowsEnabled => windowsConfig?.generate ?? false;
+
+  /// Whether macOS icon generation is enabled (`macos.generate`)
+  bool get macOSEnabled => macOSConfig?.generate ?? false;
+
+  /// Whether Linux icon generation is enabled (`linux.generate`)
+  bool get linuxEnabled => linuxConfig?.generate ?? false;
+
+  /// Checks if at least one platform section has `generate: true`
   bool get hasEnabledPlatform {
-    return isNeedingNewAndroidIcon || isNeedingNewIOSIcon || (webConfig?.generate ?? false) || (windowsConfig?.generate ?? false) || (macOSConfig?.generate ?? false) || (linuxConfig?.generate ?? false);
+    return androidEnabled || iosEnabled || webEnabled || windowsEnabled || macOSEnabled || linuxEnabled;
   }
 
-  /// Whether or not configuration for generating Android icons exist
-  bool get hasAndroidConfig => androidConfig != null;
-
-  /// Whether or not configuration for generating iOS icons exist
-  bool get hasIOSConfig => iosConfig != null;
-
-  /// Whether or not configuration for generating Web icons exist
-  bool get hasWebConfig => webConfig != null;
-
-  /// Whether or not configuration for generating Windows icons exist
-  bool get hasWindowsConfig => windowsConfig != null;
-
-  /// Whether or not configuration for generating MacOS icons exists
-  bool get hasMacOSConfig => macOSConfig != null;
-
-  /// Whether or not configuration for generating Linux icons exists
-  bool get hasLinuxConfig => linuxConfig != null;
-
-  /// if we are needing a new Android icon
-  bool get isNeedingNewAndroidIcon => androidConfig?.generate ?? false;
-
-  /// if we are needing a new iOS icon
-  bool get isNeedingNewIOSIcon => iosConfig?.generate ?? false;
-
-  /// whether or not there is configuration for adaptive icons for android
-  bool get hasAndroidAdaptiveConfig => isNeedingNewAndroidIcon && androidConfig?.adaptiveIconForeground != null && androidConfig?.adaptiveIconBackground != null;
-
-  /// whether or not there is configuration for monochrome icons for android
-  bool get hasAndroidAdaptiveMonochromeConfig {
-    return isNeedingNewAndroidIcon && androidConfig?.adaptiveIconMonochrome != null;
+  /// Resolves the platform `image_path` (falling back to the top-level `image_path`) to an existing file, returning its project-relative path. Throws [InvalidConfigException] when unset or when the file does not exist.
+  String resolveImageFile(String? platformImagePath, String prefixPath) {
+    final resolved = platformImagePath ?? imagePath;
+    if (resolved == null || !File(path.join(prefixPath, resolved)).existsSync()) {
+      throw InvalidConfigException('Missing "image_path" within configuration, or the referenced image file does not exist${resolved == null ? '' : ': "$resolved"'}');
+    }
+    return resolved;
   }
-
-  /// whether or not there is configuration for round icons for android
-  bool get hasAndroidAdaptiveRoundConfig {
-    return isNeedingNewAndroidIcon && androidConfig?.adaptiveIconRound != null;
-  }
-
-  /// Check to see if a custom Android icon name was specified via `icon_name`. When set, a new launcher icon is generated without removing the old default existing Flutter launcher icon.
-  bool get isCustomAndroidFile => androidConfig?.iconName != null;
-
-  /// Whether or not configuration for generating liquid glass .icon exists
-  bool get hasLiquidGlassIconConfig => iosConfig?.liquidGlassLayers?.isNotEmpty ?? false;
-
-  /// Whether or not configuration for generating a macOS liquid glass .icon
-  /// exists
-  bool get hasMacOSLiquidGlassIconConfig => macOSConfig?.liquidGlassLayers?.isNotEmpty ?? false;
-
-  /// Resolves the effective image path for a platform: the platform-level
-  /// `image_path` wins, falling back to the top-level `image_path`.
-  /// Returns null when neither is set — callers throw [errorMissingImagePath].
-  String? resolveImagePath(String? platformImagePath) => platformImagePath ?? imagePath;
-
-  /// Method for the retrieval of the Android icon path
-  /// If android.image_path is found, this will be prioritised over the image_path value.
-  String? getImagePathAndroid() => resolveImagePath(androidConfig?.imagePath);
-
-  /// get the image path for IOS
-  String? getImagePathIOS() => resolveImagePath(iosConfig?.imagePath);
 
   /// Creates [Config] icons from [json]
   factory Config.fromJson(Map<dynamic, dynamic> json) {

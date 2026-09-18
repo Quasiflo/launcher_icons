@@ -10,8 +10,8 @@ import 'package:test/test.dart';
 
 // Unit tests for the liquid glass icon generator (lib/src/platforms/ios).
 void main() {
-  group('hasLiquidGlassIconConfig', () {
-    test('is true when ios.liquid_glass_layers is non-empty', () {
+  group('liquid glass layers presence', () {
+    test('layers present when ios.liquid_glass_layers is non-empty', () {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
@@ -20,22 +20,22 @@ void main() {
           ],
         },
       });
-      expect(config.hasLiquidGlassIconConfig, isTrue);
+      expect(config.iosConfig!.liquidGlassLayers, hasLength(1));
     });
 
-    test('is false when ios.liquid_glass_layers is not set', () {
+    test('layers null when ios.liquid_glass_layers is not set', () {
       final config = Config.fromJson(<String, dynamic>{});
-      expect(config.hasLiquidGlassIconConfig, isFalse);
+      expect(config.iosConfig?.liquidGlassLayers, isNull);
     });
 
-    test('is false when ios.liquid_glass_layers is empty', () {
+    test('layers empty when ios.liquid_glass_layers is empty', () {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
           'liquid_glass_layers': <dynamic>[],
         },
       });
-      expect(config.hasLiquidGlassIconConfig, isFalse);
+      expect(config.iosConfig!.liquidGlassLayers, isEmpty);
     });
   });
 

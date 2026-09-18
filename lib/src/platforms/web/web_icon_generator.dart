@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/core/constants.dart' as constants;
+import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:path/path.dart' as path;
@@ -47,7 +48,7 @@ class WebIconGenerator extends IconGenerator {
   Future<void> createIcons() async {
     final imgFilePath = path.join(
       context.prefixPath,
-      context.config.resolveImagePath(context.webConfig!.imagePath)!,
+      context.config.resolveImageFile(context.webConfig!.imagePath, context.prefixPath),
     );
 
     // load and decode the image file
@@ -137,10 +138,10 @@ class WebIconGenerator extends IconGenerator {
     // config preconditions are checked here.
     context.logger.verbose('Checking webconfig...');
     final webConfig = context.webConfig!;
-    if (context.config.resolveImagePath(webConfig.imagePath) == null) {
-      context.logger.error(
-        'Invalid config. Either provide web.imagePath or imagePath',
-      );
+    try {
+      context.config.resolveImageFile(webConfig.imagePath, context.prefixPath);
+    } on InvalidConfigException catch (e) {
+      context.logger.error(e.message);
       return false;
     }
 

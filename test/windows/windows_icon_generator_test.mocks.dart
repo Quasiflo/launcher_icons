@@ -6,10 +6,10 @@
 
 import 'package:cli_util/cli_logging.dart' as _i2;
 import 'package:launcher_icons/src/config/config.dart' as _i3;
-import 'package:launcher_icons/src/config/windows_config.dart' as _i4;
+import 'package:launcher_icons/src/config/windows_config.dart' as _i5;
 import 'package:launcher_icons/src/core/logger.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i5;
+import 'package:mockito/src/dummies.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -56,20 +56,38 @@ class MockConfig extends _i1.Mock implements _i3.Config {
   }
 
   @override
-  bool get hasAndroidAdaptiveConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidAdaptiveConfig),
+  bool get androidEnabled => (super.noSuchMethod(
+        Invocation.getter(#androidEnabled),
         returnValue: false,
       ) as bool);
 
   @override
-  bool get hasAndroidAdaptiveMonochromeConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidAdaptiveMonochromeConfig),
+  bool get iosEnabled => (super.noSuchMethod(
+        Invocation.getter(#iosEnabled),
         returnValue: false,
       ) as bool);
 
   @override
-  bool get hasAndroidAdaptiveRoundConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidAdaptiveRoundConfig),
+  bool get webEnabled => (super.noSuchMethod(
+        Invocation.getter(#webEnabled),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get windowsEnabled => (super.noSuchMethod(
+        Invocation.getter(#windowsEnabled),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get macOSEnabled => (super.noSuchMethod(
+        Invocation.getter(#macOSEnabled),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get linuxEnabled => (super.noSuchMethod(
+        Invocation.getter(#linuxEnabled),
         returnValue: false,
       ) as bool);
 
@@ -80,70 +98,29 @@ class MockConfig extends _i1.Mock implements _i3.Config {
       ) as bool);
 
   @override
-  bool get hasAndroidConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidConfig),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get hasIOSConfig => (super.noSuchMethod(
-        Invocation.getter(#hasIOSConfig),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get hasWebConfig => (super.noSuchMethod(
-        Invocation.getter(#hasWebConfig),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get hasWindowsConfig => (super.noSuchMethod(
-        Invocation.getter(#hasWindowsConfig),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get hasMacOSConfig => (super.noSuchMethod(
-        Invocation.getter(#hasMacOSConfig),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get hasLinuxConfig => (super.noSuchMethod(
-        Invocation.getter(#hasLinuxConfig),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get isCustomAndroidFile => (super.noSuchMethod(
-        Invocation.getter(#isCustomAndroidFile),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get isNeedingNewAndroidIcon => (super.noSuchMethod(
-        Invocation.getter(#isNeedingNewAndroidIcon),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get isNeedingNewIOSIcon => (super.noSuchMethod(
-        Invocation.getter(#isNeedingNewIOSIcon),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get hasLiquidGlassIconConfig => (super.noSuchMethod(
-        Invocation.getter(#hasLiquidGlassIconConfig),
-        returnValue: false,
-      ) as bool);
-
-  @override
-  bool get hasMacOSLiquidGlassIconConfig => (super.noSuchMethod(
-        Invocation.getter(#hasMacOSLiquidGlassIconConfig),
-        returnValue: false,
-      ) as bool);
+  String resolveImageFile(
+    String? platformImagePath,
+    String? prefixPath,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #resolveImageFile,
+          [
+            platformImagePath,
+            prefixPath,
+          ],
+        ),
+        returnValue: _i4.dummyValue<String>(
+          this,
+          Invocation.method(
+            #resolveImageFile,
+            [
+              platformImagePath,
+              prefixPath,
+            ],
+          ),
+        ),
+      ) as String);
 
   @override
   Map<String, dynamic> toJson() => (super.noSuchMethod(
@@ -158,7 +135,7 @@ class MockConfig extends _i1.Mock implements _i3.Config {
 /// A class which mocks [WindowsConfig].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockWindowsConfig extends _i1.Mock implements _i4.WindowsConfig {
+class MockWindowsConfig extends _i1.Mock implements _i5.WindowsConfig {
   MockWindowsConfig() {
     _i1.throwOnMissingStub(this);
   }
@@ -172,7 +149,7 @@ class MockWindowsConfig extends _i1.Mock implements _i4.WindowsConfig {
   @override
   String get iconFilename => (super.noSuchMethod(
         Invocation.getter(#iconFilename),
-        returnValue: _i5.dummyValue<String>(
+        returnValue: _i4.dummyValue<String>(
           this,
           Invocation.getter(#iconFilename),
         ),

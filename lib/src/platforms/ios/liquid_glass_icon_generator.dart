@@ -18,17 +18,17 @@ Future<void> generateLiquidGlassIcon(
   LILogger? logger,
   String prefixPath = '.',
 }) async {
-  if (!config.hasLiquidGlassIconConfig) {
+  // The bundle exists exactly when the iOS struct carries layers.
+  final layers = config.iosConfig?.liquidGlassLayers;
+  if (layers == null || layers.isEmpty) {
     return;
   }
-
   final iosConfig = config.iosConfig!;
 
   printStatus('Creating liquid glass .icon for $iconName', logger);
 
   // Resolve per-appearance sources. Variants fall back to the dark/tinted
   // app artwork so one file serves both unless explicitly overridden.
-  final layers = iosConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[];
   final darkFallback = iosConfig.imagePathDarkTransparent;
   final tintedFallback = iosConfig.imagePathTintedGrayscale;
 
@@ -58,17 +58,16 @@ Future<void> generateMacOSLiquidGlassIcon(
   LILogger? logger,
   String prefixPath = '.',
 }) async {
-  if (!config.hasMacOSLiquidGlassIconConfig) {
+  // The bundle exists exactly when the macOS struct carries layers.
+  final layers = config.macOSConfig?.liquidGlassLayers;
+  if (layers == null || layers.isEmpty) {
     return;
   }
-
-  final macOSConfig = config.macOSConfig!;
 
   printStatus('Creating macOS liquid glass .icon for $iconName', logger);
 
   // macOS has no dark/tinted PNG catalog variants to fall back to: only
   // explicitly configured layer sources become appearances.
-  final layers = macOSConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[];
 
   await _writeLiquidGlassBundle(
     sources: {

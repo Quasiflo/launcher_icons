@@ -6,10 +6,10 @@
 
 import 'package:cli_util/cli_logging.dart' as _i2;
 import 'package:launcher_icons/src/config/config.dart' as _i3;
-import 'package:launcher_icons/src/config/macos_config.dart' as _i4;
+import 'package:launcher_icons/src/config/macos_config.dart' as _i5;
 import 'package:launcher_icons/src/core/logger.dart' as _i6;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i5;
+import 'package:mockito/src/dummies.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -52,22 +52,43 @@ class _FakeProgress_1 extends _i1.SmartFake implements _i2.Progress {
 /// See the documentation for Mockito's code generation for more information.
 class MockConfig extends _i1.Mock implements _i3.Config {
   @override
-  bool get hasAndroidAdaptiveConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidAdaptiveConfig),
+  bool get androidEnabled => (super.noSuchMethod(
+        Invocation.getter(#androidEnabled),
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
 
   @override
-  bool get hasAndroidAdaptiveMonochromeConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidAdaptiveMonochromeConfig),
+  bool get iosEnabled => (super.noSuchMethod(
+        Invocation.getter(#iosEnabled),
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
 
   @override
-  bool get hasAndroidAdaptiveRoundConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidAdaptiveRoundConfig),
+  bool get webEnabled => (super.noSuchMethod(
+        Invocation.getter(#webEnabled),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool get windowsEnabled => (super.noSuchMethod(
+        Invocation.getter(#windowsEnabled),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool get macOSEnabled => (super.noSuchMethod(
+        Invocation.getter(#macOSEnabled),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
+  bool get linuxEnabled => (super.noSuchMethod(
+        Invocation.getter(#linuxEnabled),
         returnValue: false,
         returnValueForMissingStub: false,
       ) as bool);
@@ -80,81 +101,39 @@ class MockConfig extends _i1.Mock implements _i3.Config {
       ) as bool);
 
   @override
-  bool get hasAndroidConfig => (super.noSuchMethod(
-        Invocation.getter(#hasAndroidConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get hasIOSConfig => (super.noSuchMethod(
-        Invocation.getter(#hasIOSConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get hasWebConfig => (super.noSuchMethod(
-        Invocation.getter(#hasWebConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get hasWindowsConfig => (super.noSuchMethod(
-        Invocation.getter(#hasWindowsConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get hasMacOSConfig => (super.noSuchMethod(
-        Invocation.getter(#hasMacOSConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get hasLinuxConfig => (super.noSuchMethod(
-        Invocation.getter(#hasLinuxConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get isCustomAndroidFile => (super.noSuchMethod(
-        Invocation.getter(#isCustomAndroidFile),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get isNeedingNewAndroidIcon => (super.noSuchMethod(
-        Invocation.getter(#isNeedingNewAndroidIcon),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get isNeedingNewIOSIcon => (super.noSuchMethod(
-        Invocation.getter(#isNeedingNewIOSIcon),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get hasLiquidGlassIconConfig => (super.noSuchMethod(
-        Invocation.getter(#hasLiquidGlassIconConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
-
-  @override
-  bool get hasMacOSLiquidGlassIconConfig => (super.noSuchMethod(
-        Invocation.getter(#hasMacOSLiquidGlassIconConfig),
-        returnValue: false,
-        returnValueForMissingStub: false,
-      ) as bool);
+  String resolveImageFile(
+    String? platformImagePath,
+    String? prefixPath,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #resolveImageFile,
+          [
+            platformImagePath,
+            prefixPath,
+          ],
+        ),
+        returnValue: _i4.dummyValue<String>(
+          this,
+          Invocation.method(
+            #resolveImageFile,
+            [
+              platformImagePath,
+              prefixPath,
+            ],
+          ),
+        ),
+        returnValueForMissingStub: _i4.dummyValue<String>(
+          this,
+          Invocation.method(
+            #resolveImageFile,
+            [
+              platformImagePath,
+              prefixPath,
+            ],
+          ),
+        ),
+      ) as String);
 
   @override
   Map<String, dynamic> toJson() => (super.noSuchMethod(
@@ -170,7 +149,7 @@ class MockConfig extends _i1.Mock implements _i3.Config {
 /// A class which mocks [MacOSConfig].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockMacOSConfig extends _i1.Mock implements _i4.MacOSConfig {
+class MockMacOSConfig extends _i1.Mock implements _i5.MacOSConfig {
   @override
   bool get generate => (super.noSuchMethod(
         Invocation.getter(#generate),
@@ -202,11 +181,11 @@ class MockMacOSConfig extends _i1.Mock implements _i4.MacOSConfig {
   @override
   String get backgroundColor => (super.noSuchMethod(
         Invocation.getter(#backgroundColor),
-        returnValue: _i5.dummyValue<String>(
+        returnValue: _i4.dummyValue<String>(
           this,
           Invocation.getter(#backgroundColor),
         ),
-        returnValueForMissingStub: _i5.dummyValue<String>(
+        returnValueForMissingStub: _i4.dummyValue<String>(
           this,
           Invocation.getter(#backgroundColor),
         ),
@@ -222,11 +201,11 @@ class MockMacOSConfig extends _i1.Mock implements _i4.MacOSConfig {
   @override
   String get liquidGlassShadowKind => (super.noSuchMethod(
         Invocation.getter(#liquidGlassShadowKind),
-        returnValue: _i5.dummyValue<String>(
+        returnValue: _i4.dummyValue<String>(
           this,
           Invocation.getter(#liquidGlassShadowKind),
         ),
-        returnValueForMissingStub: _i5.dummyValue<String>(
+        returnValueForMissingStub: _i4.dummyValue<String>(
           this,
           Invocation.getter(#liquidGlassShadowKind),
         ),
