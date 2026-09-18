@@ -1,32 +1,25 @@
+import 'dart:io';
+
 import 'package:launcher_icons/src/config/config.dart';
-import 'package:launcher_icons/src/core/custom_exceptions.dart';
-import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
-import 'package:test_descriptor/test_descriptor.dart' as d;
+import 'package:yaml/yaml.dart';
 
 import './templates.dart' as templates;
 
+/// Parses the `launcher_icons:` section of a config-file template string,
+/// mirroring what the file loaders extracted before their removal.
+Config parseTemplateSection(String template) => Config.fromJson(
+      loadYaml(template)['launcher_icons'] as Map<dynamic, dynamic>,
+    );
+
 void main() {
   group('Config', () {
-    late String prefixPath;
-    setUpAll(() {
-      prefixPath = path.join(d.sandbox, 'fli_test');
-    });
-    group('#loadConfigFromPath', () {
-      setUpAll(() async {
-        await d.dir('fli_test', [
-          d.file('launcher_icons.yaml', templates.liConfigTemplate),
-          d.file('invalid_fli_config.yaml', templates.invalidliConfigTemplate),
-        ]).create();
-      });
+    group('Config file parsing', () {
       test('should return valid configs', () {
-        final configs = Config.loadConfigFromPath(
-          'launcher_icons.yaml',
-          prefixPath,
-        );
+        final configs = parseTemplateSection(templates.liConfigTemplate);
         expect(configs, isNotNull);
         // android configs
-        expect(configs!.hasAndroidConfig, isTrue);
+        expect(configs.hasAndroidConfig, isTrue);
         expect(configs.isNeedingNewAndroidIcon, isTrue);
         expect(configs.isCustomAndroidFile, isFalse);
         expect(configs.imagePath, isNotNull);
@@ -157,32 +150,15 @@ void main() {
           }),
         );
       });
-
-      test('should return null when invalid filePath is given', () {
-        final configs = Config.loadConfigFromPath(
-          'file_that_dont_exist.yaml',
-          prefixPath,
-        );
-        expect(configs, isNull);
-      });
-
-      test('should throw InvalidConfigException when config is invalid', () {
-        expect(
-          () => Config.loadConfigFromPath(
-            'invalid_fli_config.yaml',
-            prefixPath,
-          ),
-          throwsA(isA<InvalidConfigException>()),
-        );
-      });
     });
     group('#loadConfigFromTestPubSpec', () {
       test('should return valid configs', () {
-        const String path = 'test/config/test_pubspec.yaml';
-        final configs = Config.loadConfigFromPath(path, '.');
-        expect(configs, isNotNull);
+        const String pubspecPath = 'test/config/test_pubspec.yaml';
+        final configs = parseTemplateSection(
+          File(pubspecPath).readAsStringSync(),
+        );
         const String imagePath = 'assets/images/icon-710x599.png';
-        expect(configs!.imagePath, equals(imagePath));
+        expect(configs.imagePath, equals(imagePath));
         // android configs
         expect(configs.hasAndroidConfig, isTrue);
         expect(configs.isNeedingNewAndroidIcon, isTrue);
@@ -208,18 +184,11 @@ void main() {
       });
     });
     group('#loadConfigFromPubSpec', () {
-      setUpAll(() async {
-        await d.dir('fli_test', [
-          d.file('pubspec.yaml', templates.pubspecTemplate),
-          d.file('launcher_icons.yaml', templates.liConfigTemplate),
-          d.file('invalid_fli_config.yaml', templates.invalidliConfigTemplate),
-        ]).create();
-      });
       test('should return valid configs', () {
-        final configs = Config.loadConfigFromPubSpec(prefixPath);
+        final configs = parseTemplateSection(templates.pubspecTemplate);
         expect(configs, isNotNull);
         // android configs
-        expect(configs!.hasAndroidConfig, isTrue);
+        expect(configs.hasAndroidConfig, isTrue);
         expect(configs.isNeedingNewAndroidIcon, isTrue);
         expect(configs.isCustomAndroidFile, isFalse);
         expect(configs.imagePath, isNotNull);
@@ -350,42 +319,11 @@ void main() {
           }),
         );
       });
-
-      group('should throw', () {
-        setUp(() async {
-          await d.dir('fli_test', [
-            d.file('pubspec.yaml', templates.invalidPubspecTemplate),
-            d.file('launcher_icons.yaml', templates.liConfigTemplate),
-            d.file(
-              'invalid_fli_config.yaml',
-              templates.invalidliConfigTemplate,
-            ),
-          ]).create();
-        });
-        test('InvalidConfigException when config is invalid', () {
-          expect(
-            () => Config.loadConfigFromPubSpec(prefixPath),
-            throwsA(isA<InvalidConfigException>()),
-          );
-        });
-      });
     });
     group('#loadConfigFromFlavor', () {
-      setUpAll(() async {
-        await d.dir('fli_test', [
-          d.file(
-            'launcher_icons-development.yaml',
-            templates.flavorLIConfigTemplate,
-          ),
-        ]).create();
-      });
       test('should return valid config', () {
-        final configs = Config.loadConfigFromFlavor(
-          'development',
-          prefixPath,
-        );
-        expect(configs, isNotNull);
-        expect(configs!.hasAndroidConfig, isTrue);
+        final configs = parseTemplateSection(templates.flavorLIConfigTemplate);
+        expect(configs.hasAndroidConfig, isTrue);
         expect(configs.isNeedingNewAndroidIcon, isTrue);
         expect(configs.imagePath, isNotNull);
         expect(configs.androidConfig!.imagePath, isNotNull);

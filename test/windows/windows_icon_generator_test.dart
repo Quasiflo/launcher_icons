@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
-import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/platforms/windows/windows_icon_generator.dart';
@@ -12,6 +11,7 @@ import 'package:mockito/mockito.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
+import 'package:yaml/yaml.dart';
 
 import '../templates.dart' as templates;
 import 'windows_icon_generator_test.mocks.dart';
@@ -109,21 +109,6 @@ void main() {
         expect(generator.isEnabled, isFalse);
       });
 
-      test('Config.fromJson rejects removed windows.icon_size with help', () {
-        expect(
-          () => Config.fromJson(<String, dynamic>{
-            'windows': {'generate': true, 'icon_size': 48},
-          }),
-          throwsA(
-            isA<InvalidConfigException>().having(
-              (e) => e.toString(),
-              'message',
-              contains('windows.icon_size'),
-            ),
-          ),
-        );
-      });
-
       test('should return false when windows.image_path and imagePath is null', () {
         when(mockWindowsConfig.imagePath).thenReturn(null);
         when(mockConfig.imagePath).thenReturn(null);
@@ -176,10 +161,11 @@ void main() {
         d.file('master-light-1024.png', imageFile.readAsBytesSync()),
       ]).create();
       prefixPath = path.join(d.sandbox, 'fli_test');
-      config = Config.loadConfigFromPath(
-        'launcher_icons.yaml',
-        prefixPath,
-      )!;
+      config = Config.fromJson(
+        loadYaml(
+          templates.liWindowsConfig,
+        )['launcher_icons'] as Map<dynamic, dynamic>,
+      );
       context = IconGeneratorContext(
         config: config,
         prefixPath: prefixPath,

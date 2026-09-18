@@ -26,8 +26,8 @@
         "editor.selectionHighlight": false, // Let dart choose which instances of selected words to highlight rather than all of them
         "editor.wordBasedSuggestions": "off", // Let dart choose the autocompletes
         "editor.codeActionsOnSave": {
-            "source.fixAll": "explicit",
-            "source.organizeImports": "explicit"
+            "source.fixAll": "never",
+            "source.organizeImports": "never"
         }
     },
     //* Markdown

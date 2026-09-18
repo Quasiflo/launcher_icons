@@ -131,30 +131,48 @@ launcher_icons-production:
       );
     });
 
-    test('flavor file wins over a section with the same name', () async {
+    test('duplicate file and pubspec section throws', () async {
       const fileYaml = '''
-launcher_icons:
+launcher_icons-staging:
   image_path: "icon.png"
   windows:
     generate: true
     icon_filename: "file_staging.ico"
 ''';
       await File(path.join(sandboxDir, 'launcher_icons-staging.yaml')).writeAsString(fileYaml);
-
-      final printed = await runCli([]);
-
-      expect(printed.any((line) => line.contains('for flavors')), isTrue);
-      expect(icoExists('file_staging.ico'), isTrue);
-      expect(icoExists('key_staging.ico'), isFalse);
-    });
-
-    test('-c flavor file conflicting with --flavor throws', () async {
-      await File(path.join(sandboxDir, 'launcher_icons-staging.yaml')).writeAsString(keyedYaml);
+      await File(path.join(sandboxDir, 'pubspec.yaml')).writeAsString('''
+launcher_icons-staging:
+  image_path: "icon.png"
+  windows:
+    generate: true
+    icon_filename: "key_staging.ico"
+''');
 
       await expectLater(
-        runCli(['-c', 'launcher_icons-staging.yaml', '--flavor', 'production']),
+        runCli([]),
         throwsA(isA<InvalidConfigException>()),
       );
+    });
+
+    test('-c folder with -f flavor uses the folder file, flavor-named outputs', () async {
+      const subYaml = '''
+launcher_icons-myflav:
+  image_path: "icon.png"
+  windows:
+    generate: true
+    icon_filename: "app_myflav.ico"
+''';
+      await Directory(path.join(sandboxDir, 'sub')).create();
+      await File(path.join(sandboxDir, 'sub', 'launcher_icons-myflav.yaml')).writeAsString(subYaml);
+
+      final printed = await runCli(['-c', 'sub', '-f', 'myflav']);
+
+      expect(printed.any((line) => line.contains('Flavor: myflav')), isTrue);
+      // The section ran from sub/launcher_icons-myflav.yaml ...
+      expect(icoExists('app_myflav.ico'), isTrue);
+      // ...not from the root launcher_icons.yaml sections.
+      expect(icoExists('key_staging.ico'), isFalse);
+      expect(icoExists('key_production.ico'), isFalse);
     });
   });
 }

@@ -11,14 +11,22 @@ import 'package:mockito/mockito.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
+import 'package:yaml/yaml.dart';
 
 import '../templates.dart' as templates;
+
 @GenerateNiceMocks([
   MockSpec<Config>(),
   MockSpec<MacOSConfig>(),
   MockSpec<LILogger>(),
 ])
 import 'macos_icon_generator_test.mocks.dart';
+
+// Parses the `launcher_icons:` section of a config-file template string,
+// mirroring what the removed file loaders extracted.
+Config parseTemplateSection(String template) => Config.fromJson(
+      loadYaml(template)['launcher_icons'] as Map<dynamic, dynamic>,
+    );
 
 void main() {
   group('MacOSIconGenerator', () {
@@ -151,10 +159,7 @@ void main() {
         d.file('master-light-1024.png', imageFile.readAsBytesSync()),
       ]).create();
       prefixPath = path.join(d.sandbox, 'fli_test');
-      config = Config.loadConfigFromPath(
-        'launcher_icons.yaml',
-        prefixPath,
-      )!;
+      config = parseTemplateSection(templates.liConfigTemplate);
       context = IconGeneratorContext(
         config: config,
         prefixPath: prefixPath,
@@ -204,10 +209,7 @@ void main() {
         d.file('master-light-1024.png', imageFile.readAsBytesSync()),
       ]).create();
       final flavorPrefix = path.join(d.sandbox, 'fli_test_flavor');
-      final flavorConfig = Config.loadConfigFromPath(
-        'launcher_icons.yaml',
-        flavorPrefix,
-      )!;
+      final flavorConfig = parseTemplateSection(templates.liConfigTemplate);
       final flavorContext = IconGeneratorContext(
         config: flavorConfig,
         prefixPath: flavorPrefix,
@@ -251,10 +253,7 @@ void main() {
         d.file('master-light-1024.png', imageFile.readAsBytesSync()),
       ]).create();
       final freshPrefix = path.join(d.sandbox, 'fli_test_fresh');
-      final freshConfig = Config.loadConfigFromPath(
-        'launcher_icons.yaml',
-        freshPrefix,
-      )!;
+      final freshConfig = parseTemplateSection(templates.liConfigTemplate);
       final freshGenerator = MacOSIconGenerator(
         IconGeneratorContext(
           config: freshConfig,

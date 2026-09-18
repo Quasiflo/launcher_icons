@@ -8,6 +8,7 @@ import 'package:launcher_icons/src/platforms/web/web_icon_generator.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
+import 'package:yaml/yaml.dart';
 
 import '../templates.dart' as templates;
 
@@ -34,10 +35,11 @@ void main() {
         d.file('app_icon_favicon.png', imageFile.readAsBytesSync()),
       ]).create();
       prefixPath = path.join(d.sandbox, 'fli_test');
-      config = Config.loadConfigFromPath(
-        'launcher_icons.yaml',
-        prefixPath,
-      )!;
+      config = Config.fromJson(
+        loadYaml(
+          templates.liWebConfig,
+        )['launcher_icons'] as Map<dynamic, dynamic>,
+      );
       context = IconGeneratorContext(
         config: config,
         prefixPath: prefixPath,

@@ -27,6 +27,13 @@ launcher_icons:
     generate: true
 ''';
 
+    String flavorYaml(String flavor) => '''
+launcher_icons-$flavor:
+  image_path: "icon.png"
+  windows:
+    generate: true
+''';
+
     setUp(() async {
       originalDir = Directory.current.path;
       sandboxDir = path.join(
@@ -44,11 +51,10 @@ launcher_icons:
       File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'icon.png'));
       await File(
         path.join(sandboxDir, 'launcher_icons-staging.yaml'),
-      ).writeAsString(windowsYaml);
+      ).writeAsString(flavorYaml('staging'));
       await File(
         path.join(sandboxDir, 'launcher_icons-production.yaml'),
-      ).writeAsString(windowsYaml);
-      await File(path.join(sandboxDir, 'custom.yaml')).writeAsString(windowsYaml);
+      ).writeAsString(flavorYaml('production'));
       Directory.current = sandboxDir;
     });
 
@@ -80,8 +86,8 @@ launcher_icons:
       );
     });
 
-    test('explicit -c flavor file runs only that flavor (fluttercommunity/flutter_launcher_icons#215)', () async {
-      final printed = await runCli(['-c', 'launcher_icons-staging.yaml']);
+    test('explicit --flavor runs only that flavor (fluttercommunity/flutter_launcher_icons#215)', () async {
+      final printed = await runCli(['--flavor', 'staging']);
       expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
       expect(
         printed.any((line) => line.contains('Flavor: production')),
@@ -89,8 +95,14 @@ launcher_icons:
       );
     });
 
-    test('explicit -c custom file bypasses the flavor loop (fluttercommunity/flutter_launcher_icons#426)', () async {
-      final printed = await runCli(['-c', 'custom.yaml']);
+    test('explicit -c folder with a default file bypasses the flavor loop (fluttercommunity/flutter_launcher_icons#426)', () async {
+      final custom = path.join(Directory.current.path, 'customdir');
+      await Directory(custom).create();
+      await File(
+        path.join(custom, 'launcher_icons.yaml'),
+      ).writeAsString(windowsYaml);
+
+      final printed = await runCli(['-c', 'customdir']);
       expect(
         printed.any((line) => line.contains('Flavor:')),
         isFalse,
@@ -110,7 +122,7 @@ launcher_icons:
       await Directory(sub).create();
       await File(
         path.join(sub, 'launcher_icons-qa.yaml'),
-      ).writeAsString(windowsYaml);
+      ).writeAsString(flavorYaml('qa'));
 
       final printed = await runCli(['-c', 'sub']);
 
@@ -126,12 +138,12 @@ launcher_icons:
       await Directory(sub).create();
       await File(
         path.join(sub, 'launcher_icons-qa.yaml'),
-      ).writeAsString(windowsYaml);
+      ).writeAsString(flavorYaml('qa'));
       final nested = path.join(sub, 'nested');
       await Directory(nested).create();
       await File(
         path.join(nested, 'launcher_icons-deep.yaml'),
-      ).writeAsString(windowsYaml);
+      ).writeAsString(flavorYaml('deep'));
 
       final printed = await runCli(['-c', 'sub']);
 

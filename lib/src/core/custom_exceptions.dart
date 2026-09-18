@@ -16,6 +16,12 @@ abstract class LIException implements Exception {
   }
 }
 
+/// Exception to be thrown whenever we have invalid command line arguments
+class InvalidCommandException extends LIException {
+  /// Constructs instance
+  const InvalidCommandException([super.message]);
+}
+
 /// Exception to be thrown whenever we have an invalid configuration
 class InvalidConfigException extends LIException {
   /// Constructs instance

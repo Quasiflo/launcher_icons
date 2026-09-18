@@ -33,7 +33,7 @@ void main(List<String> arguments) {
 
   final results = parser.parse(arguments);
   final override = results['override'] as bool;
-  final fileName = results['fileName'] as String;
+  final fileName = results['config'] as String;
 
   if (results.flag('help')) {
     print('Generates template configuration file');

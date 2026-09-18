@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:launcher_icons/src/config/android_config.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/ios_config.dart';
@@ -8,6 +6,7 @@ import 'package:launcher_icons/src/config/macos_config.dart';
 import 'package:launcher_icons/src/config/web_config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
 import 'package:test/test.dart';
+import 'package:yaml/yaml.dart';
 
 import '../bin/generate.dart' as generate;
 
@@ -56,20 +55,13 @@ void main() {
       expect(missing, isEmpty, reason: 'template is missing: $missing');
     });
 
-    test('parses to a valid enabled config', () async {
-      final dir = await Directory.systemTemp.createTemp('template_test');
-      try {
-        final file = File('${dir.path}/launcher_icons.yaml');
-        await file.writeAsString(generate.configFileTemplate);
-        final config = Config.loadConfigFromPath(
-          'launcher_icons.yaml',
-          dir.path,
-        );
-        expect(config, isNotNull);
-        expect(config!.hasEnabledPlatform, isTrue);
-      } finally {
-        await dir.delete(recursive: true);
-      }
+    test('parses to a valid enabled config', () {
+      final config = Config.fromJson(
+        loadYaml(
+          generate.configFileTemplate,
+        )['launcher_icons'] as Map<dynamic, dynamic>,
+      );
+      expect(config.hasEnabledPlatform, isTrue);
     });
   });
 }
