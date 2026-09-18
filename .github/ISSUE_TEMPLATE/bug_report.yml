@@ -1,0 +1,84 @@
+name: Bug report
+description: Something isn't working as expected
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! A complete report gets fixed faster — please fill in every section.
+  - type: checkboxes
+    id: triage
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched [existing issues](https://github.com/Quasiflo/launcher_icons/issues) and didn't find a duplicate
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: launcher_icons version
+      description: The version actually running (The output of `dart run launcher_icons --version`).
+      placeholder: "0.14.4" # x-release-please-version
+    validations:
+      required: true
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Affected platforms
+      description: Which platform outputs are wrong?
+      multiple: true
+      options:
+        - Android
+        - iOS
+        - Web
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: launcher_icons config
+      description: Paste the relevant `launcher_icons` section from your pubspec.yaml or launcher_icons.yaml.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should the output / generated icons look like?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What is the output / error / generated icons look like instead? Drag screenshots in here if applicable — they help a lot for an icon tool.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: What operating system / targets are you building on / for.
+      render: console
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Output of `dart run launcher_icons -v`.
+      render: console

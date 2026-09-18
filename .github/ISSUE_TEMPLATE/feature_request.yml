@@ -1,0 +1,42 @@
+name: Feature request
+description: Suggest an idea for launcher_icons
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Tell us the problem it solves, not just the solution — that keeps the design discussion useful.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can't you do today? What workaround are you using, if any?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How should it work? A sketch of the config you imagine is ideal.
+      render: yaml
+    validations:
+      required: true
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Affected platforms
+      description: Which platform outputs would this touch?
+      multiple: true
+      options:
+        - Android
+        - iOS
+        - Web
+        - Windows
+        - macOS
+        - Linux
+        - All / cross-cutting
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you thought of, and why they fall short.

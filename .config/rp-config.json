@@ -13,6 +13,10 @@
         {
           "type": "generic",
           "path": "README.md"
+        },
+        {
+          "type": "generic",
+          "path": ".github/ISSUE_TEMPLATE/bug_report.yml"
         }
       ]
     }
