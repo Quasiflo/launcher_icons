@@ -72,7 +72,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: What operating system / targets are you building on / for.
+      description: What operating system / architecture / targets are you building on / for.
       render: console
     validations:
       required: true

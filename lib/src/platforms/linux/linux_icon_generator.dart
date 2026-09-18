@@ -23,7 +23,7 @@ class LinuxIconGenerator extends IconGenerator {
   LinuxIconGenerator(IconGeneratorContext context) : super(context, 'Linux');
 
   @override
-  bool get isEnabled => context.linuxConfig?.generate ?? false;
+  bool get isEnabled => context.config.linuxConfig?.generate ?? false;
 
   /// Runtime icon path: SVG sources derive a sibling raster (see
   /// [_linuxRuntimeSize]) because the runner can only load rasters;
@@ -37,7 +37,7 @@ class LinuxIconGenerator extends IconGenerator {
 
   @override
   Future<void> createIcons() async {
-    final sourcePath = context.config.resolveImageFile(context.linuxConfig!.imagePath, context.prefixPath);
+    final sourcePath = context.config.resolveImageFile(context.config.linuxConfig!.imagePath, context.prefixPath);
     final iconPath = runtimeIconPath(sourcePath);
     context.logger.verbose('Using Linux icon at $iconPath...');
 
@@ -284,7 +284,7 @@ parts:
     // The generate flag is enforced by [isEnabled]; only filesystem and
     // config preconditions are checked here.
     context.logger.verbose('Validating Linux config...');
-    final linuxConfig = context.linuxConfig!;
+    final linuxConfig = context.config.linuxConfig!;
 
     final String sourcePath;
     try {

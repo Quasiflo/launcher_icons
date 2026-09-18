@@ -13,19 +13,14 @@ WindowsConfig _$WindowsConfigFromJson(Map json) => $checkedCreate(
         final val = WindowsConfig(
           generate: $checkedConvert('generate', (v) => v as bool? ?? false),
           imagePath: $checkedConvert('image_path', (v) => v as String?),
-          iconFilename: $checkedConvert(
-              'icon_filename', (v) => v as String? ?? 'app_icon.ico'),
+          iconFilename: $checkedConvert('icon_filename', (v) => v as String? ?? 'app_icon.ico'),
         );
         return val;
       },
-      fieldKeyMap: const {
-        'imagePath': 'image_path',
-        'iconFilename': 'icon_filename'
-      },
+      fieldKeyMap: const {'imagePath': 'image_path', 'iconFilename': 'icon_filename'},
     );
 
-Map<String, dynamic> _$WindowsConfigToJson(WindowsConfig instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$WindowsConfigToJson(WindowsConfig instance) => <String, dynamic>{
       'generate': instance.generate,
       'image_path': instance.imagePath,
       'icon_filename': instance.iconFilename,

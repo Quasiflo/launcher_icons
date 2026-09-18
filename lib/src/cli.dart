@@ -148,38 +148,61 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     if (flavor != null) {
       logger.info('\nFlavor: $flavor');
     }
+    if (!entry.value.hasEnabledPlatform) {
+      throw const InvalidConfigException('No platform enabled within config to generate icons for. Set "generate: true" for at least one platform.');
+    }
     try {
-      if (!entry.value.hasEnabledPlatform) {
-        throw const InvalidConfigException('No platform enabled within config to generate icons for. Set "generate: true" for at least one platform.');
-      }
-      await generateIconsFor(
+      final failedPlatforms = <String>[];
+      final context = IconGeneratorContext(
         config: entry.value,
         logger: logger,
         prefixPath: prefixPath,
         flavor: flavor,
-        platforms: (context) {
-          final platforms = <IconGenerator>[];
-          if (entry.value.androidEnabled) {
-            platforms.add(AndroidIconGenerator(context));
-          }
-          if (entry.value.iosEnabled) {
-            platforms.add(IosIconGenerator(context));
-          }
-          if (entry.value.webEnabled) {
-            platforms.add(WebIconGenerator(context));
-          }
-          if (entry.value.windowsEnabled) {
-            platforms.add(WindowsIconGenerator(context));
-          }
-          if (entry.value.macOSEnabled) {
-            platforms.add(MacOSIconGenerator(context));
-          }
-          if (entry.value.linuxEnabled) {
-            platforms.add(LinuxIconGenerator(context));
-          }
-          return platforms;
-        },
       );
+      final platformList = <IconGenerator>[];
+      if (entry.value.androidEnabled) {
+        platformList.add(AndroidIconGenerator(context));
+      }
+      if (entry.value.iosEnabled) {
+        platformList.add(IosIconGenerator(context));
+      }
+      if (entry.value.webEnabled) {
+        platformList.add(WebIconGenerator(context));
+      }
+      if (entry.value.windowsEnabled) {
+        platformList.add(WindowsIconGenerator(context));
+      }
+      if (entry.value.macOSEnabled) {
+        platformList.add(MacOSIconGenerator(context));
+      }
+      if (entry.value.linuxEnabled) {
+        platformList.add(LinuxIconGenerator(context));
+      }
+
+      for (final platform in platformList) {
+        final progress = logger.progress('Creating Icons for ${platform.platformName}');
+        logger.verbose('Validating platform requirements for ${platform.platformName}');
+        // A failing platform must not stop the remaining ones, but the run as a whole still fails: failures are collected and reported together via [IconGenerationException] below.
+        try {
+          if (!platform.validateRequirements()) {
+            logger.error('Requirements failed for platform ${platform.platformName}. Skipped');
+            progress.cancel();
+            continue;
+          }
+          await platform.createIcons();
+          progress.finish(message: 'done', showTiming: true);
+        } catch (e, st) {
+          progress.cancel();
+          logger
+            ..error(e.toString())
+            ..verbose(st);
+          failedPlatforms.add(platform.platformName);
+          continue;
+        }
+      }
+      if (failedPlatforms.isNotEmpty) {
+        throw IconGenerationException(failedPlatforms);
+      }
     } on IconGenerationException catch (e) {
       logger.error('\n✕ Could not generate launcher icons');
       logger.error(e);

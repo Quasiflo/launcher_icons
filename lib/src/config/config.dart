@@ -96,4 +96,7 @@ class Config {
 
   /// Converts config to [Map]
   Map<String, dynamic> toJson() => _$ConfigToJson(this);
+
+  @override
+  String toString() => 'Config: ${toJson()}';
 }

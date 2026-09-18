@@ -29,11 +29,11 @@ class WebIconGenerator extends IconGenerator {
   WebIconGenerator(IconGeneratorContext context) : super(context, 'Web');
 
   @override
-  bool get isEnabled => context.webConfig?.generate ?? false;
+  bool get isEnabled => context.config.webConfig?.generate ?? false;
 
   /// Web root directory honoring `output_path` (default `web`), so flavors
   /// can target separate web roots (fluttercommunity/flutter_launcher_icons#426).
-  String get _webRoot => context.webConfig?.outputPath ?? paths.webDirPath;
+  String get _webRoot => context.config.webConfig?.outputPath ?? paths.webDirPath;
 
   /// All web file paths resolved under [_webRoot] via the shared path helpers.
 
@@ -41,7 +41,7 @@ class WebIconGenerator extends IconGenerator {
   Future<void> createIcons() async {
     final imgFilePath = path.join(
       context.prefixPath,
-      context.config.resolveImageFile(context.webConfig!.imagePath, context.prefixPath),
+      context.config.resolveImageFile(context.config.webConfig!.imagePath, context.prefixPath),
     );
 
     // load and decode the image file
@@ -55,7 +55,7 @@ class WebIconGenerator extends IconGenerator {
     // resolve the favicon image path and file, which is either one explicitly provided or the same as the image file loaded above
     late final String faviconImgFilePath;
     late final utils.SizeImageLoader loadFavicon;
-    final faviconImagePathOverride = context.webConfig!.imagePathFavicon;
+    final faviconImagePathOverride = context.config.webConfig!.imagePathFavicon;
     if (faviconImagePathOverride != null) {
       // favicon override was specified, construct the full path and decode
       faviconImgFilePath = path.join(context.prefixPath, faviconImagePathOverride);
@@ -76,7 +76,7 @@ class WebIconGenerator extends IconGenerator {
     // downscale starts at full quality.
     utils.SizeImageLoader? loadMaskable;
     Image? deriveLogo;
-    final maskableImagePathOverride = context.webConfig!.imagePathMaskable;
+    final maskableImagePathOverride = context.config.webConfig!.imagePathMaskable;
     final deriveMaskable = maskableImagePathOverride == null;
     if (maskableImagePathOverride != null) {
       final maskableImgFilePath = path.join(context.prefixPath, maskableImagePathOverride);
@@ -130,7 +130,7 @@ class WebIconGenerator extends IconGenerator {
     // The generate flag is enforced by [isEnabled]; only filesystem and
     // config preconditions are checked here.
     context.logger.verbose('Checking webconfig...');
-    final webConfig = context.webConfig!;
+    final webConfig = context.config.webConfig!;
     try {
       context.config.resolveImageFile(webConfig.imagePath, context.prefixPath);
     } on InvalidConfigException catch (e) {
@@ -177,7 +177,7 @@ class WebIconGenerator extends IconGenerator {
   }
 
   Future<void> _generateFavicon(utils.SizeImageLoader loadFavicon) async {
-    final size = context.webConfig?.faviconSize ?? constants.kFaviconSize;
+    final size = context.config.webConfig?.faviconSize ?? constants.kFaviconSize;
     final favIcon = await loadFavicon(
       size > 0 ? size : constants.kFaviconSize,
     );
@@ -185,7 +185,7 @@ class WebIconGenerator extends IconGenerator {
       path.join(context.prefixPath, paths.webFaviconFilePath(_webRoot)),
     );
     await favIconFile.writeAsBytes(encodePng(favIcon));
-    if (context.webConfig?.faviconIco ?? true) {
+    if (context.config.webConfig?.faviconIco ?? true) {
       // Browsers request /favicon.ico by default; emit the consensus
       // multi-frame container alongside the PNG (fluttercommunity/flutter_launcher_icons#540).
       final multi = await loadFavicon(_faviconIcoSizes.first);
@@ -231,7 +231,7 @@ class WebIconGenerator extends IconGenerator {
   /// outer edge survives maskable cropping.
   Image _buildPaddedMaskable(Image source, int size) {
     var bg = (r: 255, g: 255, b: 255);
-    final bgRaw = context.webConfig?.backgroundColor;
+    final bgRaw = context.config.webConfig?.backgroundColor;
     if (bgRaw != null) {
       try {
         bg = utils.parseHexColor(bgRaw);
@@ -255,13 +255,13 @@ class WebIconGenerator extends IconGenerator {
     final manifestConfig = jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
 
     // update background_color
-    if (context.webConfig?.backgroundColor != null) {
-      manifestConfig['background_color'] = context.webConfig?.backgroundColor;
+    if (context.config.webConfig?.backgroundColor != null) {
+      manifestConfig['background_color'] = context.config.webConfig?.backgroundColor;
     }
 
     // update theme_color
-    if (context.webConfig?.themeColor != null) {
-      manifestConfig['theme_color'] = context.webConfig?.themeColor;
+    if (context.config.webConfig?.themeColor != null) {
+      manifestConfig['theme_color'] = context.config.webConfig?.themeColor;
     }
 
     // replace existing icons to eliminate conflicts
@@ -282,7 +282,7 @@ class WebIconGenerator extends IconGenerator {
     final rgba = resized.numChannels == 4 ? resized : resized.convert(numChannels: 4);
 
     var bg = (r: 255, g: 255, b: 255);
-    final bgRaw = context.webConfig?.backgroundColor;
+    final bgRaw = context.config.webConfig?.backgroundColor;
     if (bgRaw != null) {
       try {
         bg = utils.parseHexColor(bgRaw);
@@ -323,9 +323,9 @@ class WebIconGenerator extends IconGenerator {
     final indexFile = File(path.join(context.prefixPath, paths.webIndexFilePath(_webRoot)));
     var content = await indexFile.readAsString();
 
-    final favSize = context.webConfig?.faviconSize ?? constants.kFaviconSize;
-    final themeColor = context.webConfig?.themeColor;
-    final includeIco = context.webConfig?.faviconIco ?? true;
+    final favSize = context.config.webConfig?.faviconSize ?? constants.kFaviconSize;
+    final themeColor = context.config.webConfig?.themeColor;
+    final includeIco = context.config.webConfig?.faviconIco ?? true;
     final block = '''
   <!--LI-->${includeIco ? '\n  <link rel="icon" type="image/x-icon" sizes="any" href="favicon.ico"/>' : ''}
   <link rel="icon" type="image/png" sizes="${favSize}x$favSize" href="favicon.png"/>

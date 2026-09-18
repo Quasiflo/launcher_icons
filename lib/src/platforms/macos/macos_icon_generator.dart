@@ -31,7 +31,7 @@ class MacOSIconGenerator extends IconGenerator {
   MacOSIconGenerator(IconGeneratorContext context) : super(context, 'MacOS');
 
   @override
-  bool get isEnabled => context.macOSConfig?.generate ?? false;
+  bool get isEnabled => context.config.macOSConfig?.generate ?? false;
 
   /// Icons directory, flavor-aware: `AppIcon-<flavor>.appiconset` for flavor runs so macOS honors flavors like iOS does (fluttercommunity/flutter_launcher_icons#638).
   String _iconsDirPath() {
@@ -166,7 +166,7 @@ class MacOSIconGenerator extends IconGenerator {
     // The generate flag is enforced by [isEnabled]; only filesystem and
     // config preconditions are checked here.
     context.logger.verbose('Checking $platformName config...');
-    final macOSConfig = context.macOSConfig!;
+    final macOSConfig = context.config.macOSConfig!;
 
     try {
       context.config.resolveImageFile(macOSConfig.imagePath, context.prefixPath);
@@ -200,8 +200,8 @@ class MacOSIconGenerator extends IconGenerator {
     final iconsDir = await utils.createDirIfNotExist(
       path.join(context.prefixPath, _iconsDirPath()),
     );
-    final padding = context.macOSConfig?.padding ?? 0;
-    final roundedCorners = context.macOSConfig?.roundedCorners ?? false;
+    final padding = context.config.macOSConfig?.padding ?? 0;
+    final roundedCorners = context.config.macOSConfig?.roundedCorners ?? false;
 
     for (final template in _iconSizeTemplates) {
       final resizedImg = await effects.buildMacOSIconImage(

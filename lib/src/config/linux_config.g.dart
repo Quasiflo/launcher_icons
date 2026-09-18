@@ -19,8 +19,7 @@ LinuxConfig _$LinuxConfigFromJson(Map json) => $checkedCreate(
       fieldKeyMap: const {'imagePath': 'image_path'},
     );
 
-Map<String, dynamic> _$LinuxConfigToJson(LinuxConfig instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$LinuxConfigToJson(LinuxConfig instance) => <String, dynamic>{
       'generate': instance.generate,
       'image_path': instance.imagePath,
     };
