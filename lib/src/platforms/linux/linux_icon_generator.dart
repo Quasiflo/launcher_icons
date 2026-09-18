@@ -31,7 +31,7 @@ class LinuxIconGenerator extends IconGenerator {
   static String runtimeIconPath(String iconPath) => utils.isSvgPath(iconPath)
       ? path.join(
           path.dirname(iconPath),
-          '${path.basenameWithoutExtension(iconPath)}.linux.png',
+          '${path.basenameWithoutExtension(iconPath)}${paths.linuxDerivedIconSuffix}',
         )
       : iconPath;
 
@@ -99,28 +99,21 @@ class LinuxIconGenerator extends IconGenerator {
 
     for (final size in _hicolorSizes) {
       await _writeBytesIfAbsent(
-        path.join(
-          'share',
-          'icons',
-          'hicolor',
-          '${size}x$size',
-          'apps',
-          '$appName.png',
-        ),
+        paths.linuxHicolorIconPath(appName, size),
         encodePng(await loadSize(size)),
       );
     }
     await _writeBytesIfAbsent(
-      path.join('snap', 'gui', '$appName.png'),
+      paths.linuxSnapIconPath(appName),
       encodePng(await loadSize(256)),
     );
     final applicationId = _readApplicationId();
     await _writeStringIfAbsent(
-      path.join('share', 'applications', '$appName.desktop'),
+      paths.linuxDesktopFilePath(appName),
       _desktopFile(appName, 'Icon=$appName', applicationId),
     );
     await _writeStringIfAbsent(
-      path.join('snap', 'gui', '$appName.desktop'),
+      paths.linuxSnapDesktopFilePath(appName),
       _desktopFile(
         appName,
         'Icon=\${SNAP}/meta/gui/$appName.png',
@@ -128,7 +121,7 @@ class LinuxIconGenerator extends IconGenerator {
       ),
     );
     await _writeStringIfAbsent(
-      path.join('snap', 'snapcraft.yaml'),
+      paths.linuxSnapcraftFilePath,
       _snapcraftFile(appName, appVersion),
     );
   }

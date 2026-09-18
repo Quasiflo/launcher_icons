@@ -1,7 +1,4 @@
-import 'package:launcher_icons/src/core/utils.dart';
-
 /// Base class for all launcher_icons exceptions.
-///
 /// Catching `LIException` handles every error thrown by this package while the specific subtypes stay available for fine-grained handling.
 abstract class LIException implements Exception {
   /// Constructs instance
@@ -12,7 +9,7 @@ abstract class LIException implements Exception {
 
   @override
   String toString() {
-    return generateError(this, message);
+    return '\n✗ ERROR: ${runtimeType.toString()} \n$message';
   }
 }
 
@@ -55,9 +52,7 @@ class FileNotFoundException extends LIException {
   final String fileName;
 }
 
-/// Exception to be thrown when one or more platforms fail during
-/// [generateIconsFor]. Every enabled platform still runs; the names of the
-/// failed platforms are collected here so the CLI can report them together and exit non-zero.
+/// Exception to be thrown when one or more platforms fail during [generateIconsFor]. Every enabled platform still runs; the names of the failed platforms are collected here so the CLI can report them together and exit non-zero.
 class IconGenerationException extends LIException {
   /// Constructs instance with the names of the failed platforms
   IconGenerationException(this.failedPlatforms) : super('Icon generation failed for: ${failedPlatforms.join(', ')}');

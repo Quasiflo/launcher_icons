@@ -322,7 +322,7 @@ void main() {
         await generateLiquidGlassIcon(config, 'AppIcon');
 
         final assetsImage = File(
-          paths.iosLiquidGlassAssetsPath('AppIcon') + 'master-light-1024.png',
+          path.join(paths.iosLiquidGlassAssetsPath('AppIcon'), 'master-light-1024.png'),
         );
         expect(assetsImage.existsSync(), isTrue);
 
@@ -360,7 +360,7 @@ void main() {
 
         // Simulate a PNG -> SVG source switch: the stale copy must go.
         final stale = File(
-          paths.iosLiquidGlassAssetsPath('AppIcon') + 'stale-layer.png',
+          path.join(paths.iosLiquidGlassAssetsPath('AppIcon'), 'stale-layer.png'),
         );
         await stale.writeAsBytes([1, 2, 3]);
 
@@ -369,7 +369,7 @@ void main() {
         expect(stale.existsSync(), isFalse);
         expect(
           File(
-            paths.iosLiquidGlassAssetsPath('AppIcon') + 'master-light-1024.png',
+            path.join(paths.iosLiquidGlassAssetsPath('AppIcon'), 'master-light-1024.png'),
           ).existsSync(),
           isTrue,
         );

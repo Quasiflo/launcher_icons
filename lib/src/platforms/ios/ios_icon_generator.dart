@@ -1,5 +1,6 @@
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
 
@@ -25,7 +26,7 @@ class IosIconGenerator extends IconGenerator {
     }
 
     final failedEntityPath = utils.areFSEntiesExist(
-      [utils.withPrefix(context.prefixPath, 'ios')],
+      [utils.withPrefix(context.prefixPath, paths.iosDirPath)],
     );
     if (failedEntityPath != null) {
       context.logger.error(

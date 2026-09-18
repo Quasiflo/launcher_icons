@@ -1,6 +1,7 @@
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 
@@ -26,7 +27,7 @@ class AndroidIconGenerator extends IconGenerator {
     }
 
     final failedEntityPath = utils.areFSEntiesExist(
-      [utils.withPrefix(context.prefixPath, 'android')],
+      [utils.withPrefix(context.prefixPath, paths.androidDirPath)],
     );
     if (failedEntityPath != null) {
       context.logger.error(

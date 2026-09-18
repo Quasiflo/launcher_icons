@@ -169,10 +169,8 @@ Future<void> createIcons(
   // The name of the icon catalog the generated icons are written to. The
   // liquid glass .icon bundle is created with the same name so Xcode
   // associates it with the catalog.
-  String catalogName = 'AppIcon';
+  String catalogName = paths.appIconCatalogName(flavor);
   if (flavor != null) {
-    catalogName = 'AppIcon-$flavor';
-
     printStatus('Building iOS launcher icon for $flavor', logger);
     for (IosIconTemplate template in generateIosIcons) {
       concurrentIconUpdates.add(
@@ -190,7 +188,7 @@ Future<void> createIcons(
     }
 
     if (darkImage != null) {
-      final String darkName = 'AppIcon-$flavor-Dark';
+      final String darkName = '$catalogName${paths.appIconDarkSuffix}';
       darkIconName = darkName;
       printStatus('Building iOS dark launcher icon for $flavor', logger);
       for (IosIconTemplate template in generateIosIcons) {
@@ -208,7 +206,7 @@ Future<void> createIcons(
       }
     }
     if (tintedImage != null) {
-      final String tintedName = 'AppIcon-$flavor-Tinted';
+      final String tintedName = '$catalogName${paths.appIconTintedSuffix}';
       tintedIconName = tintedName;
       printStatus('Building iOS tinted launcher icon for $flavor', logger);
       for (IosIconTemplate template in generateIosIcons) {
@@ -345,11 +343,11 @@ Future<void> createIcons(
       for (IosIconTemplate template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadDark!(template.size).then(
-            (sized) => overwriteDefaultIcons(template, sized, '-Dark', prefixPath),
+            (sized) => overwriteDefaultIcons(template, sized, paths.appIconDarkSuffix, prefixPath),
           ),
         );
       }
-      darkIconName = iosDefaultIconName + '-Dark';
+      darkIconName = iosDefaultIconName + paths.appIconDarkSuffix;
     }
     if (tintedImage != null) {
       printStatus(
@@ -359,15 +357,15 @@ Future<void> createIcons(
       for (IosIconTemplate template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadTinted!(template.size).then(
-            (sized) => overwriteDefaultIcons(template, sized, '-Tinted', prefixPath),
+            (sized) => overwriteDefaultIcons(template, sized, paths.appIconTintedSuffix, prefixPath),
           ),
         );
       }
-      tintedIconName = iosDefaultIconName + '-Tinted';
+      tintedIconName = iosDefaultIconName + paths.appIconTintedSuffix;
     }
     iconName = iosDefaultIconName;
     await changeIosLauncherIcon(
-      'AppIcon',
+      catalogName,
       flavor,
       config.iosConfig?.xcodeprojPath,
       prefixPath,
@@ -461,7 +459,7 @@ Future<void> overwriteDefaultIcons(
   await File(
     withPrefix(
       prefixPath,
-      paths.iosDefaultIconFolder + iosDefaultIconName + iconNameSuffix + template.name + '.png',
+      path.join(paths.iosDefaultIconFolder, '$iosDefaultIconName$iconNameSuffix${template.name}.png'),
     ),
   ).writeAsBytes(encodePng(newImage));
 }
@@ -475,10 +473,10 @@ Future<void> saveNewIcons({
   required String iconName,
   String prefixPath = '.',
 }) async {
-  final String newIconFolder = paths.iosAssetFolder + catalogName + '.appiconset/';
+  final String newIconFolder = path.join(paths.iosAssetFolder, '$catalogName.appiconset');
   final Image newImage = createResizedImage(template.size, image);
   final newFile = await createFileIfNotExist(
-    withPrefix(prefixPath, newIconFolder + iconName + template.name + '.png'),
+    withPrefix(prefixPath, path.join(newIconFolder, '$iconName${template.name}.png')),
   );
   await newFile.writeAsBytes(encodePng(newImage));
 }
@@ -658,17 +656,17 @@ String? resolveIosPbxprojPath([
   String prefixPath = '.',
 ]) {
   if (xcodeprojPath != null) {
-    return '$xcodeprojPath/project.pbxproj';
+    return '$xcodeprojPath/${paths.pbxprojFileName}';
   }
   final standardPath = withPrefix(prefixPath, paths.iosConfigFile);
   if (File(standardPath).existsSync()) {
     return standardPath;
   }
-  final iosDir = Directory(withPrefix(prefixPath, 'ios'));
+  final iosDir = Directory(withPrefix(prefixPath, paths.iosDirPath));
   if (iosDir.existsSync()) {
-    final candidates = iosDir.listSync().whereType<Directory>().where((dir) => dir.path.endsWith('.xcodeproj')).toList()..sort((a, b) => a.path.compareTo(b.path));
+    final candidates = iosDir.listSync().whereType<Directory>().where((dir) => dir.path.endsWith(paths.xcodeprojExtension)).toList()..sort((a, b) => a.path.compareTo(b.path));
     for (final dir in candidates) {
-      final candidate = '${dir.path}/project.pbxproj';
+      final candidate = '${dir.path}/${paths.pbxprojFileName}';
       if (File(candidate).existsSync()) {
         return candidate;
       }
@@ -884,11 +882,11 @@ Future<void> removeOrphanedCatalogs({
   }
   for (final entity in dir.listSync().whereType<Directory>()) {
     final dirname = path.basename(entity.path);
-    if (!dirname.endsWith('.appiconset')) {
+    if (!dirname.endsWith(paths.appIconSetExtension)) {
       continue;
     }
-    final name = dirname.substring(0, dirname.length - '.appiconset'.length);
-    if (name == currentCatalog || name == 'AppIcon') {
+    final name = dirname.substring(0, dirname.length - paths.appIconSetExtension.length);
+    if (name == currentCatalog || name == paths.appIconCatalogName(null)) {
       continue;
     }
     if (referenceTexts.any((text) => text.contains(name))) {
@@ -934,7 +932,7 @@ Future<void> modifyContentsFile(
 ]) async {
   final String newContentsFilename = withPrefix(
     prefixPath,
-    paths.iosAssetFolder + newIconName + '.appiconset/Contents.json',
+    path.join(paths.iosAssetFolder, '$newIconName.appiconset', 'Contents.json'),
   );
   final contentsJsonFile = await createFileIfNotExist(newContentsFilename);
   final String contentsFileContent = generateContentsFileAsString(
@@ -956,7 +954,7 @@ Future<void> modifyDefaultContentsFile(
 ]) async {
   final String newIconFolder = withPrefix(
     prefixPath,
-    paths.iosAssetFolder + 'AppIcon.appiconset/Contents.json',
+    path.join(paths.iosAssetFolder, 'AppIcon.appiconset', 'Contents.json'),
   );
   final contentsJsonFile = await createFileIfNotExist(newIconFolder);
   final String contentsFileContent = generateContentsFileAsString(

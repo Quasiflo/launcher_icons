@@ -163,7 +163,7 @@ void main() {
           'main',
           'res',
           template.directoryName,
-          androidAdaptiveBackgroundFileName,
+          paths.androidAdaptiveBackgroundFileName,
         );
 
     test('jpg background generates background PNGs and @drawable mipmap', () async {
@@ -320,7 +320,7 @@ void main() {
           'main',
           'res',
           'drawable-mdpi',
-          androidAdaptiveForegroundFileName,
+          paths.androidAdaptiveForegroundFileName,
         ),
       );
       await staleForeground.create(recursive: true);

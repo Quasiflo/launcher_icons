@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:launcher_icons/src/config/config.dart';
-import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
@@ -92,8 +91,8 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
   // Folder's default-named yaml: default section plus any suffixed flavors.
   mergeConfigs(
     configs,
-    configSections(path.join(configValue, constants.defaultConfigFileName)),
-    constants.defaultConfigFileName,
+    configSections(path.join(configValue, paths.defaultConfigFileName)),
+    paths.defaultConfigFileName,
   );
 
   // Collect all flavors from discovered flavor config files. Each file carries its own `launcher_icons-<flavor>:` section keyed by the file name.

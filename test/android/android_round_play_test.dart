@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/config/config.dart';
-import 'package:launcher_icons/src/core/constants.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 import 'package:launcher_icons/src/platforms/android/android_icon_generator.dart';
 import 'package:path/path.dart' as path;
@@ -110,7 +110,7 @@ void main() {
               'main',
               'res',
               template,
-              androidAdaptiveRoundFileName,
+              paths.androidAdaptiveRoundFileName,
             ),
           ).existsSync(),
           isTrue,
@@ -170,7 +170,7 @@ void main() {
           'main',
           'res',
           'drawable-mdpi',
-          androidAdaptiveRoundFileName,
+          paths.androidAdaptiveRoundFileName,
         ),
       );
       await stalePng.create(recursive: true);
@@ -285,7 +285,7 @@ void main() {
 
       await generatorFor(config).createIcons();
 
-      final sidecar = File(path.join(prefixPath, androidPlayStoreIconFile));
+      final sidecar = File(path.join(prefixPath, paths.androidPlayStoreIconFile));
       expect(sidecar.existsSync(), isTrue);
       final image = decodeImage(sidecar.readAsBytesSync())!;
       expect(image.width, equals(512));
@@ -303,7 +303,7 @@ void main() {
       await generatorFor(config).createIcons();
 
       expect(
-        File(path.join(prefixPath, androidPlayStoreIconFile)).existsSync(),
+        File(path.join(prefixPath, paths.androidPlayStoreIconFile)).existsSync(),
         isFalse,
       );
     });

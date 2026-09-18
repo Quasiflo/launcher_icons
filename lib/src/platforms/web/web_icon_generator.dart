@@ -5,6 +5,7 @@ import 'package:image/image.dart';
 import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
+import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:path/path.dart' as path;
 
@@ -32,17 +33,9 @@ class WebIconGenerator extends IconGenerator {
 
   /// Web root directory honoring `output_path` (default `web`), so flavors
   /// can target separate web roots (fluttercommunity/flutter_launcher_icons#426).
-  String get _webDirPath => context.webConfig?.outputPath ?? 'web';
+  String get _webRoot => context.webConfig?.outputPath ?? paths.webDirPath;
 
-  /// All web file paths resolved under [_webDirPath].
-  String get _manifestFilePath => path.join(_webDirPath, 'manifest.json');
-  String get _indexFilePath => path.join(_webDirPath, 'index.html');
-  String get _faviconFilePath => path.join(_webDirPath, 'favicon.png');
-  String get _faviconIcoFilePath => path.join(_webDirPath, 'favicon.ico');
-  String get _iconsDirPath => path.join(_webDirPath, 'icons');
-
-  /// Opaque 180x180 apple-touch-icon for iOS Safari, which ignores manifest icons or picks the wrong art without an explicit tag.
-  String get _appleTouchIconFilePath => path.join(_iconsDirPath, 'apple-touch-icon.png');
+  /// All web file paths resolved under [_webRoot] via the shared path helpers.
 
   @override
   Future<void> createIcons() async {
@@ -117,7 +110,7 @@ class WebIconGenerator extends IconGenerator {
 
     // update manifest.json in <web root>/manifest.json
     context.logger.verbose(
-      'Updating ${path.join(context.prefixPath, _manifestFilePath)}...',
+      'Updating ${path.join(context.prefixPath, paths.webManifestFilePath(_webRoot))}...',
     );
     await _updateManifestFile();
 
@@ -127,7 +120,7 @@ class WebIconGenerator extends IconGenerator {
 
     // make the generated files discoverable from index.html
     context.logger.verbose(
-      'Updating ${path.join(context.prefixPath, _indexFilePath)}...',
+      'Updating ${path.join(context.prefixPath, paths.webIndexFilePath(_webRoot))}...',
     );
     await _updateIndexFile();
   }
@@ -147,9 +140,9 @@ class WebIconGenerator extends IconGenerator {
 
     // verify web platform related files and directories exists
     final entitesToCheck = [
-      path.join(context.prefixPath, _webDirPath),
-      path.join(context.prefixPath, _manifestFilePath),
-      path.join(context.prefixPath, _indexFilePath),
+      path.join(context.prefixPath, _webRoot),
+      path.join(context.prefixPath, paths.webManifestFilePath(_webRoot)),
+      path.join(context.prefixPath, paths.webIndexFilePath(_webRoot)),
     ];
 
     // web platform related files must exist to continue
@@ -189,7 +182,7 @@ class WebIconGenerator extends IconGenerator {
       size > 0 ? size : constants.kFaviconSize,
     );
     final favIconFile = await utils.createFileIfNotExist(
-      path.join(context.prefixPath, _faviconFilePath),
+      path.join(context.prefixPath, paths.webFaviconFilePath(_webRoot)),
     );
     await favIconFile.writeAsBytes(encodePng(favIcon));
     if (context.webConfig?.faviconIco ?? true) {
@@ -200,7 +193,7 @@ class WebIconGenerator extends IconGenerator {
         multi.addFrame(await loadFavicon(frameSize));
       }
       final favIcoFile = await utils.createFileIfNotExist(
-        path.join(context.prefixPath, _faviconIcoFilePath),
+        path.join(context.prefixPath, paths.webFaviconIcoFilePath(_webRoot)),
       );
       await favIcoFile.writeAsBytes(encodeIco(multi));
     }
@@ -214,7 +207,7 @@ class WebIconGenerator extends IconGenerator {
     bool deriveMaskable,
   ) async {
     final iconsDir = await utils.createDirIfNotExist(
-      path.join(context.prefixPath, _iconsDirPath),
+      path.join(context.prefixPath, paths.webIconsDirPath(_webRoot)),
     );
     // generate icons
     for (final template in _webIconSizeTemplates) {
@@ -257,7 +250,7 @@ class WebIconGenerator extends IconGenerator {
 
   Future<void> _updateManifestFile() async {
     final manifestFile = await utils.createFileIfNotExist(
-      path.join(context.prefixPath, _manifestFilePath),
+      path.join(context.prefixPath, paths.webManifestFilePath(_webRoot)),
     );
     final manifestConfig = jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
 
@@ -317,7 +310,7 @@ class WebIconGenerator extends IconGenerator {
     }
 
     final iconFile = await utils.createFileIfNotExist(
-      path.join(context.prefixPath, _appleTouchIconFilePath),
+      path.join(context.prefixPath, paths.webAppleTouchIconFilePath(_webRoot)),
     );
     await iconFile.writeAsBytes(encodePng(flat));
   }
@@ -327,7 +320,7 @@ class WebIconGenerator extends IconGenerator {
   /// An existing block is replaced in place; otherwise the block is
   /// inserted before `</head>`.
   Future<void> _updateIndexFile() async {
-    final indexFile = File(path.join(context.prefixPath, _indexFilePath));
+    final indexFile = File(path.join(context.prefixPath, paths.webIndexFilePath(_webRoot)));
     var content = await indexFile.readAsString();
 
     final favSize = context.webConfig?.faviconSize ?? constants.kFaviconSize;

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:launcher_icons/src/core/constants.dart';
+import 'package:launcher_icons/src/core/paths.dart';
 
 /// The function will be called from command line using the following command:
 /// ```sh

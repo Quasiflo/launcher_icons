@@ -92,7 +92,7 @@ class WindowsIconGenerator extends IconGenerator {
       path.join(
         context.prefixPath,
         paths.windowsResourcesDirPath,
-        context.windowsConfig?.iconFilename ?? 'app_icon.ico',
+        context.windowsConfig?.iconFilename ?? paths.windowsDefaultIconFilename,
       ),
     );
     await iconFile.writeAsBytes(encodeIco(multi!));

@@ -8,6 +8,7 @@ import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/android/xml_templates.dart' as xml_template;
+import 'package:path/path.dart' as path;
 
 /// A legacy launcher icon density target: [directoryName] under the
 /// flavor-aware res folder, rendered at [size] px square.
@@ -22,23 +23,15 @@ class AndroidIconTemplate {
   final int size;
 }
 
-/// Adaptive foreground/background density targets (108dp layers).
-final List<AndroidIconTemplate> adaptiveForegroundIcons = <AndroidIconTemplate>[
-  AndroidIconTemplate(directoryName: 'drawable-mdpi', size: 108),
-  AndroidIconTemplate(directoryName: 'drawable-hdpi', size: 162),
-  AndroidIconTemplate(directoryName: 'drawable-xhdpi', size: 216),
-  AndroidIconTemplate(directoryName: 'drawable-xxhdpi', size: 324),
-  AndroidIconTemplate(directoryName: 'drawable-xxxhdpi', size: 432),
-];
+/// Adaptive foreground/background density targets (108dp layers, scaled per density).
+List<AndroidIconTemplate> get adaptiveForegroundIcons => [
+      for (final density in paths.androidDensities.entries) AndroidIconTemplate(directoryName: 'drawable-${density.key}', size: (108 * density.value).round()),
+    ];
 
-/// Legacy mipmap density targets (48dp across 1x–4x).
-List<AndroidIconTemplate> androidIcons = <AndroidIconTemplate>[
-  AndroidIconTemplate(directoryName: 'mipmap-mdpi', size: 48),
-  AndroidIconTemplate(directoryName: 'mipmap-hdpi', size: 72),
-  AndroidIconTemplate(directoryName: 'mipmap-xhdpi', size: 96),
-  AndroidIconTemplate(directoryName: 'mipmap-xxhdpi', size: 144),
-  AndroidIconTemplate(directoryName: 'mipmap-xxxhdpi', size: 192),
-];
+/// Legacy mipmap density targets (48dp across 1x–4x, scaled per density).
+List<AndroidIconTemplate> get androidIcons => [
+      for (final density in paths.androidDensities.entries) AndroidIconTemplate(directoryName: 'mipmap-${density.key}', size: (48 * density.value).round()),
+    ];
 
 /// Whether [config] requests the adaptive pair: enabled with both background and foreground layers. Only Android reads these keys, so the rule lives here rather than on Config.
 bool hasAndroidAdaptiveConfig(Config config) {
@@ -120,7 +113,7 @@ Future<void> createDefaultIcons(
           (image) => writeResizedPng(
             template,
             image,
-            constants.androidFileName,
+            paths.androidFileName,
             flavor,
             prefixPath: prefixPath,
           ),
@@ -167,7 +160,7 @@ Future<void> removeStaleLegacyIconsForSwitch(
     final file = File(
       utils.withPrefix(
         prefixPath,
-        paths.androidResFolder(flavor) + template.directoryName + '/' + '$oldIconName.png',
+        path.join(paths.androidResFolder(flavor), template.directoryName, '$oldIconName.png'),
       ),
     );
     if (file.existsSync()) {
@@ -223,7 +216,7 @@ Future<void> createAdaptiveIcons(
         (foregroundImage) => writeResizedPng(
           androidIcon,
           foregroundImage,
-          constants.androidAdaptiveForegroundFileName,
+          paths.androidAdaptiveForegroundFileName,
           flavor,
           prefixPath: prefixPath,
         ),
@@ -288,7 +281,7 @@ Future<void> createAdaptiveMonochromeIcons(
         (monochromeImage) => writeResizedPng(
           androidIcon,
           monochromeImage,
-          constants.androidAdaptiveMonochromeFileName,
+          paths.androidAdaptiveMonochromeFileName,
           flavor,
           prefixPath: prefixPath,
         ),
@@ -302,7 +295,7 @@ Future<void> createAdaptiveMonochromeIcons(
 /// `ic_launcher_round` otherwise.
 String androidAdaptiveRoundXmlName(Config config) {
   final customName = config.androidConfig?.iconName;
-  return customName != null ? '${customName}_round' : constants.androidAdaptiveRoundIconName;
+  return customName != null ? '${customName}_round' : paths.androidAdaptiveRoundIconName;
 }
 
 /// Creates the opt-in adaptive round icons.
@@ -339,7 +332,7 @@ Future<void> createAdaptiveRoundIcons(
         (roundImage) => writeResizedPng(
           androidIcon,
           roundImage,
-          constants.androidAdaptiveRoundFileName,
+          paths.androidAdaptiveRoundFileName,
           flavor,
           prefixPath: prefixPath,
         ),
@@ -366,11 +359,11 @@ Future<void> createPlayStoreIcon(
   );
   final bytes = encodePng(await loadSize(512));
   final outFile = await utils.createFileIfNotExist(
-    utils.withPrefix(prefixPath, constants.androidPlayStoreIconFile),
+    utils.withPrefix(prefixPath, paths.androidPlayStoreIconFile),
   );
   await outFile.writeAsBytes(bytes);
   utils.printStatus(
-    'Created Play Store icon ${constants.androidPlayStoreIconFile} '
+    'Created Play Store icon ${paths.androidPlayStoreIconFile} '
     '(${bytes.length ~/ 1024}KB)',
     logger,
   );
@@ -453,14 +446,14 @@ Future<void> createMipmapXmlFile(
     mipmapXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) + androidConfig.iconName! + '.xml',
+        path.join(paths.androidAdaptiveXmlFolder(flavor), '${androidConfig.iconName!}.xml'),
       ),
     );
   } else {
     mipmapXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) + constants.androidDefaultIconName + '.xml',
+        path.join(paths.androidAdaptiveXmlFolder(flavor), '${constants.androidDefaultIconName}.xml'),
       ),
     );
   }
@@ -475,7 +468,7 @@ Future<void> createMipmapXmlFile(
     final roundXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) + androidAdaptiveRoundXmlName(config) + '.xml',
+        path.join(paths.androidAdaptiveXmlFolder(flavor), '${androidAdaptiveRoundXmlName(config)}.xml'),
       ),
     );
     await roundXmlFile.writeAsString(
@@ -503,23 +496,23 @@ Future<void> _removeStaleAdaptiveIcons(
     for (final name in xmlNames)
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) + name + '.xml',
+        path.join(paths.androidAdaptiveXmlFolder(flavor), '$name.xml'),
       ),
     for (final name in xmlNames)
       utils.withPrefix(
         prefixPath,
-        paths.androidAdaptiveXmlFolder(flavor) + name + '_round.xml',
+        path.join(paths.androidAdaptiveXmlFolder(flavor), '${name}_round.xml'),
       ),
     for (final template in adaptiveForegroundIcons)
       for (final fileName in [
-        constants.androidAdaptiveForegroundFileName,
-        constants.androidAdaptiveBackgroundFileName,
-        constants.androidAdaptiveMonochromeFileName,
-        constants.androidAdaptiveRoundFileName,
+        paths.androidAdaptiveForegroundFileName,
+        paths.androidAdaptiveBackgroundFileName,
+        paths.androidAdaptiveMonochromeFileName,
+        paths.androidAdaptiveRoundFileName,
       ])
         utils.withPrefix(
           prefixPath,
-          paths.androidResFolder(flavor) + template.directoryName + '/' + fileName,
+          path.join(paths.androidResFolder(flavor), template.directoryName, fileName),
         ),
   ];
   for (final filePath in stalePaths) {
@@ -590,7 +583,7 @@ Future<void> _createAdaptiveBackgrounds(
         (image) => writeResizedPng(
           androidIcon,
           image,
-          constants.androidAdaptiveBackgroundFileName,
+          paths.androidAdaptiveBackgroundFileName,
           flavor,
           prefixPath: prefixPath,
         ),
@@ -662,7 +655,7 @@ Future<void> writeResizedPng(
   final pngFile = await utils.createFileIfNotExist(
     utils.withPrefix(
       prefixPath,
-      paths.androidResFolder(flavor) + template.directoryName + '/' + filename,
+      path.join(paths.androidResFolder(flavor), template.directoryName, filename),
     ),
   );
   await pngFile.writeAsBytes(encodePng(resizedImage));
@@ -753,6 +746,6 @@ bool isTransparentAdaptiveBackground(String? backgroundConfig) {
 /// (NOTE THIS IS JUST USED FOR UNIT TEST)
 /// Ensures the correct path is used for generating adaptive icons
 /// "Next you must create alternative drawable resources in your app for use with Android 8.0 (API level 26) in res/mipmap-anydpi/ic_launcher.xml" Source: https://developer.android.com/develop/ui/compose/system/icon_design_adaptive
-bool isCorrectMipmapDirectoryForAdaptiveIcon(String path) {
-  return path == 'android/app/src/main/res/mipmap-anydpi-v26/';
+bool isCorrectMipmapDirectoryForAdaptiveIcon(String dirPath) {
+  return dirPath == paths.androidAdaptiveXmlFolder(null);
 }

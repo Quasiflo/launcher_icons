@@ -39,16 +39,11 @@ class MacOSIconGenerator extends IconGenerator {
     if (flavor == null) {
       return paths.macOSIconsDirPath;
     }
-    return path.join(
-      paths.macOSDirPath,
-      'Runner',
-      'Assets.xcassets',
-      'AppIcon-$flavor.appiconset',
-    );
+    return path.join(paths.macOSAssetsDirPath, '${paths.appIconCatalogName(flavor)}${paths.appIconSetExtension}');
   }
 
   /// Contents.json path matching [_iconsDirPath].
-  String _contentsFilePath() => path.join(_iconsDirPath(), 'Contents.json');
+  String _contentsFilePath() => path.join(_iconsDirPath(), paths.contentsJsonFileName);
 
   @override
   Future<void> createIcons() async {
@@ -74,18 +69,12 @@ class MacOSIconGenerator extends IconGenerator {
     final pbxprojFile = File(
       path.join(
         context.prefixPath,
-        'macos',
-        'Runner.xcodeproj',
-        'project.pbxproj',
+        paths.macOSConfigFile,
       ),
     );
     await ios.removeOrphanedCatalogs(
-      assetFolderRelative: path.join(
-        paths.macOSDirPath,
-        'Runner',
-        'Assets.xcassets',
-      ),
-      currentCatalog: context.flavor == null ? 'AppIcon' : 'AppIcon-${context.flavor}',
+      assetFolderRelative: paths.macOSAssetsDirPath,
+      currentCatalog: paths.appIconCatalogName(context.flavor),
       referenceTexts: [
         if (pbxprojFile.existsSync()) await pbxprojFile.readAsString(),
       ],
@@ -102,9 +91,7 @@ class MacOSIconGenerator extends IconGenerator {
     if (flavor != null) {
       final pbxprojPath = path.join(
         context.prefixPath,
-        'macos',
-        'Runner.xcodeproj',
-        'project.pbxproj',
+        paths.macOSConfigFile,
       );
       if (!File(pbxprojPath).existsSync()) {
         context.logger.error(
@@ -115,12 +102,11 @@ class MacOSIconGenerator extends IconGenerator {
         );
       } else {
         await ios.changeIosLauncherIcon(
-          'AppIcon-$flavor',
+          paths.appIconCatalogName(flavor),
           flavor,
           path.join(
             context.prefixPath,
-            'macos',
-            'Runner.xcodeproj',
+            paths.macOSXcodeprojPath,
           ),
           // The xcodeproj path above is already prefixed.
           '.',
@@ -133,7 +119,7 @@ class MacOSIconGenerator extends IconGenerator {
     // catalog name so Xcode associates it with the icon set; the PNG
     // catalog stays the fallback on macOS older than Tahoe 26.
     if (context.config.macOSConfig?.liquidGlassLayers?.isNotEmpty ?? false) {
-      final glassIconName = context.flavor == null ? 'AppIcon' : 'AppIcon-${context.flavor}';
+      final glassIconName = paths.appIconCatalogName(context.flavor);
       await generateMacOSLiquidGlassIcon(
         context.config,
         glassIconName,
@@ -150,9 +136,7 @@ class MacOSIconGenerator extends IconGenerator {
   Future<void> _addLiquidGlassIconToProject(String iconName) async {
     final pbxprojPath = path.join(
       context.prefixPath,
-      'macos',
-      'Runner.xcodeproj',
-      'project.pbxproj',
+      paths.macOSConfigFile,
     );
     final pbxprojFile = File(pbxprojPath);
     if (!pbxprojFile.existsSync()) {
@@ -195,7 +179,7 @@ class MacOSIconGenerator extends IconGenerator {
     // The asset catalog must exist; the (flavor) icon set inside it is
     // created on demand, so a new flavor bootstraps from the CLI.
     final enitiesToCheck = [
-      path.join(context.prefixPath, paths.macOSDirPath),
+      path.join(context.prefixPath, paths.macOSRunnerFolder),
       path.join(context.prefixPath, paths.macOSAssetsDirPath),
     ];
 

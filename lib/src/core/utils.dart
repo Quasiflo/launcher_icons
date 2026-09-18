@@ -9,7 +9,7 @@ import 'package:pure_svg/svg.dart' as pure_svg;
 import 'custom_exceptions.dart';
 import 'logger.dart';
 
-/// Note: Do not change interpolation unless you end up with better results (see issue for result when using cubic interpolation) https://github.com/Quasiflo/launcher_icons/issues/101#issuecomment-495528733
+/// Note: Do not change interpolation unless you end up with better results (see issue for result when using cubic interpolation) https://github.com/fluttercommunity/launcher_icons/issues/101#issuecomment-495528733
 Image createResizedImage(int iconSize, Image image) {
   if (image.width >= iconSize) {
     return copyResize(
@@ -37,15 +37,7 @@ void printStatus(String message, [LILogger? logger]) {
   }
 }
 
-/// Formats [e] for CLI output as `✗ ERROR: <Type>` plus [error] detail.
-String generateError(Exception e, String? error) {
-  final errorOutput = error == null ? '' : ' \n$error';
-  return '\n✗ ERROR: ${(e).runtimeType.toString()}$errorOutput';
-}
-
-/// Decodes the image at [filePath], throwing [FileSystemException] when
-/// missing and [NoDecoderForImageFormatException] when undecodable.
-/// Never returns null.
+/// Decodes the image at [filePath], throwing [FileSystemException] when missing and [NoDecoderForImageFormatException] when undecodable. Never returns null.
 Future<Image> decodeImageFile(String filePath, {SvgRasterCache? cache}) async {
   if (isSvgPath(filePath)) {
     return cachedSvgRaster(
@@ -71,13 +63,8 @@ bool isSvgPath(String imagePath) => imagePath.toLowerCase().endsWith('.svg');
 /// Raster width/height for SVG sources in single-master mode. Vectors scale losslessly, so one 1024 master feeds every downscale below it.
 const int svgMasterSize = 1024;
 
-/// Rasterizes the SVG at [filePath] to exactly [width]×[height] pixels
-/// (defaulting to a [svgMasterSize] square), throwing
-/// [InvalidConfigException] when the file is missing, malformed, or
-/// declares no dimensions.
-///
-/// Transparency is recovered by difference matting: the source renders
-/// twice (over solid white and solid black) because the renderer flattens alpha, and per-pixel alpha is derived from the channel differences.
+/// Rasterizes the SVG at [filePath] to exactly [width]×[height] pixels (defaulting to a [svgMasterSize] square), throwing [InvalidConfigException] when the file is missing, malformed, or declares no dimensions.
+/// Transparency is recovered by difference matting: the source renders twice (over solid white and solid black) because the renderer flattens alpha, and per-pixel alpha is derived from the channel differences.
 Future<Image> rasterizeSvgFile(
   String filePath, {
   int width = svgMasterSize,
@@ -107,8 +94,7 @@ Future<Image> rasterizeSvgFile(
   }
 }
 
-/// Rejects SVG sources with no usable viewport before rendering: the
-/// renderer reports missing dimensions through an unhandled async error the caller cannot catch, so detect it here with a clear message instead. Only the root `<svg>` tag's attributes count.
+/// Rejects SVG sources with no usable viewport before rendering: the renderer reports missing dimensions through an unhandled async error the caller cannot catch, so detect it here with a clear message instead. Only the root `<svg>` tag's attributes count.
 void _requireSvgDimensions(String source, String filePath) {
   Never fail(String reason) => throw InvalidConfigException(
         'Cannot rasterize SVG image at "$filePath": $reason',
@@ -155,9 +141,7 @@ String _svgWithBackground(String source, String hexColor, String filePath) {
 }
 
 /// Recovers per-pixel alpha from opaque [white]/[black] background renders of the same artwork: each render composites the art over its background (`observed = art × α + bg × (1 − α)`), so one minus the white-minus-black difference is alpha, and the black render holds the premultiplied color.
-///
-/// The alpha channel is stripped when every pixel is opaque, so downstream
-/// `hasAlpha` checks (remove_alpha, store warnings) see opaque art as opaque.
+/// The alpha channel is stripped when every pixel is opaque, so downstream `hasAlpha` checks (remove_alpha, store warnings) see opaque art as opaque.
 @visibleForTesting
 Image matteWhiteBlack(Image white, Image black) {
   assert(
@@ -204,10 +188,7 @@ Image matteWhiteBlack(Image white, Image black) {
 }
 
 /// Builds a per-size artwork loader for [imagePath].
-///
-/// Raster sources decode once and resize per size. SVG sources rasterize
-/// once at [svgMasterSize] and resize — equivalent crispness for icon art
-/// at a fraction of the cost.
+/// Raster sources decode once and resize per size. SVG sources rasterize once at [svgMasterSize] and resize — equivalent crispness for icon art at a fraction of the cost.
 typedef SizeImageLoader = Future<Image> Function(int size);
 
 /// Builds a [SizeImageLoader] for [imagePath] — see [SizeImageLoader].
@@ -229,14 +210,8 @@ Future<SizeImageLoader> sizeImageLoaderFor(
   return (int size) async => createResizedImage(size, master);
 }
 
-/// Single-run memo of SVG rasterizations, keyed by absolute path and
-/// dimensions.
-///
-/// Lives on [IconGeneratorContext] so every platform generator in one CLI
-/// run shares rasters instead of re-rendering the same source per
-/// platform — and so nothing leaks across runs. There is intentionally no
-/// disk or process-wide cache: staleness across runs is impossible by
-/// construction.
+/// Single-run memo of SVG rasterizations, keyed by absolute path and dimensions.
+/// Lives on [IconGeneratorContext] so every platform generator in one CLI run shares rasters instead of re-rendering the same source per platform — and so nothing leaks across runs. There is intentionally no disk or process-wide cache: staleness across runs is impossible by construction.
 class SvgRasterCache {
   /// In-flight and completed rasterizations by cache key.
   final Map<String, Future<Image>> _entries = {};
@@ -253,14 +228,8 @@ class SvgRasterCache {
   Future<Image> load(String key, Future<Image> Function() load) => _entries.putIfAbsent(key, load);
 }
 
-/// Rasterizes the SVG at [filePath] to [width]×[height], sharing the
-/// rasterization work through [cache] when provided. Prints [message]
-/// (when non-null) only when a rasterization actually runs, so shared
-/// hits stay silent.
-///
-/// Every caller receives an independent copy: downstream transforms
-/// (`grayscale`, matte blending) mutate in place, so handing out the
-/// canonical instance would corrupt later consumers.
+/// Rasterizes the SVG at [filePath] to [width]×[height], sharing the rasterization work through [cache] when provided. Prints [message] (when non-null) only when a rasterization actually runs, so shared hits stay silent.
+/// Every caller receives an independent copy: downstream transforms (`grayscale`, matte blending) mutate in place, so handing out the canonical instance would corrupt later consumers.
 Future<Image> cachedSvgRaster(
   SvgRasterCache? cache,
   String filePath,
@@ -283,14 +252,11 @@ Future<Image> cachedSvgRaster(
 }
 
 /// Joins [prefixPath] with a project-relative [target] path.
-///
 /// The default `'.'` prefix leaves [target] untouched so default runs keep their historical relative paths; any other prefix is joined normally.
 String withPrefix(String prefixPath, String target) => prefixPath == '.' ? target : path.join(prefixPath, target);
 
 /// Parses a `#rrggbb` (or `rrggbb`) hex color into its channels.
-///
-/// Only the 6-digit form is accepted; anything else throws
-/// [InvalidConfigException].
+/// Only the 6-digit form is accepted; anything else throws [InvalidConfigException].
 ({int r, int g, int b}) parseHexColor(String hexColor) {
   final cleanHex = hexColor.startsWith('#') ? hexColor.substring(1) : hexColor;
   final hexValue = int.tryParse(cleanHex, radix: 16);
@@ -306,8 +272,7 @@ String withPrefix(String prefixPath, String target) => prefixPath == '.' ? targe
   );
 }
 
-/// Whether [color] is a valid CSS hex color: `#rgb`, `#rgba`, `#rrggbb`,
-/// or `#rrggbbaa`.
+/// Whether [color] is a valid CSS hex color: `#rgb`, `#rgba`, `#rrggbb`, or `#rrggbbaa`.
 bool isHexColor(String color) {
   if (!color.startsWith('#')) {
     return false;
@@ -354,6 +319,3 @@ String? areFSEntiesExist(List<String> paths) {
   }
   return null;
 }
-
-/// Config file name for [flavor] (e.g. `launcher_icons-staging.yaml`).
-String flavorConfigFile(String flavor) => 'launcher_icons-$flavor.yaml';
