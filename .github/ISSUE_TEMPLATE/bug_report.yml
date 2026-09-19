@@ -18,7 +18,7 @@ body:
     attributes:
       label: launcher_icons version
       description: The version actually running (The output of `dart run launcher_icons --version`).
-      placeholder: "0.14.4" # x-release-please-version
+      placeholder: "0.15.0" # x-release-please-version
     validations:
       required: true
   - type: dropdown
