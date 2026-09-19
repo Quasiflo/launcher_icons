@@ -212,6 +212,8 @@ launcher_icons:
   linux:
     generate: true
     # image_path: "path/to/image.png"
+    # share_prefix: "linux" # location prefix for the freedesktop share/ tree (linux/share/...); empty restores top-level share/...
+    # generate_snap: true # emit snap/gui/ + snap/snapcraft.yaml, off by default
 
   # Per-flavor variants can live in this file (or pubspec.yaml) as
   # launcher_icons-<flavor> sections instead of one

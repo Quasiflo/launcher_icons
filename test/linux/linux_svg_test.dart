@@ -8,10 +8,7 @@ import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/platforms/linux/linux_icon_generator.dart';
 import 'package:test/test.dart';
 
-// Linux SVG sources: the runner loads the window icon from flutter_assets
-// at runtime where only rasters work, so SVG sources derive a sibling
-// `<name>.linux.png` raster that is wired and bundled instead. Desktop
-// entries also carry StartupWMClass from the CMake application id.
+// Linux SVG sources: the runner loads the window icon from flutter_assets at runtime where only rasters work, so SVG sources derive a sibling `<name>.linux.png` raster that is wired and bundled instead. Desktop entries also carry StartupWMClass from the CMake application id.
 void main() {
   group('LinuxIconGenerator.runtimeIconPath', () {
     test('derives a sibling raster for SVG sources', () {
@@ -47,8 +44,7 @@ void main() {
       await tempDir.delete(recursive: true);
     });
 
-    /// Minimal project with an SVG source; the pubspec bundles
-    /// [pubspecAsset] (default: the derived runtime raster).
+    /// Minimal project with an SVG source; the pubspec bundles [pubspecAsset] (default: the derived runtime raster).
     Future<void> setUpSvgProject({
       String pubspecAsset = 'assets/images/icon.linux.png',
       String? applicationId,
@@ -87,10 +83,10 @@ flutter:
 ''');
     }
 
-    LinuxIconGenerator generator() {
-      const config = Config(
+    LinuxIconGenerator generator({bool generateSnap = false}) {
+      final config = Config(
         imagePath: 'assets/images/icon.svg',
-        linuxConfig: LinuxConfig(generate: true),
+        linuxConfig: LinuxConfig(generate: true, generateSnap: generateSnap),
       );
       return LinuxIconGenerator(
         IconGeneratorContext(
@@ -122,7 +118,7 @@ flutter:
     test('derives, wires, and packages the runtime raster', () async {
       await setUpSvgProject(applicationId: 'com.example.test_app');
 
-      await generator().createIcons();
+      await generator(generateSnap: true).createIcons();
 
       // Derived 512px raster next to the source.
       final derived = File('${tempDir.path}/assets/images/icon.linux.png');
@@ -140,13 +136,13 @@ flutter:
       // hicolor tree still renders from the vector source.
       expect(
         File(
-          '${tempDir.path}/share/icons/hicolor/512x512/apps/test_app.png',
+          '${tempDir.path}/linux/share/icons/hicolor/512x512/apps/test_app.png',
         ).existsSync(),
         isTrue,
       );
       // Desktop entries carry the CMake application id.
       final desktop = File(
-        '${tempDir.path}/share/applications/test_app.desktop',
+        '${tempDir.path}/linux/share/applications/test_app.desktop',
       ).readAsStringSync();
       expect(desktop, contains('StartupWMClass=com.example.test_app'));
       final snapDesktop = File(
@@ -173,7 +169,7 @@ flutter:
       await generator().createIcons();
 
       final desktop = File(
-        '${tempDir.path}/share/applications/test_app.desktop',
+        '${tempDir.path}/linux/share/applications/test_app.desktop',
       ).readAsStringSync();
       expect(desktop, isNot(contains('StartupWMClass')));
     });
@@ -193,7 +189,7 @@ endif()
       LinuxIconGenerator flavorGenerator(String flavor) {
         const config = Config(
           imagePath: 'assets/images/icon.svg',
-          linuxConfig: LinuxConfig(generate: true),
+          linuxConfig: LinuxConfig(generate: true, generateSnap: true),
         );
         return LinuxIconGenerator(
           IconGeneratorContext(
@@ -207,7 +203,7 @@ endif()
 
       await flavorGenerator('development').createIcons();
       expect(
-        File('${tempDir.path}/share/applications/test_app.desktop').readAsStringSync(),
+        File('${tempDir.path}/linux/share/applications/test_app.desktop').readAsStringSync(),
         contains('StartupWMClass=com.example.dev'),
       );
 
@@ -219,10 +215,10 @@ endif()
       );
 
       // Unflavored runs fall back to the unconditional id.
-      await File('${tempDir.path}/share/applications/test_app.desktop').delete();
-      await generator().createIcons();
+      await File('${tempDir.path}/linux/share/applications/test_app.desktop').delete();
+      await generator(generateSnap: true).createIcons();
       expect(
-        File('${tempDir.path}/share/applications/test_app.desktop').readAsStringSync(),
+        File('${tempDir.path}/linux/share/applications/test_app.desktop').readAsStringSync(),
         contains('StartupWMClass=com.example.base'),
       );
     });

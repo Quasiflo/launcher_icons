@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/linux_config.dart';
+import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/platforms/linux/linux_icon_generator.dart';
 import 'package:test/test.dart';
 
-// The real Linux launcher deliverables: hicolor PNG tree, .desktop entries, and snap packaging — all strictly only-if-absent, never overwriting.
+// The real Linux launcher deliverables: hicolor PNG tree + .desktop under linux/share/ by default, snap packaging only when generate_snap is true, plus a CMake install block — all strictly only-if-absent, never overwriting.
 void main() {
   group('LinuxIconGenerator packaging', () {
     late Directory tempDir;
@@ -21,8 +22,7 @@ void main() {
       await tempDir.delete(recursive: true);
     });
 
-    /// Minimal valid project: linux runner, icon file, pubspec bundling the
-    /// icon with a name + version carrying a build number.
+    /// Minimal valid project: linux runner, top-level CMake, icon file, pubspec bundling the icon with a name + version carrying a build number.
     Future<void> setUpProject() async {
       await Directory('${tempDir.path}/linux/runner').create(
         recursive: true,
@@ -37,6 +37,10 @@ static void my_application_activate(GApplication* application) {
   gtk_window_set_default_size(window, 1280, 720);
   gtk_widget_show(GTK_WIDGET(window));
 }
+''');
+      await File('${tempDir.path}/linux/CMakeLists.txt').writeAsString('''
+cmake_minimum_required(VERSION 3.13)
+project(runner LANGUAGES CXX)
 ''');
       final iconBytes = File(
         '${Directory.current.path}/test/assets/master-light-1024.png',
@@ -57,10 +61,17 @@ flutter:
 ''');
     }
 
-    LinuxIconGenerator generator() {
-      const config = Config(
+    LinuxIconGenerator generator({
+      String sharePrefix = 'linux',
+      bool generateSnap = false,
+    }) {
+      final config = Config(
         imagePath: 'assets/images/icon.png',
-        linuxConfig: LinuxConfig(generate: true),
+        linuxConfig: LinuxConfig(
+          generate: true,
+          sharePrefix: sharePrefix,
+          generateSnap: generateSnap,
+        ),
       );
       return LinuxIconGenerator(
         IconGeneratorContext(
@@ -71,21 +82,49 @@ flutter:
       );
     }
 
-    test('emits hicolor tree, desktop entries, and snap files', () async {
+    test('emits hicolor tree + desktop under linux/share, no snap by default', () async {
       await setUpProject();
 
       await generator().createIcons();
 
       // hicolor tree across all sizes.
-      for (final size in [16, 22, 24, 32, 48, 64, 128, 256, 512]) {
+      for (final size in constants.linuxHicolorSizes) {
         final file = File(
-          '${tempDir.path}/share/icons/hicolor/${size}x$size/apps/test_app.png',
+          '${tempDir.path}/linux/share/icons/hicolor/${size}x$size/apps/test_app.png',
         );
         expect(file.existsSync(), isTrue, reason: '${size}x$size');
         final image = decodeImage(file.readAsBytesSync())!;
         expect(image.width, equals(size));
         expect(image.height, equals(size));
       }
+      // freedesktop desktop entry resolves via hicolor.
+      final desktopContent = File(
+        '${tempDir.path}/linux/share/applications/test_app.desktop',
+      ).readAsStringSync();
+      expect(desktopContent, contains('Name=test_app'));
+      expect(desktopContent, contains('Icon=test_app'));
+      // snap stays off by default.
+      expect(File('${tempDir.path}/snap/gui/test_app.png').existsSync(), isFalse);
+      expect(File('${tempDir.path}/snap/gui/test_app.desktop').existsSync(), isFalse);
+      expect(File('${tempDir.path}/snap/snapcraft.yaml').existsSync(), isFalse);
+      // CMake installs the linux/share tree.
+      final cmake = File('${tempDir.path}/linux/CMakeLists.txt').readAsStringSync();
+      expect(cmake, contains('# Installed by launcher_icons'));
+      expect(
+        cmake,
+        contains(r'install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/share/icons" DESTINATION "share" COMPONENT Runtime)'),
+      );
+      expect(
+        cmake,
+        contains(r'install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/share/applications" DESTINATION "share" COMPONENT Runtime)'),
+      );
+    });
+
+    test('emits snap files when generate_snap is true', () async {
+      await setUpProject();
+
+      await generator(generateSnap: true).createIcons();
+
       // snap icon.
       final snapIcon = File('${tempDir.path}/snap/gui/test_app.png');
       expect(snapIcon.existsSync(), isTrue);
@@ -100,51 +139,94 @@ flutter:
         snapContent,
         contains(r'Icon=${SNAP}/meta/gui/test_app.png'),
       );
-      // freedesktop desktop entry resolves via hicolor.
-      final desktopContent = File(
-        '${tempDir.path}/share/applications/test_app.desktop',
-      ).readAsStringSync();
-      expect(desktopContent, contains('Name=test_app'));
-      expect(desktopContent, contains('Icon=test_app'));
-      // snapcraft.yaml interpolates the pubspec name/version (build
-      // number stripped).
+      // snapcraft.yaml interpolates the pubspec name/version (build number stripped).
       final snapcraft = File(
         '${tempDir.path}/snap/snapcraft.yaml',
       ).readAsStringSync();
       expect(snapcraft, contains('name: test_app'));
       expect(snapcraft, contains('version: 1.2.3'));
       expect(snapcraft, isNot(contains('+4')));
+      // share tree still emitted.
+      expect(
+        File('${tempDir.path}/linux/share/icons/hicolor/32x32/apps/test_app.png').existsSync(),
+        isTrue,
+      );
+    });
+
+    test('empty share_prefix restores top-level share + ../share CMake sources', () async {
+      await setUpProject();
+
+      await generator(sharePrefix: '').createIcons();
+
+      expect(
+        File('${tempDir.path}/share/icons/hicolor/48x48/apps/test_app.png').existsSync(),
+        isTrue,
+      );
+      expect(
+        File('${tempDir.path}/share/applications/test_app.desktop').existsSync(),
+        isTrue,
+      );
+      expect(
+        File('${tempDir.path}/linux/share/icons/hicolor/48x48/apps/test_app.png').existsSync(),
+        isFalse,
+      );
+      final cmake = File('${tempDir.path}/linux/CMakeLists.txt').readAsStringSync();
+      expect(
+        cmake,
+        contains(r'install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../share/icons" DESTINATION "share" COMPONENT Runtime)'),
+      );
     });
 
     test('never overwrites existing packaging files', () async {
       await setUpProject();
-      final desktop = File('${tempDir.path}/snap/gui/test_app.desktop');
+      final desktop = File('${tempDir.path}/linux/share/applications/test_app.desktop');
       await desktop.create(recursive: true);
       await desktop.writeAsString('[custom]\n');
-      final snapcraft = File('${tempDir.path}/snap/snapcraft.yaml');
-      await snapcraft.create(recursive: true);
-      await snapcraft.writeAsString('custom: true\n');
       final hicolor = File(
-        '${tempDir.path}/share/icons/hicolor/48x48/apps/test_app.png',
+        '${tempDir.path}/linux/share/icons/hicolor/48x48/apps/test_app.png',
       );
       await hicolor.create(recursive: true);
       await hicolor.writeAsBytes([1, 2, 3]);
 
-      await generator().createIcons();
+      await generator(generateSnap: true).createIcons();
 
       expect(desktop.readAsStringSync(), equals('[custom]\n'));
-      expect(snapcraft.readAsStringSync(), equals('custom: true\n'));
       expect(hicolor.readAsBytesSync(), equals([1, 2, 3]));
       // ...while still creating the rest.
       expect(
         File(
-          '${tempDir.path}/share/icons/hicolor/32x32/apps/test_app.png',
+          '${tempDir.path}/linux/share/icons/hicolor/32x32/apps/test_app.png',
         ).existsSync(),
         isTrue,
       );
       expect(
         File('${tempDir.path}/snap/gui/test_app.png').existsSync(),
         isTrue,
+      );
+    });
+
+    test('CMake block is idempotent and follows prefix changes', () async {
+      await setUpProject();
+
+      await generator().createIcons();
+      final once = File('${tempDir.path}/linux/CMakeLists.txt').readAsStringSync();
+      await generator().createIcons();
+      final twice = File('${tempDir.path}/linux/CMakeLists.txt').readAsStringSync();
+      expect(twice, equals(once));
+      expect(
+        '# Installed by launcher_icons'.allMatches(twice).length,
+        equals(1),
+      );
+
+      await generator(sharePrefix: '').createIcons();
+      final moved = File('${tempDir.path}/linux/CMakeLists.txt').readAsStringSync();
+      expect(
+        moved,
+        contains(r'${CMAKE_CURRENT_SOURCE_DIR}/../share/icons'),
+      );
+      expect(
+        '# Installed by launcher_icons'.allMatches(moved).length,
+        equals(1),
       );
     });
   });

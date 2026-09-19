@@ -34,8 +34,7 @@ void main() {
       await tempDir.delete(recursive: true);
     });
 
-    /// Creates a minimal valid project layout (linux runner, icon file and
-    /// a pubspec.yaml bundling the icon) inside [tempDir].
+    /// Creates a minimal valid project layout (linux runner, icon file and a pubspec.yaml bundling the icon) inside [tempDir].
     Future<File> setUpValidProject({
       String iconPath = 'assets/images/icon.png',
       String? pubspecAssetsEntry,
@@ -215,8 +214,7 @@ flutter:
         // Create my_application.cc file
         myAppFile = File('${tempDir.path}/linux/runner/my_application.cc');
 
-        // Create test icon file in assets (real decodable bytes: the
-        // generator renders PNGs from the source).
+        // Create test icon file in assets (real decodable bytes: the generator renders PNGs from the source).
         final assetsDir = Directory('${tempDir.path}/assets/images');
         await assetsDir.create(recursive: true);
         final iconFile = File('${tempDir.path}/assets/images/icon.png');
@@ -392,8 +390,7 @@ static void my_application_activate(GApplication* application) {
 
         final testGenerator = LinuxIconGenerator(testContext);
 
-        // Create custom icon file (real decodable bytes: the generator
-        // renders PNGs from the source).
+        // Create custom icon file (real decodable bytes: the generator renders PNGs from the source).
         final iconsDir = Directory('${tempDir.path}/assets/icons');
         await iconsDir.create(recursive: true);
         final customIconFile = File('${tempDir.path}/assets/icons/custom.png');
@@ -791,8 +788,7 @@ static void my_application_activate(GApplication* application) {
               'gtk_window_set_icon_from_file(window, linux_icon_path, NULL);',
             ),
           );
-          // The 2-line call depends on the helper + include, so the message
-          // must spell those out as well.
+          // The 2-line call depends on the helper + include, so the message must spell those out as well.
           expect(e.toString(), contains('#include <gio/gio.h>'));
           expect(
             e.toString(),

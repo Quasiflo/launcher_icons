@@ -149,6 +149,8 @@ void main() {
           equals(<String, dynamic>{
             'generate': true,
             'image_path': 'master-light-1024.png',
+            'share_prefix': 'linux',
+            'generate_snap': false,
           }),
         );
       });
@@ -314,6 +316,8 @@ void main() {
           equals(<String, dynamic>{
             'generate': true,
             'image_path': 'master-light-1024.png',
+            'share_prefix': 'linux',
+            'generate_snap': false,
           }),
         );
       });
@@ -407,6 +411,8 @@ void main() {
           equals(<String, dynamic>{
             'generate': true,
             'image_path': 'master-light-1024.png',
+            'share_prefix': 'linux',
+            'generate_snap': false,
           }),
         );
       });

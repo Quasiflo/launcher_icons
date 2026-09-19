@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:image/image.dart';
+import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
@@ -8,23 +9,12 @@ import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
-/// A Implementation of [LinuxIconGenerator] for Linux
+/// An implementation of [LinuxIconGenerator] for Linux
 class LinuxIconGenerator extends IconGenerator {
-  /// hicolor theme sizes (conventional full set).
-  static const _hicolorSizes = [16, 22, 24, 32, 48, 64, 128, 256, 512];
-
-  /// Edge length of the derived runtime raster for SVG sources. The
-  /// runner loads the window icon from flutter_assets at runtime, where
-  /// only rasters work — so SVG sources are rasterized once to a
-  /// `<name>.linux.png` sibling at this size and wired instead.
-  static const _linuxRuntimeSize = 512;
-
-  /// Creates a instance of [LinuxIconGenerator]
+  /// Creates an instance of [LinuxIconGenerator]
   LinuxIconGenerator(IconGeneratorContext context) : super(context, 'Linux');
 
-  /// Runtime icon path: SVG sources derive a sibling raster (see
-  /// [_linuxRuntimeSize]) because the runner can only load rasters;
-  /// raster sources pass through untouched.
+  /// Runtime icon path: SVG sources derive a sibling raster (see constants.linuxRuntimeSize) because the runner can only load rasters; raster sources pass through untouched.
   static String runtimeIconPath(String iconPath) => utils.isSvgPath(iconPath)
       ? path.join(
           path.dirname(iconPath),
@@ -38,26 +28,18 @@ class LinuxIconGenerator extends IconGenerator {
     final iconPath = runtimeIconPath(sourcePath);
     context.logger.verbose('Using Linux icon at $iconPath...');
 
-    // SVG sources can't be loaded by the runner: derive the runtime
-    // raster first. The file is tool-owned and always rewritten so the
-    // wired window icon can never go stale.
+    // SVG sources can't be loaded by the runner: derive the runtime raster first. The file is tool-owned and always rewritten so the wired window icon can never go stale.
     if (iconPath != sourcePath) {
       await _writeDerivedRuntimeIcon(sourcePath, iconPath);
     }
 
-    // The icon must be a bundled flutter asset: the runner resolves it at
-    // runtime via data/flutter_assets (a filesystem path, not an asset
-    // handle), so an absolute host path would not be portable.
+    // The icon must be a bundled flutter asset: the runner resolves it at runtime via data/flutter_assets (a filesystem path, not an asset handle), so an absolute host path would not be portable.
     // Bundling is enforced by validateRequirements() via _hasPubspecAsset.
 
-    // Update my_application.cc file with the icon path (X11 window icon).
-    // On Wayland there is no window-icon protocol: the compositor matches
-    // the window to the installed .desktop file instead, which the
-    // packaging files below provide.
+    // Update my_application.cc file with the icon path (X11 window icon). On Wayland there is no window-icon protocol: the compositor matches the window to the installed .desktop file instead, which the packaging files below provide.
     await _updateMyApplicationFile(iconPath);
 
-    // Real launcher deliverables for Wayland/desktop/snap. Everything is
-    // strictly only-if-absent: existing files are never overwritten.
+    // Real launcher deliverables for Wayland/desktop/snap. Everything is strictly only-if-absent: existing files are never overwritten.
     await _generatePackagingFiles(sourcePath);
   }
 
@@ -69,8 +51,8 @@ class LinuxIconGenerator extends IconGenerator {
     final image = await utils.cachedSvgRaster(
       context.svgRasterCache,
       path.join(context.prefixPath, sourcePath),
-      _linuxRuntimeSize,
-      _linuxRuntimeSize,
+      constants.linuxRuntimeSize,
+      constants.linuxRuntimeSize,
       logger: context.logger,
       message: 'Rasterizing SVG source $sourcePath for the Linux runtime icon',
     );
@@ -79,13 +61,13 @@ class LinuxIconGenerator extends IconGenerator {
     await file.writeAsBytes(encodePng(image));
   }
 
-  /// Generates the real launcher deliverables: the hicolor PNG tree, the
-  /// freedesktop + snap `.desktop` entries, the snap icon, and
-  /// `snap/snapcraft.yaml` — all keyed off the pubspec name/version.
+  /// Generates the real launcher deliverables: the hicolor PNG tree and the freedesktop `.desktop` entry under `sharePrefix`, plus (when `generate_snap` is true) the snap icon, the snap `.desktop` entry and `snap/snapcraft.yaml` — all keyed off the pubspec name/version. Also ensures `linux/CMakeLists.txt` installs the `share/` tree.
   ///
-  /// Every file is strictly only-if-absent: pre-existing files are left
-  /// untouched (with a warning) so user edits are never clobbered.
+  /// Every file is strictly only-if-absent: pre-existing files are left untouched (with a warning) so user edits are never clobbered. The CMake block is canonical and updated in place when the prefix changes.
   Future<void> _generatePackagingFiles(String iconPath) async {
+    final linuxConfig = context.config.linuxConfig!;
+    final sharePrefix = linuxConfig.sharePrefix;
+    final generateSnap = linuxConfig.generateSnap;
     final loadSize = await utils.sizeImageLoaderFor(
       path.join(context.prefixPath, iconPath),
       logger: context.logger,
@@ -94,37 +76,39 @@ class LinuxIconGenerator extends IconGenerator {
     final appName = _readAppName();
     final appVersion = _readAppVersion();
 
-    for (final size in _hicolorSizes) {
+    for (final size in constants.linuxHicolorSizes) {
       await _writeBytesIfAbsent(
-        paths.linuxHicolorIconPath(appName, size),
+        paths.linuxHicolorIconPath(appName, size, sharePrefix),
         encodePng(await loadSize(size)),
       );
     }
-    await _writeBytesIfAbsent(
-      paths.linuxSnapIconPath(appName),
-      encodePng(await loadSize(256)),
-    );
     final applicationId = _readApplicationId();
     await _writeStringIfAbsent(
-      paths.linuxDesktopFilePath(appName),
+      paths.linuxDesktopFilePath(appName, sharePrefix),
       _desktopFile(appName, 'Icon=$appName', applicationId),
     );
-    await _writeStringIfAbsent(
-      paths.linuxSnapDesktopFilePath(appName),
-      _desktopFile(
-        appName,
-        'Icon=\${SNAP}/meta/gui/$appName.png',
-        applicationId,
-      ),
-    );
-    await _writeStringIfAbsent(
-      paths.linuxSnapcraftFilePath,
-      _snapcraftFile(appName, appVersion),
-    );
+    if (generateSnap) {
+      await _writeBytesIfAbsent(
+        paths.linuxSnapIconPath(appName),
+        encodePng(await loadSize(256)),
+      );
+      await _writeStringIfAbsent(
+        paths.linuxSnapDesktopFilePath(appName),
+        _desktopFile(
+          appName,
+          'Icon=\${SNAP}/meta/gui/$appName.png',
+          applicationId,
+        ),
+      );
+      await _writeStringIfAbsent(
+        paths.linuxSnapcraftFilePath,
+        _snapcraftFile(appName, appVersion),
+      );
+    }
+    await _ensureCmakeInstallRules(sharePrefix);
   }
 
-  /// Writes [bytes] to [relativePath] (under [prefixPath]) unless the file
-  /// already exists, in which case it warns and leaves it untouched.
+  /// Writes [bytes] to [relativePath] (under [prefixPath]) unless the file already exists, in which case it warns and leaves it untouched.
   Future<void> _writeBytesIfAbsent(String relativePath, List<int> bytes) async {
     final file = File(path.join(context.prefixPath, relativePath));
     if (file.existsSync()) {
@@ -151,6 +135,53 @@ class LinuxIconGenerator extends IconGenerator {
     context.logger.verbose('Created $relativePath.');
   }
 
+  /// Marker anchoring the tool-owned CMake install block in `linux/CMakeLists.txt`.
+  static const _cmakeMarker = '# Installed by launcher_icons';
+
+  /// Ensures `linux/CMakeLists.txt` installs the freedesktop `share/` tree (icons + desktop entry) into the bundle/system `share/`.
+  ///
+  /// The source directory is derived from [sharePrefix] relative to `linux/` (default `linux` -> `${CMAKE_CURRENT_SOURCE_DIR}/share/...`), so custom prefixes keep working. Idempotent: the canonical 2-line block is added once and rewritten in place when the prefix changes; user edits outside the block are preserved.
+  Future<void> _ensureCmakeInstallRules(String sharePrefix) async {
+    final file = File(path.join(context.prefixPath, paths.linuxTopCMakeListsFile));
+    if (!file.existsSync()) {
+      context.logger.verbose('${paths.linuxTopCMakeListsFile} not found, skipping CMake install rules.');
+      return;
+    }
+    final content = await file.readAsString();
+    final shareRoot = paths.linuxShareRoot(sharePrefix);
+    final rawRel = path.relative(shareRoot, from: paths.linuxDirPath).replaceAll(r'\', '/');
+    // `path.relative` yields `.` when both coincide; CMake wants `share`.
+    final cmakeRel = (rawRel == '.' || rawRel.isEmpty) ? 'share' : rawRel;
+    final block = '$_cmakeMarker: freedesktop icons + desktop entry from $shareRoot/.\n'
+        'install(DIRECTORY "\${CMAKE_CURRENT_SOURCE_DIR}/$cmakeRel/icons" DESTINATION "share" COMPONENT Runtime)\n'
+        'install(DIRECTORY "\${CMAKE_CURRENT_SOURCE_DIR}/$cmakeRel/applications" DESTINATION "share" COMPONENT Runtime)';
+
+    if (content.contains(_cmakeMarker)) {
+      final pattern = RegExp(
+        RegExp.escape(_cmakeMarker) + r'[^\n]*\ninstall\(DIRECTORY "\$\{CMAKE_CURRENT_SOURCE_DIR\}/[^"]+/icons" DESTINATION "share" COMPONENT Runtime\)\ninstall\(DIRECTORY "\$\{CMAKE_CURRENT_SOURCE_DIR\}/[^"]+/applications" DESTINATION "share" COMPONENT Runtime\)',
+      );
+      if (pattern.hasMatch(content)) {
+        final updated = content.replaceFirst(pattern, block);
+        if (updated != content) {
+          await file.writeAsString(updated);
+          context.logger.verbose('Updated CMake install rules for $shareRoot.');
+        } else {
+          context.logger.verbose('CMake install rules already up to date for $shareRoot.');
+        }
+      } else {
+        // Marker present but block shape diverged (hand-edited): leave it.
+        context.logger.verbose('CMake install block already present, skipping.');
+      }
+      return;
+    }
+    final eol = content.contains('\r\n') ? '\r\n' : '\n';
+    final normalizedEol = content.replaceAll('\r\n', '\n');
+    final withTrailing = normalizedEol.endsWith('\n') ? normalizedEol : '$normalizedEol\n';
+    final updated = (withTrailing + '\n$block\n').replaceAll('\n', eol);
+    await file.writeAsString(updated);
+    context.logger.verbose('Added CMake install rules for $shareRoot.');
+  }
+
   /// Reads the pubspec `name` (fallback `app`).
   String _readAppName() {
     final yamlDoc = _readPubspec();
@@ -161,8 +192,7 @@ class LinuxIconGenerator extends IconGenerator {
     return 'app';
   }
 
-  /// Reads the pubspec `version` with any build number stripped (fallback
-  /// `0.0.1`).
+  /// Reads the pubspec `version` with any build number stripped (fallback `0.0.1`).
   String _readAppVersion() {
     final yamlDoc = _readPubspec();
     final version = yamlDoc?['version'];
@@ -185,10 +215,7 @@ class LinuxIconGenerator extends IconGenerator {
     }
   }
 
-  /// freedesktop desktop entry with the given `Icon=` line. [applicationId]
-  /// becomes `StartupWMClass=` so docks/taskbars group the window under
-  /// this entry; it is omitted when unknown (a wrong value is worse than
-  /// none — it would override the signals that already work).
+  /// freedesktop desktop entry with the given `Icon=` line. [applicationId] becomes `StartupWMClass=` so docks/taskbars group the window under this entry; it is omitted when unknown (a wrong value is worse than none — it would override the signals that already work).
   String _desktopFile(
     String appName,
     String iconLine,
@@ -210,15 +237,9 @@ Categories=Utility;
     return buffer.toString();
   }
 
-  /// Reads the GTK application id from `linux/CMakeLists.txt`
-  /// (`set(APPLICATION_ID "...")`). This id is the window identity on both
-  /// session types (Wayland `app_id`, X11 `WM_CLASS` instance part), so it
-  /// is the only correct `StartupWMClass` value. A flavor-conditional
-  /// override (`if(FLUTTER_APP_FLAVOR STREQUAL "<flavor>")`) wins on flavor
-  /// runs. Null when absent — the caller omits the line rather than
-  /// guessing.
+  /// Reads the GTK application id from `linux/CMakeLists.txt` (`set(APPLICATION_ID "...")`). This id is the window identity on both session types (Wayland `app_id`, X11 `WM_CLASS` instance part), so it is the only correct `StartupWMClass` value. A flavor-conditional override (`if(FLUTTER_APP_FLAVOR STREQUAL "<flavor>")`) wins on flavor runs. Null when absent — the caller omits the line rather than guessing.
   String? _readApplicationId() {
-    final file = File(path.join(context.prefixPath, 'linux', 'CMakeLists.txt'));
+    final file = File(path.join(context.prefixPath, paths.linuxTopCMakeListsFile));
     if (!file.existsSync()) {
       return null;
     }
@@ -290,8 +311,7 @@ parts:
       return false;
     }
 
-    // SVG sources derive a sibling raster at generation time (see
-    // [_linuxRuntimeSize]): the pubspec must bundle the derived file.
+    // SVG sources derive a sibling raster at generation time (see constants.linuxRuntimeSize): the pubspec must bundle the derived file.
     final iconPath = runtimeIconPath(sourcePath);
 
     final entitesToCheck = [
@@ -317,10 +337,7 @@ parts:
     return true;
   }
 
-  /// Returns `true` when [iconPath] (or its directory) is declared in the
-  /// `assets:` list under `flutter:` in `pubspec.yaml`. [sourcePath] names
-  /// the SVG the runtime raster derives from, so the error can explain
-  /// which file to declare.
+  /// Returns `true` when [iconPath] (or its directory) is declared in the `assets:` list under `flutter:` in `pubspec.yaml`. [sourcePath] names the SVG the runtime raster derives from, so the error can explain which file to declare.
   bool _hasPubspecAsset(String iconPath, {String? sourcePath}) {
     final pubspecFile = File(path.join(context.prefixPath, 'pubspec.yaml'));
 
@@ -360,8 +377,7 @@ parts:
       return false;
     }
 
-    // Check if the icon path or its directory is included in assets.
-    // Normalize separators so a directory entry also matches on Windows.
+    // Check if the icon path or its directory is included in assets. Normalize separators so a directory entry also matches on Windows.
     final iconDir = '${path.dirname(iconPath).replaceAll(r'\', '/')}/';
     for (final asset in assets) {
       final assetStr = asset.toString();
@@ -383,8 +399,7 @@ parts:
   static const _iconVarName = 'linux_icon_path';
   static const _gioInclude = '#include <gio/gio.h>';
 
-  /// Matches the helper definition/call, but not a longer identifier that
-  /// merely ends with the helper name (e.g. `my_get_flutter_asset_path(`).
+  /// Matches the helper definition/call, but not a longer identifier that merely ends with the helper name (e.g. `my_get_flutter_asset_path(`).
   static final _helperRefRegex = RegExp(
     '(^|[^A-Za-z0-9_])' + _assetHelperName + r'\s*\(',
     multiLine: true,
@@ -458,9 +473,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
       }
     }
 
-    // Legacy single/multi-line call present -> upgrade to canonical block,
-    // taking the path from the manual call only for logging; we always
-    // rewrite to the configured iconPath.
+    // Legacy single/multi-line call present -> upgrade to canonical block, taking the path from the manual call only for logging; we always rewrite to the configured iconPath.
     final existingIconRegex = RegExp(
       r'gtk_window_set_icon_from_file\s*\(\s*[^;]*;',
       multiLine: true,
@@ -485,8 +498,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
         );
         return;
       } else {
-        // Canonical call line exists but helper-call regex missed (should be
-        // rare) -> just ensure helper + include.
+        // Canonical call line exists but helper-call regex missed (should be rare) -> just ensure helper + include.
         final updated = _ensureHelperAndInclude(content);
         if (updated != content) {
           await myAppFile.writeAsString(updated);
@@ -578,8 +590,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
         'Updated my_application.cc with icon configuration: $iconPath',
       );
     } else {
-      // The 2-line call depends on the asset-path helper and the gio
-      // include, so spell out all three pieces for a manual fix.
+      // The 2-line call depends on the asset-path helper and the gio include, so spell out all three pieces for a manual fix.
       final errorMessage = 'Could not find appropriate location to add icon configuration in my_application.cc. '
           'Please manually update it as follows:\n'
           '1. Add $_gioInclude alongside the other includes (if missing).\n'
@@ -622,8 +633,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     return updated;
   }
 
-  /// Replaces a legacy `gtk_window_set_icon_from_file(...)` statement with
-  /// the canonical 2-line exe-relative block, preserving indentation.
+  /// Replaces a legacy `gtk_window_set_icon_from_file(...)` statement with the canonical 2-line exe-relative block, preserving indentation.
   String _replaceLegacyCall(
     String content,
     RegExp legacyRegex,

@@ -61,6 +61,13 @@ const int windowsWide310Width = 310;
 /// Base height for the wide tile entry.
 const int windowsWide150Height = 150;
 
+//* Linux
+/// hicolor theme sizes (conventional full set).
+const List<int> linuxHicolorSizes = [16, 22, 24, 32, 48, 64, 128, 256, 512];
+
+/// Edge length of the derived runtime raster for SVG sources. The runner loads the window icon from flutter_assets at runtime, where only rasters work — so SVG sources are rasterized once to a `<name>.linux.png` sibling at this size and wired instead.
+const int linuxRuntimeSize = 512;
+
 /// CLI banner with the current package version.
 String introMessage() => '''
   ════════════════════════════════════════════

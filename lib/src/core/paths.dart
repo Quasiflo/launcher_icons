@@ -160,17 +160,32 @@ const linuxDirPath = 'linux';
 /// Relative path to linux my_application.cc file
 String linuxMyApplicationFile = path.join(linuxDirPath, 'runner', 'my_application.cc');
 
+/// Relative path to linux top-level CMakeLists.txt file
+final linuxTopCMakeListsFile = path.join(linuxDirPath, 'CMakeLists.txt');
+
 /// Suffix for the runtime raster derived from SVG sources
 const linuxDerivedIconSuffix = '.linux.png';
 
-/// Relative hicolor icon path for [appName] at [size]px
-String linuxHicolorIconPath(String appName, int size) => path.join('share', 'icons', 'hicolor', '${size}x$size', 'apps', '$appName.png');
+/// Joins [sharePrefix] with the freedesktop `share/` tree. An empty or `.` prefix restores the legacy top-level `share/...` layout; the default `linux` prefix yields `linux/share/...`.
+String _withSharePrefix(String sharePrefix, List<String> tail) {
+  final normalized = sharePrefix.trim();
+  if (normalized.isEmpty || normalized == '.' || normalized == './') {
+    return path.join('share', path.joinAll(tail));
+  }
+  return path.join(normalized, 'share', path.joinAll(tail));
+}
+
+/// Project-relative root of the freedesktop `share/` tree for [sharePrefix].
+String linuxShareRoot([String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, []);
+
+/// Relative hicolor icon path for [appName] at [size]px under [sharePrefix]
+String linuxHicolorIconPath(String appName, int size, [String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, ['icons', 'hicolor', '${size}x$size', 'apps', '$appName.png']);
 
 /// Relative snap icon path for [appName]
 String linuxSnapIconPath(String appName) => path.join('snap', 'gui', '$appName.png');
 
-/// Relative freedesktop desktop entry path for [appName]
-String linuxDesktopFilePath(String appName) => path.join('share', 'applications', '$appName.desktop');
+/// Relative freedesktop desktop entry path for [appName] under [sharePrefix]
+String linuxDesktopFilePath(String appName, [String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, ['applications', '$appName.desktop']);
 
 /// Relative snap desktop entry path for [appName]
 String linuxSnapDesktopFilePath(String appName) => path.join('snap', 'gui', '$appName.desktop');

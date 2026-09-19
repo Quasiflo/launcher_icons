@@ -15,10 +15,20 @@ class LinuxConfig {
   @JsonKey(name: 'image_path')
   final String? imagePath;
 
+  /// Location prefix for the freedesktop `share/` tree (default `linux`, yielding `linux/share/...`). Set to empty to restore the legacy top-level `share/...` layout.
+  @JsonKey(name: 'share_prefix')
+  final String sharePrefix;
+
+  /// Whether to emit snap packaging (`snap/gui/` + `snap/snapcraft.yaml`, default false).
+  @JsonKey(name: 'generate_snap')
+  final bool generateSnap;
+
   /// Creates a instance of [LinuxConfig]
   const LinuxConfig({
     this.generate = false,
     this.imagePath,
+    this.sharePrefix = 'linux',
+    this.generateSnap = false,
   });
 
   /// Creates [LinuxConfig] from [json]
