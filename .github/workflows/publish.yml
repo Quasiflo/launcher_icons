@@ -1,0 +1,15 @@
+# Publishes to pub.dev via OIDC trusted publishing whenever release-please cuts a new version (which pushes a `v<version>` tag).
+---
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+name: publish to pub.dev
+permissions: {} # no default token permissions; each job grants only what it needs
+jobs:
+  publish:
+    name: Publish to pub.dev
+    permissions:
+      contents: read # check out the tagged release
+      id-token: write # request the OIDC token pub.dev exchanges for a publishing token
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1
