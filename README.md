@@ -31,7 +31,7 @@ Add the dependency and generate a starter config:
 
 ```yaml
 dev_dependencies:
-  launcher_icons: "^0.14.4"
+  launcher_icons: "^0.15.0"
 ```
 
 <!-- x-release-please-end -->
