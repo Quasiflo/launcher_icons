@@ -66,9 +66,9 @@ void main() {
       ).copySync(path.join(prefixPath, name));
     }
 
-    test('isEnabled follows android.generate', () {
+    test('androidEnabled follows android.generate', () {
       expect(
-        generatorFor(configFor({})).isEnabled,
+        generatorFor(configFor({})).context.config.androidEnabled,
         isTrue,
       );
       expect(
@@ -76,7 +76,7 @@ void main() {
           Config.fromJson(<String, dynamic>{
             'android': {'generate': false},
           }),
-        ).isEnabled,
+        ).context.config.androidEnabled,
         isFalse,
       );
     });

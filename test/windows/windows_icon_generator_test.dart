@@ -107,15 +107,27 @@ void main() {
         );
       });
 
-      test('isEnabled is false when windows config is not provided', () {
-        when(mockConfig.windowsConfig).thenReturn(null);
-        expect(generator.isEnabled, isFalse);
+      test('windowsEnabled is false with no windows section', () {
+        final realContext = IconGeneratorContext(
+          config: const Config(imagePath: 'icon.png'),
+          prefixPath: prefixPath,
+          logger: LILogger(false),
+        );
+
+        expect(realContext.config.windowsEnabled, isFalse);
       });
 
-      test('isEnabled is false when windows.generate is false', () {
-        when(mockConfig.windowsConfig).thenReturn(mockWindowsConfig);
-        when(mockWindowsConfig.generate).thenReturn(false);
-        expect(generator.isEnabled, isFalse);
+      test('windowsEnabled is false when windows.generate is false', () {
+        final realContext = IconGeneratorContext(
+          config: const Config(
+            imagePath: 'icon.png',
+            windowsConfig: WindowsConfig(generate: false),
+          ),
+          prefixPath: prefixPath,
+          logger: LILogger(false),
+        );
+
+        expect(realContext.config.windowsEnabled, isFalse);
       });
 
       test('should return false when windows.image_path and imagePath is null', () {

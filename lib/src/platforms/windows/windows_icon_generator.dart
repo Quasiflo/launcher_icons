@@ -16,9 +16,6 @@ class WindowsIconGenerator extends IconGenerator {
   static const List<int> _icoSizes = [16, 24, 32, 40, 48, 64, 256];
 
   @override
-  bool get isEnabled => context.config.windowsConfig?.generate ?? false;
-
-  @override
   Future<void> createIcons() async {
     final imgFilePath = path.join(
       context.prefixPath,
@@ -48,8 +45,7 @@ class WindowsIconGenerator extends IconGenerator {
 
   @override
   bool validateRequirements() {
-    // The generate flag is enforced by [isEnabled]; only filesystem and
-    // config preconditions are checked here.
+    // The generate flag is enforced by the caller via the config enabled flag; only filesystem and config preconditions are checked here.
     context.logger.verbose('Validating windows config...');
     final windowsConfig = context.config.windowsConfig!;
 

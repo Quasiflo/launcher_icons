@@ -21,18 +21,12 @@ class WebConfig {
   final String? imagePathFavicon;
 
   /// Dedicated maskable-icon source (opaque, full-bleed, safe-zone aware).
-  ///
-  /// When omitted, the maskable files are derived from the base image:
-  /// the logo is scaled to ~80% and centered on the opaque
-  /// `background_color` (white fallback) so the outer edge survives
-  /// maskable cropping.
+  /// When omitted, the maskable files are derived from the base image: the logo is scaled to ~80% and centered on the opaque `background_color` (white fallback) so the outer edge survives maskable cropping.
   @JsonKey(name: 'image_path_maskable')
   final String? imagePathMaskable;
 
   /// Output directory for web icons (default `web`).
-  ///
-  /// Lets flavors (or custom setups) target different web roots, e.g.
-  /// `output_path: web_prod`.
+  /// Lets flavors (or custom setups) target different web roots, e.g. `output_path: web_prod`.
   @JsonKey(name: 'output_path')
   final String outputPath;
 
@@ -41,9 +35,7 @@ class WebConfig {
   final int faviconSize;
 
   /// Whether to emit `favicon.ico` alongside `favicon.png` (default true).
-  ///
-  /// Browsers request `/favicon.ico` by default; set to `false` to opt out
-  /// and ship the PNG only.
+  /// Browsers request `/favicon.ico` by default; set to `false` to opt out and ship the PNG only.
   @JsonKey(name: 'favicon_ico')
   final bool faviconIco;
 

@@ -70,9 +70,9 @@ flutter:
       expect(generator.platformName, equals('Linux'));
     });
 
-    group('isEnabled', () {
+    group('linuxEnabled', () {
       test('returns true when linux.generate is true', () {
-        expect(generator.isEnabled, isTrue);
+        expect(context.config.linuxEnabled, isTrue);
       });
 
       test('returns false when linux.generate is false', () {
@@ -87,7 +87,7 @@ flutter:
           prefixPath: tempDir.path,
         );
 
-        expect(LinuxIconGenerator(testContext).isEnabled, isFalse);
+        expect(testContext.config.linuxEnabled, isFalse);
       });
 
       test('returns false when linux config is missing', () {
@@ -99,7 +99,7 @@ flutter:
           prefixPath: tempDir.path,
         );
 
-        expect(LinuxIconGenerator(testContext).isEnabled, isFalse);
+        expect(testContext.config.linuxEnabled, isFalse);
       });
     });
 

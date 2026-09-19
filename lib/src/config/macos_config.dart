@@ -20,8 +20,7 @@ class MacOSConfig {
 
   /// Safe-area margin as a percent of the icon size applied on every side.
   ///
-  /// The artwork is scaled into the remaining inner area and centered on a
-  /// transparent canvas. `0` (default) disables padding.
+  /// The artwork is scaled into the remaining inner area and centered on a transparent canvas. `0` (default) disables padding.
   @JsonKey(name: 'padding')
   final int padding;
 
@@ -31,10 +30,7 @@ class MacOSConfig {
   @JsonKey(name: 'rounded_corners')
   final bool roundedCorners;
 
-  /// Liquid glass artwork layers (bottom-to-top). The `.icon` bundle is
-  /// emitted when the list is non-empty; each entry is one Icon Composer
-  /// layer with its own artwork, position, and composition. Unlike iOS,
-  /// per-layer dark/tinted sources have no catalog fallbacks.
+  /// Liquid glass artwork layers (bottom-to-top). The `.icon` bundle is emitted when the list is non-empty; each entry is one Icon Composer layer with its own artwork, position, and composition. Unlike iOS, per-layer dark/tinted sources have no catalog fallbacks.
   @JsonKey(name: 'liquid_glass_layers')
   final List<LiquidGlassLayer>? liquidGlassLayers;
 
@@ -66,8 +62,7 @@ class MacOSConfig {
   @JsonKey(name: 'liquid_glass_blur')
   final double? liquidGlassBlur;
 
-  /// Group lighting model: `individual` or `combined`. Unset by default
-  /// (omitted from icon.json); only observable with 2+ layers.
+  /// Group lighting model: `individual` or `combined`. Unset by default (omitted from icon.json); only observable with 2+ layers.
   @JsonKey(name: 'liquid_glass_lighting')
   final String? liquidGlassLighting;
 

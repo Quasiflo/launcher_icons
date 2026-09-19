@@ -13,8 +13,7 @@ class IOSConfig {
   /// Specifies whether to generate icons for iOS
   final bool generate;
 
-  /// When true, generates only the single 1024px universal icon instead of
-  /// the full icon set. Dark/tinted variants are ignored in this mode.
+  /// When true, generates only the single 1024px universal icon instead of the full icon set. Dark/tinted variants are ignored in this mode.
   @JsonKey(name: 'single_size')
   final bool singleSize;
 
@@ -24,22 +23,15 @@ class IOSConfig {
 
   /// Custom icon set name.
   ///
-  /// When set, a new launcher icon is generated without removing the old
-  /// default one. When `null`, the default existing icon is overridden.
+  /// When set, a new launcher icon is generated without removing the old default one. When `null`, the default existing icon is overridden.
   @JsonKey(name: 'icon_name')
   final String? iconName;
 
-  /// Custom path to the `.xcodeproj` directory (default
-  /// `ios/Runner.xcodeproj`). Set this when the Xcode project was renamed.
+  /// Custom path to the `.xcodeproj` directory (default `ios/Runner.xcodeproj`). Set this when the Xcode project was renamed.
   @JsonKey(name: 'xcodeproj_path')
   final String? xcodeprojPath;
 
-  /// Flavor wiring mode: `pbxproj` (default) rewrites
-  /// `ASSETCATALOG_COMPILER_APPICON_NAME` per build configuration in
-  /// `project.pbxproj` (the Flutter docs flow); `xcconfig` instead removes
-  /// those lines for the flavor's configurations and writes
-  /// `ios/Flutter/<flavor>-<Mode>.xcconfig` overrides (assign them as the
-  /// base configuration files in Xcode once).
+  /// Flavor wiring mode: `pbxproj` (default) rewrites `ASSETCATALOG_COMPILER_APPICON_NAME` per build configuration in `project.pbxproj` (the Flutter docs flow); `xcconfig` instead removes those lines for the flavor's configurations and writes `ios/Flutter/<flavor>-<Mode>.xcconfig` overrides (assign them as the base configuration files in Xcode once).
   @JsonKey(name: 'flavor_mode')
   final String flavorMode;
 
@@ -51,9 +43,7 @@ class IOSConfig {
   @JsonKey(name: 'image_path_tinted_grayscale')
   final String? imagePathTintedGrayscale;
 
-  /// Liquid glass artwork layers (bottom-to-top). The `.icon` bundle is
-  /// emitted when the list is non-empty; each entry is one Icon Composer
-  /// layer with its own artwork, position, and composition.
+  /// Liquid glass artwork layers (bottom-to-top). The `.icon` bundle is emitted when the list is non-empty; each entry is one Icon Composer layer with its own artwork, position, and composition.
   @JsonKey(name: 'liquid_glass_layers')
   final List<LiquidGlassLayer>? liquidGlassLayers;
 
@@ -93,9 +83,7 @@ class IOSConfig {
   @JsonKey(name: 'liquid_glass_blur')
   final double? liquidGlassBlur;
 
-  /// Group lighting model: `individual` lights each layer separately,
-  /// `combined` treats the group as one shape. Unset by default (omitted
-  /// from icon.json); only observable with 2+ layers.
+  /// Group lighting model: `individual` lights each layer separately, `combined` treats the group as one shape. Unset by default (omitted from icon.json); only observable with 2+ layers.
   @JsonKey(name: 'liquid_glass_lighting')
   final String? liquidGlassLighting;
 

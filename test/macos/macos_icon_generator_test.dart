@@ -80,15 +80,27 @@ void main() {
         );
       });
 
-      test('isEnabled is false when macos config is not provided', () {
-        when(mockConfig.macOSConfig).thenReturn(null);
-        expect(generator.isEnabled, isFalse);
+      test('macOSEnabled is false with no macos section', () {
+        final realContext = IconGeneratorContext(
+          config: const Config(imagePath: 'icon.png'),
+          prefixPath: prefixPath,
+          logger: LILogger(false),
+        );
+
+        expect(realContext.config.macOSEnabled, isFalse);
       });
 
-      test('isEnabled is false when macos.generate is false', () {
-        when(mockConfig.macOSConfig).thenReturn(mockMacOSConfig);
-        when(mockMacOSConfig.generate).thenReturn(false);
-        expect(generator.isEnabled, isFalse);
+      test('macOSEnabled is false when macos.generate is false', () {
+        final realContext = IconGeneratorContext(
+          config: const Config(
+            imagePath: 'icon.png',
+            macOSConfig: MacOSConfig(generate: false),
+          ),
+          prefixPath: prefixPath,
+          logger: LILogger(false),
+        );
+
+        expect(realContext.config.macOSEnabled, isFalse);
       });
 
       test('should return false when macos.image_path and imagePath is null', () {

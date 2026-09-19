@@ -28,9 +28,6 @@ class WebIconGenerator extends IconGenerator {
   ///
   WebIconGenerator(IconGeneratorContext context) : super(context, 'Web');
 
-  @override
-  bool get isEnabled => context.config.webConfig?.generate ?? false;
-
   /// Web root directory honoring `output_path` (default `web`), so flavors
   /// can target separate web roots (fluttercommunity/flutter_launcher_icons#426).
   String get _webRoot => context.config.webConfig?.outputPath ?? paths.webDirPath;
@@ -127,8 +124,7 @@ class WebIconGenerator extends IconGenerator {
 
   @override
   bool validateRequirements() {
-    // The generate flag is enforced by [isEnabled]; only filesystem and
-    // config preconditions are checked here.
+    // The generate flag is enforced by the caller via the config enabled flag; only filesystem and config preconditions are checked here.
     context.logger.verbose('Checking webconfig...');
     final webConfig = context.config.webConfig!;
     try {

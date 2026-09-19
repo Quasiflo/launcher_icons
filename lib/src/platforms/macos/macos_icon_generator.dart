@@ -30,9 +30,6 @@ class MacOSIconGenerator extends IconGenerator {
   /// Creates a instance of [MacOSIconGenerator]
   MacOSIconGenerator(IconGeneratorContext context) : super(context, 'MacOS');
 
-  @override
-  bool get isEnabled => context.config.macOSConfig?.generate ?? false;
-
   /// Icons directory, flavor-aware: `AppIcon-<flavor>.appiconset` for flavor runs so macOS honors flavors like iOS does (fluttercommunity/flutter_launcher_icons#638).
   String _iconsDirPath() {
     final flavor = context.flavor;
@@ -163,8 +160,7 @@ class MacOSIconGenerator extends IconGenerator {
 
   @override
   bool validateRequirements() {
-    // The generate flag is enforced by [isEnabled]; only filesystem and
-    // config preconditions are checked here.
+    // The generate flag is enforced by the caller via the config enabled flag; only filesystem and config preconditions are checked here.
     context.logger.verbose('Checking $platformName config...');
     final macOSConfig = context.config.macOSConfig!;
 

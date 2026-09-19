@@ -11,12 +11,8 @@ class AndroidIconGenerator extends IconGenerator {
   AndroidIconGenerator(IconGeneratorContext context) : super(context, 'Android');
 
   @override
-  bool get isEnabled => context.config.androidEnabled;
-
-  @override
   bool validateRequirements() {
-    // The generate flag is enforced by [isEnabled]; only filesystem and
-    // config preconditions are checked here.
+    // The generate flag is enforced by the caller via the config enabled flag; only filesystem and config preconditions are checked here.
     context.logger.verbose('Validating Android config...');
     final config = context.config;
     try {

@@ -55,13 +55,13 @@ void main() {
           ),
         );
 
-    test('isEnabled follows ios.generate', () {
+    test('iosEnabled follows ios.generate', () {
       expect(
         generatorFor(
           Config.fromJson(<String, dynamic>{
             'ios': {'generate': true, 'image_path': 'icon.png'},
           }),
-        ).isEnabled,
+        ).context.config.iosEnabled,
         isTrue,
       );
       expect(
@@ -69,7 +69,7 @@ void main() {
           Config.fromJson(<String, dynamic>{
             'ios': {'generate': false},
           }),
-        ).isEnabled,
+        ).context.config.iosEnabled,
         isFalse,
       );
     });

@@ -10,12 +10,8 @@ class IosIconGenerator extends IconGenerator {
   IosIconGenerator(IconGeneratorContext context) : super(context, 'iOS');
 
   @override
-  bool get isEnabled => context.config.iosEnabled;
-
-  @override
   bool validateRequirements() {
-    // The generate flag is enforced by [isEnabled]; only filesystem and
-    // config preconditions are checked here.
+    // The generate flag is enforced by the caller via the config enabled flag; only filesystem and config preconditions are checked here.
     context.logger.verbose('Validating iOS config...');
     final config = context.config;
     try {

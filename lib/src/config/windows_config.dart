@@ -17,10 +17,7 @@ class WindowsConfig {
 
   /// Output `.ico` file name inside `windows/runner/resources/`.
   ///
-  /// Defaults to `app_icon.ico` (the `Runner.rc` contract). Set a
-  /// per-flavor name (e.g. `app_icon_staging.ico`) so sequential flavor
-  /// runs don't clobber each other; wire the name into `Runner.rc(.in)`
-  /// manually (see Flutter's Windows flavors docs).
+  /// Defaults to `app_icon.ico` (the `Runner.rc` contract). Set a per-flavor name (e.g. `app_icon_staging.ico`) so sequential flavor runs don't clobber each other; wire the name into `Runner.rc(.in)` manually (see Flutter's Windows flavors docs).
   @JsonKey(name: 'icon_filename')
   final String iconFilename;
 

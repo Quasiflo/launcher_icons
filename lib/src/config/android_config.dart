@@ -16,9 +16,7 @@ class AndroidConfig {
   final String? imagePath;
 
   /// Custom icon name (e.g. `"ic_launcher"`).
-  ///
-  /// When set, a new launcher icon is generated without removing the old
-  /// default one. When `null`, the default existing icon is overridden.
+  /// When set, a new launcher icon is generated without removing the old default one. When `null`, the default existing icon is overridden.
   @JsonKey(name: 'icon_name')
   final String? iconName;
 
@@ -32,8 +30,7 @@ class AndroidConfig {
 
   /// android adaptive_icon_background: color, image, or `transparent`.
   ///
-  /// The keyword `transparent` (case-insensitive) maps to
-  /// `@android:color/transparent` with no colors.xml entry.
+  /// The keyword `transparent` (case-insensitive) maps to `@android:color/transparent` with no colors.xml entry.
   @JsonKey(name: 'adaptive_icon_background')
   final String? adaptiveIconBackground;
 
@@ -43,10 +40,7 @@ class AndroidConfig {
 
   /// android adaptive_icon_round image (opt-in round icon).
   ///
-  /// When set, `ic_launcher_round.png` drawables plus an
-  /// `ic_launcher_round.xml` adaptive icon are generated and the manifest
-  /// gains `android:roundIcon`. Requires the adaptive pair
-  /// (`adaptive_icon_background` + `adaptive_icon_foreground`).
+  /// When set, `ic_launcher_round.png` drawables plus an `ic_launcher_round.xml` adaptive icon are generated and the manifest gains `android:roundIcon`. Requires the adaptive pair (`adaptive_icon_background` + `adaptive_icon_foreground`).
   @JsonKey(name: 'adaptive_icon_round')
   final String? adaptiveIconRound;
 

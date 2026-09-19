@@ -18,9 +18,6 @@ abstract class IconGenerator {
   /// Creates icons for this platform.
   Future<void> createIcons();
 
-  /// Whether icon generation is enabled in the platform configuration.
-  bool get isEnabled;
-
   /// Should return `true` if this platform has all the requirements to create icons. This runs before to [createIcons]
   bool validateRequirements();
 }

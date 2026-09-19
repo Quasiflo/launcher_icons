@@ -102,7 +102,7 @@ void main() {
         ),
       );
 
-      expect(generator.isEnabled, isTrue);
+      expect(generator.context.config.macOSEnabled, isTrue);
       expect(generator.validateRequirements(), isTrue);
       await generator.createIcons();
 

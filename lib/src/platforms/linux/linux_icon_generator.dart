@@ -22,9 +22,6 @@ class LinuxIconGenerator extends IconGenerator {
   /// Creates a instance of [LinuxIconGenerator]
   LinuxIconGenerator(IconGeneratorContext context) : super(context, 'Linux');
 
-  @override
-  bool get isEnabled => context.config.linuxConfig?.generate ?? false;
-
   /// Runtime icon path: SVG sources derive a sibling raster (see
   /// [_linuxRuntimeSize]) because the runner can only load rasters;
   /// raster sources pass through untouched.
@@ -281,8 +278,7 @@ parts:
 
   @override
   bool validateRequirements() {
-    // The generate flag is enforced by [isEnabled]; only filesystem and
-    // config preconditions are checked here.
+    // The generate flag is enforced by the caller via the config enabled flag; only filesystem and config preconditions are checked here.
     context.logger.verbose('Validating Linux config...');
     final linuxConfig = context.config.linuxConfig!;
 

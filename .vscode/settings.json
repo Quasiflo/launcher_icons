@@ -56,4 +56,5 @@
     "cmake.cmakePath": "${workspaceFolder}/.vscode/mise-tools/cmake",
     // "java.import.gradle.java.home": "${workspaceFolder}/.vscode/mise-tools/java",
     // "java.jdt.ls.java.home": "${workspaceFolder}/.vscode/mise-tools/java",
+    "cSpell.enabled": false,
 }
