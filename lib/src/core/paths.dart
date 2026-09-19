@@ -147,6 +147,12 @@ String windowsResourcesDirPath = path.join(windowsDirPath, 'runner', 'resources'
 /// Default Windows icon file name (the Runner.rc contract)
 const windowsDefaultIconFilename = 'app_icon.ico';
 
+/// Relative Windows MSIX image assets directory (mirrors the manifest `Images\` convention so the emitted snippet references resolve).
+String windowsImagesDirPath = path.join(windowsDirPath, 'images');
+
+/// Manifest snippet file name written next to the MSIX image assets for hand packaging.
+const windowsManifestSnippetFileName = 'manifest-snippet.xml';
+
 //* Linux
 /// Relative path to linux directory
 const linuxDirPath = 'linux';

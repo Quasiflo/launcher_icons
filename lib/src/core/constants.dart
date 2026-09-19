@@ -33,6 +33,34 @@ const int webTwitterWidth = 1200;
 /// Twitter/X link-preview height.
 const int webTwitterHeight = 600;
 
+//* Windows
+/// Standard ICO frame sizes: Win32 full set (app icons + Classic Mode) plus 40/64 for Alt+Tab crispness and 256 for Explorer thumbnails.
+const List<int> windowsIcoSizes = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256];
+
+/// App-list target sizes from the MSIX app-icon construction table. Target-size assets use exact pixel dimensions rather than scale factors.
+const List<int> windowsAppListTargetSizes = [16, 20, 24, 30, 32, 36, 40, 48, 60, 64, 72, 80, 96, 256];
+
+/// Share of the canvas the bare mark fills in unplated AppList assets (VS-generator parity: inner graphic ~70-75% with centered transparent padding).
+const double windowsUnplatedArtworkScale = 0.75;
+
+/// Base file name all AppList target-size variants qualify off. The MSIX manifest points at this file and Windows resolves the qualified variants at runtime.
+const String windowsAppListBaseName = 'Square44x44Logo.png';
+
+/// Tile scale factors (VS-generator parity). Pixel sizes follow `round(base * scale / 100)`, matching the MSIX app-icon construction table.
+const List<int> windowsTileScales = [100, 125, 150, 200, 400];
+
+/// Base size for the small square tile entry.
+const int windowsSquare44Base = 44;
+
+/// Base size for the medium square tile entry.
+const int windowsSquare150Base = 150;
+
+/// Base width for the wide tile entry.
+const int windowsWide310Width = 310;
+
+/// Base height for the wide tile entry.
+const int windowsWide150Height = 150;
+
 /// CLI banner with the current package version.
 String introMessage() => '''
   ════════════════════════════════════════════

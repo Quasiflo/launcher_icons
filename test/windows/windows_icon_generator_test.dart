@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
+import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
@@ -91,6 +92,9 @@ void main() {
         when(mockConfig.windowsConfig).thenReturn(mockWindowsConfig);
         when(mockWindowsConfig.generate).thenReturn(true);
         when(mockWindowsConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
+        when(mockWindowsConfig.imagePathUnplated).thenReturn(null);
+        when(mockWindowsConfig.imagePathLightUnplated).thenReturn(null);
+        when(mockWindowsConfig.imagePathWide).thenReturn(null);
         when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
         // resolveImageFile is mocked: implement the real rule (platform
         // path wins, top-level fallback, missing file throws) so the unit
@@ -226,11 +230,11 @@ void main() {
       int toPixels(int byte) => byte == 0 ? 256 : byte;
       expect(
         entries.map((e) => toPixels(e.width)).toList(),
-        [16, 24, 32, 40, 48, 64, 256],
+        constants.windowsIcoSizes,
       );
       expect(
         entries.map((e) => toPixels(e.height)).toList(),
-        [16, 24, 32, 40, 48, 64, 256],
+        constants.windowsIcoSizes,
       );
 
       final firstDataOffset = 6 + entries.length * 16;

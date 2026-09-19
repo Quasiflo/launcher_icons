@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/windows_config.dart';
+import 'package:launcher_icons/src/core/constants.dart' as constants;
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
@@ -203,8 +204,8 @@ void main() {
       return bytes[4] | bytes[5] << 8;
     }
 
-    test('single-master mode emits a 7-frame ico', () async {
-      expect(icoFrameCount(await runFromSvg()), equals(7));
+    test('single-master mode emits one ico frame per windowsIcoSizes entry', () async {
+      expect(icoFrameCount(await runFromSvg()), equals(constants.windowsIcoSizes.length));
     });
   });
 }

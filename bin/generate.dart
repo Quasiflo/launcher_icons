@@ -150,34 +150,6 @@ launcher_icons:
     #     fill_tinted: "#ffffff" # tinted-appearance tint, falls back to fill
     #   - image_path: "assets/icon/liquid_glass_glyph.png" # extra layers stack on top
 
-  web:
-    generate: true
-    # output_path: "web" # custom web root, must be different per flavor ie "web-flavors/staging"
-    # image_path: "assets/icon/icon.png" # PNG or SVG, base source for favicon, PWA, maskable, apple-touch and social images
-    # image_path_pwa: "assets/icon/icon-pwa.png" # override source for standard PWA icons (Icon-192/512.png)
-    # image_path_maskable: "assets/icon/icon-maskable.png" # safe-zone-aware source, derived with ~80% padding on background_color when omitted
-    # image_path_monochrome: "assets/icon/icon-monochrome.png" # single-color source for themed icons, only emitted when set
-    # image_path_monochrome_maskable: "assets/icon/icon-monochrome-maskable.png" # monochrome safe-zone-aware source, derived from monochrome when omitted
-    # image_path_favicon_svg: "assets/icon/icon-favicon.svg" # copied verbatim to favicon.svg, never rasterized; favicon.png/.ico always render from image_path
-    # favicon_size: 32 # size of PNG favicon, the .ico always holds 16+32+48
-    # favicon_ico: false # skip favicon.ico, ship the PNG only
-    # image_path_opengraph: "assets/icon/icon-opengraph.png" # rendered at 1200x630 to opengraph.png with og:image meta, only generated when set
-    # image_path_twitter: "assets/icon/icon-twitter.png" # rendered at 1200x600 to twitter.png with twitter:image meta, only generated when set
-    # shortcut_icons: # PWA press-and-hold shortcuts, each rendered at 96px and wired into manifest shortcuts
-    #   - image_path: "assets/icon/shortcut-search.png"
-    #     name: "Search"
-    #     short_name: "Search" # optional short label
-    #     url: "/search" # route opened by the shortcut
-    #     description: "Search the app" # optional
-    # background_color: "#0175C2" # hex color, written to manifest.json
-    # theme_color_light: "#0175C2" # hex color for light scheme <meta> in index.html
-    # theme_color_dark: "#000000" # hex color for dark scheme <meta> in index.html
-
-  windows:
-    generate: true
-    # image_path: "path/to/image.png"
-    # icon_filename: "app_icon_staging.ico" # per-flavor output name
-
   macos:
     generate: true
     # image_path: "path/to/image.png"
@@ -205,6 +177,37 @@ launcher_icons:
     #     blend_mode: "normal" # normal, plus-lighter, plus-darker, overlay, multiply, soft-light, hard-light, darken, lighten, screen
     #     fill: "#ffffff" # recolor tint applied to the artwork
     #   - image_path: "assets/icon/liquid_glass_glyph.png" # extra layers stack on top
+
+  web:
+    generate: true
+    # output_path: "web" # custom web root, must be different per flavor ie "web-flavors/staging"
+    # image_path: "assets/icon/icon.png" # PNG or SVG, base source for favicon, PWA, maskable, apple-touch and social images
+    # image_path_pwa: "assets/icon/icon-pwa.png" # override source for standard PWA icons (Icon-192/512.png)
+    # image_path_maskable: "assets/icon/icon-maskable.png" # safe-zone-aware source, derived with ~80% padding on background_color when omitted
+    # image_path_monochrome: "assets/icon/icon-monochrome.png" # single-color source for themed icons, only emitted when set
+    # image_path_monochrome_maskable: "assets/icon/icon-monochrome-maskable.png" # monochrome safe-zone-aware source, derived from monochrome when omitted
+    # image_path_favicon_svg: "assets/icon/icon-favicon.svg" # copied verbatim to favicon.svg, never rasterized; favicon.png/.ico always render from image_path
+    # favicon_size: 32 # size of PNG favicon, the .ico always holds 16+32+48
+    # favicon_ico: false # skip favicon.ico, ship the PNG only
+    # image_path_opengraph: "assets/icon/icon-opengraph.png" # rendered at 1200x630 to opengraph.png with og:image meta, only generated when set
+    # image_path_twitter: "assets/icon/icon-twitter.png" # rendered at 1200x600 to twitter.png with twitter:image meta, only generated when set
+    # shortcut_icons: # PWA press-and-hold shortcuts, each rendered at 96px and wired into manifest shortcuts
+    #   - image_path: "assets/icon/shortcut-search.png"
+    #     name: "Search"
+    #     short_name: "Search" # optional short label
+    #     url: "/search" # route opened by the shortcut
+    #     description: "Search the app" # optional
+    # background_color: "#0175C2" # hex color, written to manifest.json
+    # theme_color_light: "#0175C2" # hex color for light scheme <meta> in index.html
+    # theme_color_dark: "#000000" # hex color for dark scheme <meta> in index.html
+
+  windows:
+    generate: true
+    # image_path: "path/to/image.png"
+    # icon_filename: "app_icon_staging.ico" # per-flavor output name
+    # image_path_unplated: "assets/icon/icon-unplated.png" # bare-mark source for dark-shell AppList assets, derived with ~75% padding from image_path when omitted
+    # image_path_light_unplated: "assets/icon/icon-light-unplated.png" # bare-mark source for light-shell AppList assets, derived with ~75% padding from image_path when omitted
+    # image_path_wide: "assets/icon/icon-wide.png" # wide-tile source for Wide310x150Logo scale set, derived with a center cover-crop from image_path when omitted
 
   linux:
     generate: true

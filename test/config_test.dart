@@ -108,6 +108,9 @@ void main() {
             'generate': true,
             'image_path': 'master-light-1024.png',
             'icon_filename': 'app_icon.ico',
+            'image_path_unplated': null,
+            'image_path_light_unplated': null,
+            'image_path_wide': null,
           }),
         );
         // macos
@@ -270,6 +273,9 @@ void main() {
             'generate': true,
             'image_path': 'master-light-1024.png',
             'icon_filename': 'app_icon.ico',
+            'image_path_unplated': null,
+            'image_path_light_unplated': null,
+            'image_path_wide': null,
           }),
         );
         // macos
@@ -360,6 +366,9 @@ void main() {
             'generate': true,
             'image_path': 'master-light-1024.png',
             'icon_filename': 'app_icon.ico',
+            'image_path_unplated': null,
+            'image_path_light_unplated': null,
+            'image_path_wide': null,
           }),
         );
         // macos
