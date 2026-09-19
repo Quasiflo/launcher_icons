@@ -37,7 +37,11 @@ Future<Image> buildMacOSIconImage(
 /// The mask is a superellipse (|x|^4 + |y|^4 <= r^4) rather than a plain circular arc: Apple uses continuous-curvature ("squircle") corners, and the superellipse keeps more of the corner diagonal at the same 22.5% radius. Only `rounded_corners: true` output changes.
 Image applyRoundedCorners(Image image) {
   final size = image.width;
-  assert(image.height == size, 'macOS icons must be square');
+  // A release-safe contract check (`assert` vanishes in release builds, so it
+  // cannot guard production runs): every caller feeds square canvases.
+  if (image.height != size) {
+    throw ArgumentError('macOS icons must be square (got ${image.width}x${image.height})');
+  }
   final radius = (size * macOSCornerRadiusFraction).round();
 
   var canvas = image;

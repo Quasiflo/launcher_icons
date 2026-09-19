@@ -100,6 +100,168 @@ void main() {
       expect(generator.validateRequirements(), isFalse);
     });
 
+    test('validateRequirements fails with an unknown flavor_mode', () {
+      File(
+        path.join(
+          Directory.current.path,
+          'test',
+          'assets',
+          'master-light-1024.png',
+        ),
+      ).copySync(path.join(prefixPath, 'icon.png'));
+      Directory(path.join(prefixPath, 'ios')).createSync(recursive: true);
+      final generator = generatorFor(
+        Config.fromJson(<String, dynamic>{
+          'ios': {
+            'generate': true,
+            'image_path': 'icon.png',
+            'flavor_mode': 'bogus',
+          },
+        }),
+      );
+      expect(generator.validateRequirements(), isFalse);
+    });
+
+    test('validateRequirements fails when a dark source is missing', () {
+      File(
+        path.join(
+          Directory.current.path,
+          'test',
+          'assets',
+          'master-light-1024.png',
+        ),
+      ).copySync(path.join(prefixPath, 'icon.png'));
+      Directory(path.join(prefixPath, 'ios')).createSync(recursive: true);
+      final generator = generatorFor(
+        Config.fromJson(<String, dynamic>{
+          'ios': {
+            'generate': true,
+            'image_path': 'icon.png',
+            'image_path_dark_transparent': 'missing-dark.png',
+          },
+        }),
+      );
+      expect(generator.validateRequirements(), isFalse);
+    });
+
+    test('icon_only without glass fails validation', () {
+      Directory(path.join(prefixPath, 'ios')).createSync(recursive: true);
+      final generator = generatorFor(
+        Config.fromJson(<String, dynamic>{
+          'ios': {'generate': true, 'icon_only': true},
+        }),
+      );
+      expect(generator.validateRequirements(), isFalse);
+    });
+
+    test('icon_only emits the .icon bundle without a PNG catalog', () async {
+      File(
+        path.join(
+          Directory.current.path,
+          'test',
+          'assets',
+          'master-light-1024.png',
+        ),
+      ).copySync(path.join(prefixPath, 'icon.png'));
+      Directory(
+        path.join(prefixPath, 'ios', 'Runner'),
+      ).createSync(recursive: true);
+      final generator = generatorFor(
+        Config.fromJson(<String, dynamic>{
+          'ios': {
+            'generate': true,
+            'icon_only': true,
+            'liquid_glass_layers': [
+              {'image_path': 'icon.png'},
+            ],
+          },
+        }),
+      );
+      expect(generator.validateRequirements(), isTrue);
+      await generator.createIcons();
+
+      expect(
+        File(
+          path.join(
+            prefixPath,
+            'ios',
+            'Runner',
+            'AppIcon.icon',
+            'icon.json',
+          ),
+        ).existsSync(),
+        isTrue,
+      );
+      expect(
+        Directory(
+          path.join(prefixPath, 'ios', 'Runner', 'Assets.xcassets'),
+        ).existsSync(),
+        isFalse,
+      );
+    });
+
+    test('removes a stale .icon bundle and its reference when layers are unset', () async {
+      File(
+        path.join(
+          Directory.current.path,
+          'test',
+          'assets',
+          'master-light-1024.png',
+        ),
+      ).copySync(path.join(prefixPath, 'icon.png'));
+      await Directory(
+        path.join(
+          prefixPath,
+          'ios',
+          'Runner',
+          'Assets.xcassets',
+          'AppIcon.appiconset',
+        ),
+      ).create(recursive: true);
+      await Directory(
+        path.join(prefixPath, 'ios', 'Runner.xcodeproj'),
+      ).create(recursive: true);
+      await File(
+        path.join(prefixPath, 'ios', 'Runner.xcodeproj', 'project.pbxproj'),
+      ).writeAsString(_pbxproj);
+      // Seed a stale bundle from an earlier layers run.
+      final staleAsset = File(
+        path.join(
+          prefixPath,
+          'ios',
+          'Runner',
+          'AppIcon.icon',
+          'Assets',
+          'stale-layer.png',
+        ),
+      );
+      await staleAsset.create(recursive: true);
+      final pbxprojFile = File(
+        path.join(prefixPath, 'ios', 'Runner.xcodeproj', 'project.pbxproj'),
+      );
+      await pbxprojFile.writeAsString(
+        '${await pbxprojFile.readAsString()}\t\tAAA /* AppIcon.icon */ = {isa = PBXFileReference; path = AppIcon.icon; };\n',
+      );
+
+      final generator = generatorFor(
+        Config.fromJson(<String, dynamic>{
+          'ios': {'generate': true, 'image_path': 'icon.png'},
+        }),
+      );
+      await generator.createIcons();
+
+      expect(
+        Directory(
+          path.join(prefixPath, 'ios', 'Runner', 'AppIcon.icon'),
+        ).existsSync(),
+        isFalse,
+      );
+      expect(
+        await pbxprojFile.readAsString(),
+        isNot(contains('AppIcon.icon')),
+      );
+    });
+
     test('createIcons writes under prefixPath', () async {
       File(
         path.join(

@@ -108,7 +108,7 @@ String iosLiquidGlassConfigPath(String iconName) => path.join(iosLiquidGlassIcon
 const macOSDirPath = 'macos';
 
 /// Relative path to the macOS Runner folder
-String macOSRunnerFolder = path.join(macOSDirPath, runnerFolderName);
+final String macOSRunnerFolder = path.join(macOSDirPath, runnerFolderName);
 
 /// Relative path to the macOS Runner.xcodeproj directory
 final macOSXcodeprojPath = path.join(macOSDirPath, xcodeprojDirName);

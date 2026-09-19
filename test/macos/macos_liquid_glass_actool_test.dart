@@ -215,6 +215,48 @@ void main() {
           isTrue,
         );
       });
+
+      test('multi-group gradient bundle compiles without errors', () async {
+        final config = Config.fromJson(<String, dynamic>{
+          'macos': {
+            'generate': true,
+            'liquid_glass_gradient_from': '#00FF00',
+            'liquid_glass_gradient_to': '#0000FF',
+            'liquid_glass_groups': [
+              {
+                'name': 'Background',
+                'layers': [
+                  {'image_path': 'icon.png'},
+                ],
+              },
+              {
+                'name': 'Glyph',
+                'layers': [
+                  {'image_path': 'glyph.png', 'scale': 0.7},
+                ],
+                'remove_liquid_glass': true,
+              },
+            ],
+          },
+        });
+
+        await generateMacOSLiquidGlassIcon(config, 'AppIcon');
+
+        final result = await compileIcon(
+          'macos/Runner/AppIcon.icon',
+          'AppIcon',
+          'compiled-groups',
+        );
+        expect(
+          result.exitCode,
+          equals(0),
+          reason: result.stdout.toString() + result.stderr.toString(),
+        );
+        expect(
+          File(path.join('compiled-groups', 'Assets.car')).existsSync(),
+          isTrue,
+        );
+      });
     },
     skip: !Platform.isMacOS ? 'requires macOS with Xcode actool' : false,
   );

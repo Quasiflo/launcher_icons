@@ -58,91 +58,122 @@ Future<void> createIcons(
   String prefixPath = '.',
   SvgRasterCache? cache,
 }) async {
-  final String filePath = config.resolveImageFile(config.iosConfig?.imagePath, prefixPath);
-  final String? darkFilePath = config.iosConfig?.imagePathDarkTransparent;
-  final String? tintedFilePath = config.iosConfig?.imagePathTintedGrayscale;
-
-  // decodeImageFile throws on missing/undecodable files, so a specified but bad path is a hard error rather than a silent skip.
-  Image image = await decodeImageFile(
-    withPrefix(
-      prefixPath,
-      filePath,
-    ),
-    cache: cache,
-  );
-  // Single-size mode generates only the 1024px marketing icon: dark/tinted variants are skipped entirely (no decode, no I/O).
-  final bool singleSize = config.iosConfig?.singleSize == true;
-  if (singleSize && (darkFilePath != null || tintedFilePath != null)) {
-    printStatus(
-      'Dark/tinted variants are ignored in single-size mode',
-      logger,
-    );
-  }
-
-  Image? darkImage;
-  if (darkFilePath != null && !singleSize) {
-    darkImage = await decodeImageFile(
-      withPrefix(prefixPath, darkFilePath),
-      cache: cache,
-    );
-  }
-
-  Image? tintedImage;
-  if (tintedFilePath != null && !singleSize) {
-    tintedImage = await decodeImageFile(
-      withPrefix(prefixPath, tintedFilePath),
-      cache: cache,
-    );
-    if (config.iosConfig!.desaturateTintedToGrayscale) {
-      printStatus('Desaturating iOS tinted image to grayscale', logger);
-      tintedImage = grayscale(tintedImage);
-    } else if (!isGrayscaleImage(tintedImage)) {
-      // Apple's guidance (HIG > App icons, https://developer.apple.com/design/human-interface-guidelines/app-icons): the dark variant is a transparent-background design the system background shows through, while the tinted variant must read as a single-color silhouette — i.e. grayscale. Never validate dark transparency away; warn on tinted color instead.
-      printStatus(
-        '\nWARNING: Tinted iOS image is not grayscale.\nSet "ios.desaturate_tinted_to_grayscale: true" to desaturate it.\n',
-        logger,
-      );
-    }
-  }
-
-  // remove_alpha mattes the base image onto the background color. The dark variant intentionally keeps its transparency (Apple: the system background shows through), while the tinted variant is forced opaque like the base image.
-  if (config.iosConfig?.removeAlpha == true) {
-    if (image.hasAlpha) {
-      image = _removeAlphaChannel(image, config);
-    }
-    if (darkImage != null && darkImage.hasAlpha) {
-      printStatus(
-        'Keeping transparency in the iOS dark variant '
-        '(the system background shows through)',
-        logger,
-      );
-    }
-    if (tintedImage != null && tintedImage.hasAlpha) {
-      tintedImage = _removeAlphaChannel(tintedImage, config);
-    }
-  }
-  if (image.hasAlpha) {
-    printStatus(
-      '\nWARNING: Icons with alpha channel are not allowed in the Apple App Store.\nSet "ios.remove_alpha: true" to remove it.\n',
-      logger,
-    );
-  }
-  // Artwork loaders resize the decoded master per output size. Master pixel transforms (remove_alpha matte, tinted desaturation) already ran on the masters above, so every size downscales the finished art. SVG sources rasterize once at 1024px through the shared cache.
-  Future<Image> Function(int) sizeLoaderFor({
-    required Image master,
-  }) {
-    return (int size) async => createResizedImage(size, master);
-  }
-
-  final loadBase = sizeLoaderFor(master: image);
-  // Null exactly when the matching master is null (unset source or single-size mode); call sites only run under the same guards.
-  final loadDark = darkImage == null ? null : sizeLoaderFor(master: darkImage);
-  final loadTinted = tintedImage == null ? null : sizeLoaderFor(master: tintedImage);
+  // Fail fast on config errors before any decode or I/O: a bad flavor_mode
+  // must not surface only after minutes of image work.
   final flavorMode = config.iosConfig?.flavorMode ?? 'pbxproj';
   if (flavorMode != 'pbxproj' && flavorMode != 'xcconfig') {
     throw InvalidConfigException(
       'Invalid `ios.flavor_mode` "$flavorMode": must be "pbxproj" or "xcconfig".',
     );
+  }
+  // A custom icon_name only applies to unflavored runs (flavor runs always
+  // write `AppIcon-<flavor>`); hoisted so the flavor branch can warn.
+  final String? customIconName = config.iosConfig?.iconName;
+  // `.icon`-only runs skip the PNG catalog (and its base image) and emit just
+  // the glass bundle; fail fast when there is nothing to emit at all.
+  final bool iconOnly = config.iosConfig?.iconOnly ?? false;
+  final bool hasGlass = (config.iosConfig?.liquidGlassLayers?.isNotEmpty ?? false) || (config.iosConfig?.liquidGlassGroups?.isNotEmpty ?? false);
+  if (iconOnly && !hasGlass) {
+    throw const InvalidConfigException(
+      '`ios.icon_only` requires `liquid_glass_layers` or `liquid_glass_groups`: there is nothing else to emit.',
+    );
+  }
+
+  // `.icon`-only runs emit just the bundle below: no PNG masters are decoded and the base image is optional, so the whole PNG prep is skipped.
+  // `late` (not `final`: remove_alpha re-mattes in place below) keeps icon-only runs from touching the unassigned master.
+  late Image image;
+  Image? darkImage;
+  Image? tintedImage;
+  // Single-size mode generates only the 1024px marketing icon: dark/tinted variants are skipped entirely (no decode, no I/O).
+  final bool singleSize = config.iosConfig?.singleSize == true;
+  if (!iconOnly) {
+    final String filePath = config.resolveImageFile(config.iosConfig?.imagePath, prefixPath);
+    final String? darkFilePath = config.iosConfig?.imagePathDarkTransparent;
+    final String? tintedFilePath = config.iosConfig?.imagePathTintedGrayscale;
+
+    // decodeImageFile throws on missing/undecodable files, so a specified but bad path is a hard error rather than a silent skip.
+    image = await decodeImageFile(
+      withPrefix(
+        prefixPath,
+        filePath,
+      ),
+      cache: cache,
+    );
+    if (singleSize && (darkFilePath != null || tintedFilePath != null)) {
+      printStatus(
+        'Dark/tinted variants are ignored in single-size mode',
+        logger,
+      );
+    }
+
+    if (darkFilePath != null && !singleSize) {
+      darkImage = await decodeImageFile(
+        withPrefix(prefixPath, darkFilePath),
+        cache: cache,
+      );
+    }
+
+    if (tintedFilePath != null && !singleSize) {
+      tintedImage = await decodeImageFile(
+        withPrefix(prefixPath, tintedFilePath),
+        cache: cache,
+      );
+      if (config.iosConfig!.desaturateTintedToGrayscale) {
+        printStatus('Desaturating iOS tinted image to grayscale', logger);
+        tintedImage = grayscale(tintedImage);
+      } else if (!isGrayscaleImage(tintedImage)) {
+        // Apple's guidance (HIG > App icons, https://developer.apple.com/design/human-interface-guidelines/app-icons): the dark variant is a transparent-background design the system background shows through, while the tinted variant must read as a single-color silhouette — i.e. grayscale. Never validate dark transparency away; warn on tinted color instead.
+        printStatus(
+          '\nWARNING: Tinted iOS image is not grayscale.\nSet "ios.desaturate_tinted_to_grayscale: true" to desaturate it.\n',
+          logger,
+        );
+      }
+    }
+
+    // remove_alpha mattes the base image onto the background color. The dark variant intentionally keeps its transparency (Apple: the system background shows through), while the tinted variant is forced opaque like the base image.
+    if (config.iosConfig?.removeAlpha == true) {
+      if (image.hasAlpha) {
+        image = _removeAlphaChannel(image, config);
+      }
+      if (darkImage != null && darkImage.hasAlpha) {
+        printStatus(
+          'Keeping transparency in the iOS dark variant '
+          '(the system background shows through)',
+          logger,
+        );
+      }
+      if (tintedImage != null && tintedImage.hasAlpha) {
+        tintedImage = _removeAlphaChannel(tintedImage, config);
+      }
+    }
+    if (image.hasAlpha) {
+      printStatus(
+        '\nWARNING: Icons with alpha channel are not allowed in the Apple App Store.\nSet "ios.remove_alpha: true" to remove it.\n',
+        logger,
+      );
+    }
+  } else if (singleSize) {
+    printStatus(
+      '`ios.single_size` has no effect in `icon_only` mode (no PNG catalog is written).',
+      logger,
+    );
+  }
+  // Artwork loaders hand out the finished master for any requested size. Sizing happens exactly once at the write sites ([saveNewIcons] and [overwriteDefaultIcons] resize to the template size), so loaders must not pre-resize: a second resampling pass wastes time and softens pixels. Callers only read the shared master (resize/encode never mutate it).
+  Future<Image> Function(int) sizeLoaderFor({
+    required Image master,
+  }) {
+    return (int size) async => master;
+  }
+
+  // Built only for PNG runs. Icon-only runs never touch the loaders (the PNG branch below is skipped), so the unassigned `late` masters stay unread.
+  late final Future<Image> Function(int) loadBase;
+  late final Future<Image> Function(int)? loadDark;
+  late final Future<Image> Function(int)? loadTinted;
+  if (!iconOnly) {
+    loadBase = sizeLoaderFor(master: image);
+    // Null exactly when the matching master is null (unset source or single-size mode); call sites only run under the same guards.
+    loadDark = darkImage == null ? null : sizeLoaderFor(master: darkImage);
+    loadTinted = tintedImage == null ? null : sizeLoaderFor(master: tintedImage);
   }
   String iconName;
   String? darkIconName;
@@ -153,12 +184,28 @@ Future<void> createIcons(
           IosIconTemplate(name: '-1024x1024@1x', size: 1024),
         ]
       : iosIcons;
-  final String? customIconName = config.iosConfig?.iconName;
   final concurrentIconUpdates = <Future<void>>[];
   // The name of the icon catalog the generated icons are written to. The liquid glass .icon bundle is created with the same name so Xcode associates it with the catalog.
   String catalogName = paths.appIconCatalogName(flavor);
-  if (flavor != null) {
+  if (iconOnly) {
+    // No PNG catalog, Contents.json, or APPICON_NAME edits: catalogName only names the `.icon` bundle below (a custom name still applies off-flavor).
+    if (customIconName != null && flavor == null) {
+      catalogName = customIconName;
+    }
+    printStatus(
+      'Skipping the PNG asset catalog (`ios.icon_only`): emitting $catalogName.icon only — set the target\'s App Icon to it in Xcode.',
+      logger,
+    );
+    iconName = catalogName;
+  } else if (flavor != null) {
     printStatus('Building iOS launcher icon for $flavor', logger);
+    if (customIconName != null) {
+      // A flavor run always writes `AppIcon-<flavor>`; say so instead of silently dropping the custom name.
+      printStatus(
+        'Ignoring `ios.icon_name` "$customIconName" for flavor "$flavor": flavor runs always write `AppIcon-$flavor`.',
+        logger,
+      );
+    }
     for (IosIconTemplate template in generateIosIcons) {
       concurrentIconUpdates.add(
         loadBase(template.size).then(
@@ -380,8 +427,8 @@ Future<void> createIcons(
     logger: logger,
   );
 
-  // Generate liquid glass .icon if configured
-  if (config.iosConfig?.liquidGlassLayers?.isNotEmpty ?? false) {
+  // Generate liquid glass .icon if configured (the only output in `icon_only` mode)
+  if (hasGlass) {
     await generateLiquidGlassIcon(
       config,
       catalogName,
@@ -395,7 +442,80 @@ Future<void> createIcons(
       logger,
       prefixPath,
     );
+  } else {
+    // Dropping the layers (or switching to a flavor/custom name) orphans the previous bundle: collect it and its project reference so stale glass doesn't ship. Other catalogs' bundles are left alone — a sibling flavor's `.icon` is legitimate output, not garbage.
+    await removeStaleLiquidGlassBundle(
+      iconFolderRelative: paths.iosLiquidGlassIconPath(catalogName),
+      catalogName: catalogName,
+      xcodeprojPath: config.iosConfig?.xcodeprojPath,
+      prefixPath: prefixPath,
+      logger: logger,
+    );
   }
+}
+
+/// Deletes a stale liquid glass `.icon` bundle at [iconFolderRelative] (when it exists) and removes its project reference.
+///
+/// Runs when the current catalog carries no layers/groups: without it, unsetting the layers would leave a stale bundle (and pbxproj reference) shipping old glass. Returns whether anything was removed.
+Future<void> removeStaleLiquidGlassBundle({
+  required String iconFolderRelative,
+  required String catalogName,
+  String? xcodeprojPath,
+  String prefixPath = '.',
+  LILogger? logger,
+}) async {
+  final dir = Directory(withPrefix(prefixPath, iconFolderRelative));
+  if (!dir.existsSync()) {
+    return;
+  }
+  printStatus(
+    'Removing stale liquid glass bundle $iconFolderRelative (no layers configured for $catalogName)',
+    logger,
+  );
+  await dir.delete(recursive: true);
+  await removeLiquidGlassIconFromProject(
+    catalogName,
+    xcodeprojPath,
+    logger,
+    prefixPath,
+  );
+}
+
+/// Removes the liquid glass `.icon` file reference for [iconName] from project.pbxproj (the inverse of [addLiquidGlassIconToProject]). Missing files are a no-op: the icons themselves are unaffected.
+Future<void> removeLiquidGlassIconFromProject(
+  String iconName, [
+  String? xcodeprojPath,
+  LILogger? logger,
+  String prefixPath = '.',
+]) async {
+  final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
+  final File iOSConfigFile = File(resolvedPath);
+  if (!iOSConfigFile.existsSync()) {
+    return;
+  }
+  final String wholeFile = await iOSConfigFile.readAsString();
+  final String changedFile = removeLiquidGlassIconReference(wholeFile, iconName);
+  if (changedFile == wholeFile) {
+    return;
+  }
+  await iOSConfigFile.writeAsString(changedFile);
+  printStatus(
+    'Removed liquid glass .icon reference to $iconName.icon from project.pbxproj',
+    logger,
+  );
+}
+
+/// Removes the liquid glass `.icon` file references for [iconName] from the given [pbxprojContent] and returns the modified content.
+///
+/// Drops every line mentioning `<iconName>.icon` (every reference form [addLiquidGlassIconReference] writes carries one). The `.icon` suffix anchors the match so similarly-named bundles never shadow each other. Returns the original content unchanged when nothing references the bundle.
+String removeLiquidGlassIconReference(String pbxprojContent, String iconName) {
+  final List<String> lines = const LineSplitter().convert(pbxprojContent);
+  final String token = '$iconName.icon';
+  final kept = lines.where((line) => !line.contains(token)).toList();
+  if (kept.length == lines.length) {
+    return pbxprojContent;
+  }
+  return '${kept.join('\n')}\n';
 }
 
 /// Whether [image] reads as grayscale, sampled on an 8x8 grid (64 reads regardless of image size) instead of a full O(n) pixel walk.
@@ -499,8 +619,12 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
   final List<String> lines = const LineSplitter().convert(pbxprojContent);
   final String iconPath = '$iconName.icon';
 
-  // Check if .icon reference already exists
-  final bool alreadyExists = lines.any((line) => line.contains(iconPath));
+  // Check if .icon reference already exists. Match the exact reference forms
+  // this function writes (`/* <name>.icon */` comments and `path = <name>.icon;`)
+  // so similarly-named bundles never shadow each other.
+  final String fileToken = '/* $iconPath */';
+  final String pathToken = 'path = $iconPath;';
+  final bool alreadyExists = lines.any((line) => line.contains(fileToken) || line.contains(pathToken));
   if (alreadyExists) {
     return pbxprojContent;
   }
@@ -631,7 +755,10 @@ String? resolveIosPbxprojPath([
   String prefixPath = '.',
 ]) {
   if (xcodeprojPath != null) {
-    return '$xcodeprojPath/${paths.pbxprojFileName}';
+    // Explicit paths are project-relative like everything else, so they honor
+    // prefixPath (notably `--prefix` runs and the macOS caller, which passes
+    // an already-prefixed path with the default prefix).
+    return withPrefix(prefixPath, '$xcodeprojPath/${paths.pbxprojFileName}');
   }
   final standardPath = withPrefix(prefixPath, paths.iosConfigFile);
   if (File(standardPath).existsSync()) {
@@ -843,7 +970,7 @@ Future<void> removeOrphanedCatalogs({
     if (name == currentCatalog || name == paths.appIconCatalogName(null)) {
       continue;
     }
-    if (referenceTexts.any((text) => text.contains(name))) {
+    if (referenceTexts.any((text) => _catalogIsReferenced(text, name))) {
       continue;
     }
     printStatus(
@@ -852,6 +979,14 @@ Future<void> removeOrphanedCatalogs({
     );
     await entity.delete(recursive: true);
   }
+}
+
+/// Whether [catalogName] (e.g. `AppIcon-staging`) is referenced by [referenceText] (project.pbxproj / xcconfig contents) as an exact token.
+///
+/// Substring matching over-keeps (`AppIcon-dev` would look referenced when only `AppIcon-dev2` is wired, so genuine orphans are never collected); token boundaries keep collection working while a wired set is never deleted.
+bool _catalogIsReferenced(String referenceText, String catalogName) {
+  final token = RegExp('(^|[^A-Za-z0-9_.-])${RegExp.escape(catalogName)}([^A-Za-z0-9_.-]|\$)');
+  return token.hasMatch(referenceText);
 }
 
 /// Reads the reference texts for iOS catalog orphan detection: the resolved project.pbxproj plus every `ios/Flutter/*.xcconfig`.

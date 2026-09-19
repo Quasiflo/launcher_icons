@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
-import 'package:launcher_icons/src/platforms/macos/macos_icon_generator.dart';
+import 'package:launcher_icons/src/platforms/macos/macos_icon_generator.dart' show MacOSIconGenerator, resolveMacOSXcodeprojPath;
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
@@ -127,7 +127,67 @@ void main() {
           'project.pbxproj',
         ),
       ).readAsString();
-      expect(pbxproj, contains('APPICON_NAME = AppIcon-staging;'));
+      expect(pbxproj, contains('ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-staging;'));
+    });
+  });
+
+  group('resolveMacOSXcodeprojPath', () {
+    late Directory sandbox;
+    late String prefix;
+
+    setUp(() {
+      sandbox = Directory(
+        path.join(
+          Directory.current.path,
+          '.dart_tool',
+          'launcher_icons',
+          'test',
+          'macos_resolve_xcodeproj',
+        ),
+      );
+      if (sandbox.existsSync()) {
+        sandbox.deleteSync(recursive: true);
+      }
+      sandbox.createSync(recursive: true);
+      prefix = sandbox.absolute.path;
+    });
+
+    tearDown(() {
+      if (sandbox.existsSync()) {
+        sandbox.deleteSync(recursive: true);
+      }
+    });
+
+    test('honors an explicit path', () {
+      expect(
+        resolveMacOSXcodeprojPath('macos/Custom.xcodeproj', prefix),
+        path.join(prefix, 'macos/Custom.xcodeproj'),
+      );
+    });
+
+    test('prefers the standard Runner location', () {
+      Directory(path.join(prefix, 'macos', 'Runner.xcodeproj')).createSync(recursive: true);
+      File(path.join(prefix, 'macos', 'Runner.xcodeproj', 'project.pbxproj')).writeAsStringSync('// empty');
+      Directory(path.join(prefix, 'macos', 'Other.xcodeproj')).createSync(recursive: true);
+      File(path.join(prefix, 'macos', 'Other.xcodeproj', 'project.pbxproj')).writeAsStringSync('// empty');
+      expect(
+        resolveMacOSXcodeprojPath(null, prefix),
+        path.join(prefix, 'macos', 'Runner.xcodeproj'),
+      );
+    });
+
+    test('falls back to a renamed project', () {
+      Directory(path.join(prefix, 'macos', 'Renamed.xcodeproj')).createSync(recursive: true);
+      File(path.join(prefix, 'macos', 'Renamed.xcodeproj', 'project.pbxproj')).writeAsStringSync('// empty');
+      expect(
+        resolveMacOSXcodeprojPath(null, prefix),
+        path.join(prefix, 'macos', 'Renamed.xcodeproj'),
+      );
+    });
+
+    test('returns null when no project exists', () {
+      Directory(path.join(prefix, 'macos')).createSync(recursive: true);
+      expect(resolveMacOSXcodeprojPath(null, prefix), isNull);
     });
   });
 }

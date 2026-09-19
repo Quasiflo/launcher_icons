@@ -116,6 +116,7 @@ launcher_icons:
   ios:
     generate: true
     # single_size: true # single 1024px icon; dark/tinted variants are ignored
+    # icon_only: true # skip the PNG catalog, emit only the .icon bundle (requires layers/groups; set the target's App Icon to the .icon)
     # image_path: "assets/icon/icon-ios.png"
     # icon_name: "My-Launcher-Icon" # generate a new icon without removing the old default
     # xcodeproj_path: "ios/Runner.xcodeproj" # set when the Xcode project was renamed
@@ -125,10 +126,12 @@ launcher_icons:
     # image_path_tinted_grayscale: "assets/icon/icon_tinted.png"
     # desaturate_tinted_to_grayscale: true
     # background_color: "#ffffff"
-    # remove_liquid_glass: true # flat icon without glass effects
+    # liquid_glass_gradient_from: "#ff0000" # gradient canvas top color, requires gradient_to (verified two-stop linear fill)
+    # liquid_glass_gradient_to: "#0000ff" # gradient canvas bottom color, requires gradient_from
+    # remove_liquid_glass: true # flat icon without glass effects (the bundle is still emitted)
     # liquid_glass_translucency: 0.5
     # liquid_glass_specular: true
-    # liquid_glass_shadow_kind: "Neutral" # "Neutral" or "Chromatic"
+    # liquid_glass_shadow_kind: "Neutral" # "Neutral", "Chromatic" or "None"
     # liquid_glass_shadow_opacity: 0.5
     # liquid_glass_blur: 0.5
     # liquid_glass_lighting: "combined" # "individual" or "combined"
@@ -150,17 +153,37 @@ launcher_icons:
     #     fill_dark: "#ffffff" # dark-appearance tint, falls back to fill
     #     fill_tinted: "#ffffff" # tinted-appearance tint, falls back to fill
     #   - image_path: "assets/icon/liquid_glass_glyph.png" # extra layers stack on top
+    # liquid_glass_groups: # explicit groups, bottom-to-top; replaces liquid_glass_layers when set (never both)
+    #   - name: "Background" # group display name in Icon Composer
+    #     layers: # same layer schema as above, at least one entry
+    #       - image_path: "assets/icon/liquid_glass_background.png"
+    #     liquid_glass_translucency: 0.5 # per-group overrides fall back to the platform values
+    #     liquid_glass_specular: true
+    #     liquid_glass_shadow_kind: "Neutral"
+    #     liquid_glass_shadow_opacity: 0.5
+    #     liquid_glass_blur: 0.5
+    #     liquid_glass_lighting: "combined"
+    #     liquid_glass_refractivity_enabled: true
+    #     liquid_glass_refractivity_depth: 0.5
+    #     liquid_glass_refractivity_strength: 0.5
+    #     liquid_glass_specular_highlight_placement: "inside"
+    #     remove_liquid_glass: true # flat group without glass effects
 
   macos:
     generate: true
     # image_path: "path/to/image.png"
+    # icon_name: "My-Icon" # generate a new set without removing the default (flavor runs always write AppIcon-<flavor>)
+    # xcodeproj_path: "macos/Runner.xcodeproj" # set when the Xcode project was renamed
+    # icon_only: true # skip the PNG catalog, emit only the .icon bundle (requires layers/groups; set the target's App Icon to the .icon)
     # padding: 10 # safe-area margin as % of icon size, 0 disables
     # rounded_corners: true # mask corners with an Apple-like shape
-    # remove_liquid_glass: true # flat icon without glass effects
+    # remove_liquid_glass: true # flat icon without glass effects (the bundle is still emitted)
     # background_color: "#ffffff"
+    # liquid_glass_gradient_from: "#ff0000" # gradient canvas top color, requires gradient_to (verified two-stop linear fill)
+    # liquid_glass_gradient_to: "#0000ff" # gradient canvas bottom color, requires gradient_from
     # liquid_glass_translucency: 0.5
     # liquid_glass_specular: true
-    # liquid_glass_shadow_kind: "Neutral" # "Neutral" or "Chromatic"
+    # liquid_glass_shadow_kind: "Neutral" # "Neutral", "Chromatic" or "None"
     # liquid_glass_shadow_opacity: 0.5
     # liquid_glass_blur: 0.5
     # liquid_glass_lighting: "combined" # "individual" or "combined"
@@ -170,6 +193,8 @@ launcher_icons:
     # liquid_glass_specular_highlight_placement: "inside" # "inside" or "outside"
     # liquid_glass_layers: # one entry per artwork layer, bottom-to-top; the .icon bundle is emitted when non-empty (Tahoe 26+ glass .icon; the PNG catalog stays the fallback)
     #   - image_path: "assets/icon/liquid_glass_background.png"
+    #     image_path_dark: "assets/icon/liquid_glass_background_dark.png" # explicit per-appearance sources (no catalog fallbacks on macOS)
+    #     image_path_tinted: "assets/icon/liquid_glass_background_tinted.png"
     #     scale: 1.0 # artwork scale within the canvas
     #     offset_x: 0.0 # layer offset in points
     #     offset_y: 0.0 # layer offset in points
@@ -177,7 +202,24 @@ launcher_icons:
     #     opacity: 1.0 # 0.0 (transparent) to 1.0 (opaque)
     #     blend_mode: "normal" # normal, plus-lighter, plus-darker, overlay, multiply, soft-light, hard-light, darken, lighten, screen
     #     fill: "#ffffff" # recolor tint applied to the artwork
+    #     fill_dark: "#ffffff" # dark-appearance tint, falls back to fill
+    #     fill_tinted: "#ffffff" # tinted-appearance tint, falls back to fill
     #   - image_path: "assets/icon/liquid_glass_glyph.png" # extra layers stack on top
+    # liquid_glass_groups: # explicit groups, bottom-to-top; replaces liquid_glass_layers when set (never both)
+    #   - name: "Background" # group display name in Icon Composer
+    #     layers: # same layer schema as above, at least one entry
+    #       - image_path: "assets/icon/liquid_glass_background.png"
+    #     liquid_glass_translucency: 0.5 # per-group overrides fall back to the platform values
+    #     liquid_glass_specular: true
+    #     liquid_glass_shadow_kind: "Neutral"
+    #     liquid_glass_shadow_opacity: 0.5
+    #     liquid_glass_blur: 0.5
+    #     liquid_glass_lighting: "combined"
+    #     liquid_glass_refractivity_enabled: true
+    #     liquid_glass_refractivity_depth: 0.5
+    #     liquid_glass_refractivity_strength: 0.5
+    #     liquid_glass_specular_highlight_placement: "inside"
+    #     remove_liquid_glass: true # flat group without glass effects
 
   web:
     generate: true

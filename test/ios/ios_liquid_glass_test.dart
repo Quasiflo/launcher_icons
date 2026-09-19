@@ -249,6 +249,248 @@ void main() {
       expect(layer['glass'], isFalse);
       expect(translucency['enabled'], isFalse);
     });
+
+    test('maps none shadow kind to none', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'liquid_glass_shadow_kind': 'None',
+        },
+      });
+      final groups = generateIconConfig(config)['groups'] as List;
+      final shadow = (groups.first as Map<String, dynamic>)['shadow'] as Map<String, dynamic>;
+      expect(shadow['kind'], 'none');
+    });
+
+    test('rejects out-of-range optical values with labelled errors', () {
+      Map<String, dynamic> iconJsonFor(Map<String, dynamic> extra) {
+        final config = Config.fromJson(<String, dynamic>{
+          'ios': {
+            'generate': true,
+            'liquid_glass_layers': [
+              {'image_path': 'assets/icon.png'},
+            ],
+            ...extra,
+          },
+        });
+        return generateIconConfig(config);
+      }
+
+      for (final entry in {
+        'liquid_glass_translucency': 2.0,
+        'liquid_glass_shadow_opacity': -0.1,
+        'liquid_glass_blur': 1.5,
+      }.entries) {
+        expect(
+          () => iconJsonFor({entry.key: entry.value}),
+          throwsA(
+            isA<InvalidConfigException>().having(
+              (e) => e.message,
+              'message',
+              contains('ios.${entry.key}'),
+            ),
+          ),
+        );
+      }
+    });
+
+    test('rejects a non-hex background color with a labelled error', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'background_color': 'red',
+        },
+      });
+      expect(
+        () => generateIconConfig(config),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('ios.background_color'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects a non-positive layer scale', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png', 'scale': 0.0},
+          ],
+        },
+      });
+      expect(
+        () => generateIconConfig(config),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('ios.liquid_glass_layers[0].scale'),
+          ),
+        ),
+      );
+    });
+
+    test('emits a two-stop linear gradient fill when from/to are set', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'liquid_glass_gradient_from': '#FF0000',
+          'liquid_glass_gradient_to': '#0000FF',
+        },
+      });
+      expect(
+        generateIconConfig(config)['fill'],
+        <String, dynamic>{
+          'linear-gradient': [
+            'display-p3:1.00000,0.00000,0.00000,1.00000',
+            'display-p3:0.00000,0.00000,1.00000,1.00000',
+          ],
+        },
+      );
+    });
+
+    test('rejects a half-set gradient pair', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'liquid_glass_gradient_from': '#FF0000',
+        },
+      });
+      expect(
+        () => generateIconConfig(config),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('ios.liquid_glass_gradient_from'),
+          ),
+        ),
+      );
+    });
+
+    test('emits explicit groups with per-group overrides', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_groups': [
+            {
+              'name': 'Background',
+              'layers': [
+                {'image_path': 'assets/background.png'},
+              ],
+            },
+            {
+              'name': 'Glyph',
+              'layers': [
+                {'image_path': 'assets/glyph.png', 'scale': 0.7},
+              ],
+              'liquid_glass_lighting': 'individual',
+              'liquid_glass_shadow_kind': 'None',
+            },
+          ],
+        },
+      });
+      final iconJson = generateIconConfig(config);
+      final groups = iconJson['groups'] as List;
+      expect(groups, hasLength(2));
+      expect((groups[0] as Map)['name'], 'Background');
+      expect((groups[1] as Map)['name'], 'Glyph');
+      expect((groups[1] as Map)['lighting'], 'individual');
+      expect(((groups[1] as Map)['shadow'] as Map)['kind'], 'none');
+      final glyphLayers = (groups[1] as Map)['layers'] as List;
+      expect((glyphLayers.first as Map)['image-name'], 'glyph.png');
+    });
+
+    test('rejects layers and groups set together', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'liquid_glass_groups': [
+            {
+              'layers': [
+                {'image_path': 'assets/icon.png'},
+              ],
+            },
+          ],
+        },
+      });
+      expect(
+        () => generateIconConfig(config),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('ios.liquid_glass_groups'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects a group with empty layers', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_groups': [
+            {'name': 'Empty'},
+          ],
+        },
+      });
+      expect(
+        () => generateIconConfig(config),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('ios.liquid_glass_groups[0].layers'),
+          ),
+        ),
+      );
+    });
+
+    test('labels group option errors with the group path', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'ios': {
+          'generate': true,
+          'liquid_glass_groups': [
+            {
+              'layers': [
+                {'image_path': 'assets/icon.png'},
+              ],
+              'liquid_glass_blur': 2.0,
+            },
+          ],
+        },
+      });
+      expect(
+        () => generateIconConfig(config),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('ios.liquid_glass_groups[0].liquid_glass_blur'),
+          ),
+        ),
+      );
+    });
   });
 
   group('generateLiquidGlassIcon', () {

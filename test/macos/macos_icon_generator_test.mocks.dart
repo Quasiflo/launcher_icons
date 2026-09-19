@@ -158,6 +158,13 @@ class MockMacOSConfig extends _i1.Mock implements _i5.MacOSConfig {
       ) as bool);
 
   @override
+  bool get iconOnly => (super.noSuchMethod(
+        Invocation.getter(#iconOnly),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
   int get padding => (super.noSuchMethod(
         Invocation.getter(#padding),
         returnValue: 0,

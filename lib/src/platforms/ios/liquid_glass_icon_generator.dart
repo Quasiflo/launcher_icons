@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:launcher_icons/src/config/config.dart';
 import 'package:launcher_icons/src/config/ios_config.dart';
+import 'package:launcher_icons/src/config/liquid_glass_group.dart';
 import 'package:launcher_icons/src/config/liquid_glass_layer.dart';
 import 'package:launcher_icons/src/config/macos_config.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
@@ -18,9 +19,10 @@ Future<void> generateLiquidGlassIcon(
   LILogger? logger,
   String prefixPath = '.',
 }) async {
-  // The bundle exists exactly when the iOS struct carries layers.
-  final layers = config.iosConfig?.liquidGlassLayers;
-  if (layers == null || layers.isEmpty) {
+  // The bundle exists exactly when the iOS struct carries layers or groups.
+  final layers = config.iosConfig?.liquidGlassLayers ?? const <LiquidGlassLayer>[];
+  final groups = config.iosConfig?.liquidGlassGroups ?? const <LiquidGlassGroup>[];
+  if (layers.isEmpty && groups.isEmpty) {
     return;
   }
   final iosConfig = config.iosConfig!;
@@ -31,13 +33,17 @@ Future<void> generateLiquidGlassIcon(
   final darkFallback = iosConfig.imagePathDarkTransparent;
   final tintedFallback = iosConfig.imagePathTintedGrayscale;
 
-  await _writeLiquidGlassBundle(
-    sources: {
-      for (final layer in layers) ...[
+  Set<String> layerSources(LiquidGlassLayer layer) => {
         layer.imagePath,
         if ((layer.imagePathDark ?? darkFallback) != null) (layer.imagePathDark ?? darkFallback)!,
         if ((layer.imagePathTinted ?? tintedFallback) != null) (layer.imagePathTinted ?? tintedFallback)!,
-      ],
+      };
+
+  await _writeLiquidGlassBundle(
+    sources: {
+      for (final layer in layers) ...layerSources(layer),
+      for (final group in groups)
+        for (final layer in group.layers ?? const <LiquidGlassLayer>[]) ...layerSources(layer),
     },
     iconFolderPath: withPrefix(prefixPath, paths.iosLiquidGlassIconPath(iconName)),
     assetsFolderPath: withPrefix(prefixPath, paths.iosLiquidGlassAssetsPath(iconName)),
@@ -56,9 +62,10 @@ Future<void> generateMacOSLiquidGlassIcon(
   LILogger? logger,
   String prefixPath = '.',
 }) async {
-  // The bundle exists exactly when the macOS struct carries layers.
-  final layers = config.macOSConfig?.liquidGlassLayers;
-  if (layers == null || layers.isEmpty) {
+  // The bundle exists exactly when the macOS struct carries layers or groups.
+  final layers = config.macOSConfig?.liquidGlassLayers ?? const <LiquidGlassLayer>[];
+  final groups = config.macOSConfig?.liquidGlassGroups ?? const <LiquidGlassGroup>[];
+  if (layers.isEmpty && groups.isEmpty) {
     return;
   }
 
@@ -66,13 +73,17 @@ Future<void> generateMacOSLiquidGlassIcon(
 
   // macOS has no dark/tinted PNG catalog variants to fall back to: only explicitly configured layer sources become appearances.
 
-  await _writeLiquidGlassBundle(
-    sources: {
-      for (final layer in layers) ...[
+  Set<String> layerSources(LiquidGlassLayer layer) => {
         layer.imagePath,
         if (layer.imagePathDark != null) layer.imagePathDark!,
         if (layer.imagePathTinted != null) layer.imagePathTinted!,
-      ],
+      };
+
+  await _writeLiquidGlassBundle(
+    sources: {
+      for (final layer in layers) ...layerSources(layer),
+      for (final group in groups)
+        for (final layer in group.layers ?? const <LiquidGlassLayer>[]) ...layerSources(layer),
     },
     iconFolderPath: withPrefix(prefixPath, paths.macOSLiquidGlassIconPath(iconName)),
     assetsFolderPath: withPrefix(prefixPath, paths.macOSLiquidGlassAssetsPath(iconName)),
@@ -149,7 +160,10 @@ Map<String, dynamic> generateIconConfig(Config config) {
   return buildLiquidGlassDocument(
     platform: 'ios',
     backgroundColor: iosConfig.backgroundColor,
+    gradientFrom: iosConfig.liquidGlassGradientFrom,
+    gradientTo: iosConfig.liquidGlassGradientTo,
     layers: iosConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[],
+    groups: iosConfig.liquidGlassGroups,
     darkFallback: iosConfig.imagePathDarkTransparent,
     tintedFallback: iosConfig.imagePathTintedGrayscale,
     removeGlass: iosConfig.removeLiquidGlass,
@@ -176,7 +190,10 @@ Map<String, dynamic> generateMacOSIconConfig(Config config) {
   return buildLiquidGlassDocument(
     platform: 'macos',
     backgroundColor: macOSConfig.backgroundColor,
+    gradientFrom: macOSConfig.liquidGlassGradientFrom,
+    gradientTo: macOSConfig.liquidGlassGradientTo,
     layers: macOSConfig.liquidGlassLayers ?? const <LiquidGlassLayer>[],
+    groups: macOSConfig.liquidGlassGroups,
     removeGlass: macOSConfig.removeLiquidGlass,
     translucency: macOSConfig.liquidGlassTranslucency,
     specular: macOSConfig.liquidGlassSpecular,
@@ -216,12 +233,15 @@ String _displayP3(String hex, String key) {
 
 /// Builds the Icon Composer `icon.json` document from explicit values.
 ///
-/// [platform] labels validation errors (`ios` or `macos`). [layers] stack bottom-to-top in list order inside one group sharing the group's glass pass. Optical pass-throughs are opt-in so unset keys stay out of the document and historical output is byte-identical.
+/// [platform] labels validation errors (`ios` or `macos`). [layers] stack bottom-to-top in list order inside one group sharing the group's glass pass. Pass [groups] instead to emit several groups (each with its own pass); setting both is an error. [gradientFrom]/[gradientTo] render a two-stop linear canvas gradient instead of the solid [backgroundColor] fill. Optical pass-throughs are opt-in so unset keys stay out of the document and historical output is byte-identical.
 @visibleForTesting
 Map<String, dynamic> buildLiquidGlassDocument({
   required String platform,
   required String backgroundColor,
+  String? gradientFrom,
+  String? gradientTo,
   required List<LiquidGlassLayer> layers,
+  List<LiquidGlassGroup>? groups,
   String? darkFallback,
   String? tintedFallback,
   required bool removeGlass,
@@ -236,27 +256,180 @@ Map<String, dynamic> buildLiquidGlassDocument({
   required double? refractivityStrength,
   required String? specularPlacement,
 }) {
-  // Convert background color to display P3 format
-  final displayP3Color = convertHexToDisplayP3(backgroundColor);
+  // Convert background color to display P3 format, labelling failures with the config key (the matte path validates separately).
+  String displayP3Color;
+  try {
+    displayP3Color = convertHexToDisplayP3(backgroundColor);
+  } on InvalidConfigException catch (e) {
+    throw InvalidConfigException('$platform.background_color must be a hex color: ${e.message}');
+  }
 
-  // Validate shadow kind
-  if (shadowKind.toLowerCase() != 'neutral' && shadowKind.toLowerCase() != 'chromatic') {
+  final fill = _resolveFill(
+    platform: platform,
+    displayP3Color: displayP3Color,
+    gradientFrom: gradientFrom,
+    gradientTo: gradientTo,
+  );
+
+  // NOTE: no top-level `features` declaration is emitted. It is optional per the format (the keys below stand alone), and actool rejects the array with an internal error — verified against Xcode 26.6.
+
+  // NOTE: no top-level `features` declaration is emitted. It is optional per the format (the keys below stand alone), and actool rejects the array with an internal error — verified against Xcode 26.6.
+
+  final explicitGroups = groups?.whereType<LiquidGlassGroup>().toList() ?? const <LiquidGlassGroup>[];
+  final groupsJson = <Map<String, dynamic>>[];
+  if (explicitGroups.isNotEmpty) {
+    if (layers.isNotEmpty) {
+      throw InvalidConfigException(
+        '$platform.liquid_glass_layers and $platform.liquid_glass_groups must not be set together: put every layer inside a group.',
+      );
+    }
+    for (var gi = 0; gi < explicitGroups.length; gi++) {
+      final group = explicitGroups[gi];
+      final groupLayers = group.layers ?? const <LiquidGlassLayer>[];
+      if (groupLayers.isEmpty) {
+        throw InvalidConfigException(
+          '$platform.liquid_glass_groups[$gi].layers must not be empty.',
+        );
+      }
+      groupsJson.add(
+        _buildGroup(
+          platform: platform,
+          optionsLabel: '$platform.liquid_glass_groups[$gi]',
+          name: group.name,
+          layers: groupLayers,
+          layersLabel: '$platform.liquid_glass_groups[$gi].layers',
+          darkFallback: darkFallback,
+          tintedFallback: tintedFallback,
+          removeGlass: group.removeLiquidGlass ?? removeGlass,
+          translucency: group.translucency ?? translucency,
+          specular: group.specular ?? specular,
+          shadowKind: group.shadowKind ?? shadowKind,
+          shadowOpacity: group.shadowOpacity ?? shadowOpacity,
+          blur: group.blur ?? blur,
+          lighting: group.lighting ?? lighting,
+          refractivityEnabled: group.refractivityEnabled ?? refractivityEnabled,
+          refractivityDepth: group.refractivityDepth ?? refractivityDepth,
+          refractivityStrength: group.refractivityStrength ?? refractivityStrength,
+          specularPlacement: group.specularHighlightPlacement ?? specularPlacement,
+        ),
+      );
+    }
+  } else {
+    groupsJson.add(
+      _buildGroup(
+        platform: platform,
+        optionsLabel: platform,
+        layers: layers,
+        layersLabel: '$platform.liquid_glass_layers',
+        darkFallback: darkFallback,
+        tintedFallback: tintedFallback,
+        removeGlass: removeGlass,
+        translucency: translucency,
+        specular: specular,
+        shadowKind: shadowKind,
+        shadowOpacity: shadowOpacity,
+        blur: blur,
+        lighting: lighting,
+        refractivityEnabled: refractivityEnabled,
+        refractivityDepth: refractivityDepth,
+        refractivityStrength: refractivityStrength,
+        specularPlacement: specularPlacement,
+      ),
+    );
+  }
+
+  return {
+    'fill': fill,
+    'groups': groupsJson,
+    'supported-platforms': {
+      'circles': ['watchOS'],
+      'squares': 'shared',
+    },
+  };
+}
+
+/// Resolves the canvas [fill] document: a two-stop top-to-bottom linear gradient when [gradientFrom]/[gradientTo] are both set, the solid [displayP3Color] otherwise. A half-set pair is an error.
+Map<String, dynamic> _resolveFill({
+  required String platform,
+  required String displayP3Color,
+  String? gradientFrom,
+  String? gradientTo,
+}) {
+  if (gradientFrom == null && gradientTo == null) {
+    return {'solid': displayP3Color};
+  }
+  if (gradientFrom == null || gradientTo == null) {
     throw InvalidConfigException(
-      '$platform.liquid_glass_shadow_kind must be either "Neutral" or "Chromatic", got: $shadowKind',
+      '$platform.liquid_glass_gradient_from and $platform.liquid_glass_gradient_to must be set together: a gradient needs exactly two colors.',
+    );
+  }
+  // Two-stop vertical gradient (top color first); verified against Icon Composer's document model and ictool rendering.
+  return {
+    'linear-gradient': [
+      _displayP3(gradientFrom, '$platform.liquid_glass_gradient_from'),
+      _displayP3(gradientTo, '$platform.liquid_glass_gradient_to'),
+    ],
+  };
+}
+
+/// Builds one Icon Composer group document, validating every rendering option.
+///
+/// [optionsLabel] prefixes option-key errors (`ios` for the legacy single group, `ios.liquid_glass_groups[0]` for explicit groups); [layersLabel] does the same for layer errors.
+Map<String, dynamic> _buildGroup({
+  required String platform,
+  required String optionsLabel,
+  String? name,
+  required List<LiquidGlassLayer> layers,
+  required String layersLabel,
+  String? darkFallback,
+  String? tintedFallback,
+  required bool removeGlass,
+  required double? translucency,
+  required bool specular,
+  required String shadowKind,
+  required double? shadowOpacity,
+  required double? blur,
+  required String? lighting,
+  required bool? refractivityEnabled,
+  required double? refractivityDepth,
+  required double? refractivityStrength,
+  required String? specularPlacement,
+}) {
+  // Unit-interval optical values. Unset keys fall back to 0.5 downstream, so
+  // only validate explicitly set values here.
+  for (final entry in {
+    'liquid_glass_translucency': translucency,
+    'liquid_glass_shadow_opacity': shadowOpacity,
+    'liquid_glass_blur': blur,
+  }.entries) {
+    final value = entry.value;
+    if (value != null && (value < 0.0 || value > 1.0)) {
+      throw InvalidConfigException(
+        '$optionsLabel.${entry.key} must be between 0.0 and 1.0, got: $value',
+      );
+    }
+  }
+
+  // Validate shadow kind (`none` disables the drop shadow; verified against
+  // Icon Composer's document model and ictool rendering).
+  final shadow = shadowKind.toLowerCase();
+  if (shadow != 'neutral' && shadow != 'chromatic' && shadow != 'none') {
+    throw InvalidConfigException(
+      '$optionsLabel.liquid_glass_shadow_kind must be one of "Neutral", "Chromatic" or "None", got: $shadowKind',
     );
   }
 
   // Optical pass-throughs. All are opt-in so unset keys stay out of the document and historical output is byte-identical.
   if (lighting != null && lighting != 'individual' && lighting != 'combined') {
     throw InvalidConfigException(
-      '$platform.liquid_glass_lighting must be either "individual" or "combined", got: $lighting',
+      '$optionsLabel.liquid_glass_lighting must be either "individual" or "combined", got: $lighting',
     );
   }
   Map<String, dynamic>? refractivity;
   if (refractivityEnabled == true) {
     if (refractivityDepth == null || refractivityStrength == null) {
       throw InvalidConfigException(
-        '$platform.liquid_glass_refractivity_enabled requires '
+        '$optionsLabel.liquid_glass_refractivity_enabled requires '
         '`liquid_glass_refractivity_depth` and '
         '`liquid_glass_refractivity_strength`.',
       );
@@ -269,18 +442,15 @@ Map<String, dynamic> buildLiquidGlassDocument({
   }
   if (specularPlacement != null && specularPlacement != 'inside' && specularPlacement != 'outside') {
     throw InvalidConfigException(
-      '$platform.liquid_glass_specular_highlight_placement must be either "inside" or "outside", got: $specularPlacement',
+      '$optionsLabel.liquid_glass_specular_highlight_placement must be either "inside" or "outside", got: $specularPlacement',
     );
   }
-
-  // NOTE: no top-level `features` declaration is emitted. It is optional per the format (the keys below stand alone), and actool rejects the array with an internal error — verified against Xcode 26.6.
 
   final layersJson = <Map<String, dynamic>>[];
   for (var i = 0; i < layers.length; i++) {
     layersJson.add(
       _buildLayer(
-        platform,
-        i,
+        '$layersLabel[$i]',
         layers[i],
         darkFallback: darkFallback,
         tintedFallback: tintedFallback,
@@ -290,44 +460,39 @@ Map<String, dynamic> buildLiquidGlassDocument({
   }
 
   return {
-    'fill': {
-      'solid': displayP3Color,
+    if (name != null) 'name': name,
+    'blur-material': blur,
+    if (lighting != null) 'lighting': lighting,
+    'layers': layersJson,
+    if (refractivity != null) 'refractivity': refractivity,
+    'shadow': {
+      'kind': shadow == 'chromatic' ? 'layer-color' : shadow,
+      'opacity': shadowOpacity,
     },
-    'groups': [
-      {
-        'blur-material': blur,
-        if (lighting != null) 'lighting': lighting,
-        'layers': layersJson,
-        if (refractivity != null) 'refractivity': refractivity,
-        'shadow': {
-          'kind': shadowKind.toLowerCase() == 'chromatic' ? 'layer-color' : shadowKind.toLowerCase(),
-          'opacity': shadowOpacity,
-        },
-        'specular': specular,
-        if (specularPlacement != null) 'specular-highlight-placement': specularPlacement,
-        'translucency': {
-          'enabled': !removeGlass,
-          'value': translucency ?? 0.5,
-        },
-      },
-    ],
-    'supported-platforms': {
-      'circles': ['watchOS'],
-      'squares': 'shared',
+    'specular': specular,
+    if (specularPlacement != null) 'specular-highlight-placement': specularPlacement,
+    'translucency': {
+      'enabled': !removeGlass,
+      'value': translucency ?? 0.5,
     },
   };
 }
 
 /// Builds one Icon Composer layer document from [layer], validating the per-layer composition keys and resolving appearance variants against the [darkFallback]/[tintedFallback] catalog sources.
+///
+/// [label] is the config path of the layer (e.g. `ios.liquid_glass_layers[0]` or `ios.liquid_glass_groups[1].layers[0]`) used in error messages. Clear renditions (ClearLight/ClearDark) derive automatically from the default/dark artwork: neither classic asset catalogs nor Icon Composer documents offer a clear annotation slot (verified with actool/ictool against Xcode 27).
 Map<String, dynamic> _buildLayer(
-  String platform,
-  int index,
+  String label,
   LiquidGlassLayer layer, {
   required String? darkFallback,
   required String? tintedFallback,
   required bool removeGlass,
 }) {
-  final label = '$platform.liquid_glass_layers[$index]';
+  if (layer.scale <= 0.0) {
+    throw InvalidConfigException(
+      '$label.scale must be positive, got: ${layer.scale}',
+    );
+  }
 
   final opacity = layer.opacity;
   if (opacity != null && (opacity < 0.0 || opacity > 1.0)) {

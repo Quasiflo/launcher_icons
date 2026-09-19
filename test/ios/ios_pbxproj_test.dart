@@ -138,4 +138,31 @@ void main() {
       expect(refId, isNot(collidingId));
     });
   });
+
+  group('removeLiquidGlassIconReference', () {
+    test('removes every reference the add function writes', () {
+      final added = addLiquidGlassIconReference(_pbxProjFixture, 'AppIcon');
+      expect(added, isNot(_pbxProjFixture));
+
+      final removed = removeLiquidGlassIconReference(added, 'AppIcon');
+      expect(removed, _pbxProjFixture);
+    });
+
+    test('leaves similarly-named bundles alone', () {
+      final added = addLiquidGlassIconReference(_pbxProjFixture, 'AppIcon');
+      final withSibling = addLiquidGlassIconReference(added, 'AppIcon-dev');
+
+      final removed = removeLiquidGlassIconReference(withSibling, 'AppIcon');
+      expect(removed, contains('AppIcon-dev.icon'));
+      expect(removed, isNot(contains('/* AppIcon.icon */')));
+      expect(removed, isNot(contains('path = AppIcon.icon;')));
+    });
+
+    test('returns the unchanged content when nothing references the bundle', () {
+      expect(
+        removeLiquidGlassIconReference(_pbxProjFixture, 'AppIcon'),
+        _pbxProjFixture,
+      );
+    });
+  });
 }

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:launcher_icons/src/config/liquid_glass_group.dart';
 import 'package:launcher_icons/src/config/liquid_glass_layer.dart';
 
 part 'ios_config.g.dart';
@@ -35,17 +36,27 @@ class IOSConfig {
   @JsonKey(name: 'flavor_mode')
   final String flavorMode;
 
-  /// IOS image_path_dark_transparent
+  /// Dark-appearance PNG source: full art on transparency (the system background shows through). Also feeds the dark variants of glass layers that omit `image_path_dark`. Clear renditions (ClearLight/ClearDark) derive automatically from the default/dark artwork — neither classic asset catalogs nor Icon Composer documents offer a clear slot (verified with actool/ictool against Xcode 27).
   @JsonKey(name: 'image_path_dark_transparent')
   final String? imagePathDarkTransparent;
 
-  /// IOS image_path_tinted_grayscale
+  /// Tinted-appearance PNG source: must read as a single-color silhouette (grayscale). Also feeds the tinted variants of glass layers that omit `image_path_tinted`. Clear renditions derive automatically; no clear source key exists.
   @JsonKey(name: 'image_path_tinted_grayscale')
   final String? imagePathTintedGrayscale;
+
+  /// When true, skips the PNG asset catalog entirely and emits only the liquid glass `.icon` bundle (Xcode renders every size and appearance from it).
+  ///
+  /// Requires `liquid_glass_layers` (or `liquid_glass_groups`); the target's App Icon must be set to the `.icon` in Xcode. `single_size` has no effect in this mode.
+  @JsonKey(name: 'icon_only')
+  final bool iconOnly;
 
   /// Liquid glass artwork layers (bottom-to-top). The `.icon` bundle is emitted when the list is non-empty; each entry is one Icon Composer layer with its own artwork, position, and composition.
   @JsonKey(name: 'liquid_glass_layers')
   final List<LiquidGlassLayer>? liquidGlassLayers;
+
+  /// Explicit Liquid Glass groups (bottom-to-top). When non-empty, these define the bundle's groups instead of the single group built from [liquidGlassLayers]; setting both is an error.
+  @JsonKey(name: 'liquid_glass_groups')
+  final List<LiquidGlassGroup>? liquidGlassGroups;
 
   /// IOS remove_alpha
   @JsonKey(name: 'remove_alpha')
@@ -59,9 +70,17 @@ class IOSConfig {
   @JsonKey(name: 'desaturate_tinted_to_grayscale')
   final bool desaturateTintedToGrayscale;
 
-  /// IOS background_color
+  /// Canvas background: doubles as the `remove_alpha` matte color and the `.icon` solid fill (unless a gradient pair is set). Hex `#RRGGBB`.
   @JsonKey(name: 'background_color')
   final String backgroundColor;
+
+  /// First color of an explicit two-stop linear canvas gradient (hex `#RRGGBB`). Requires [liquidGlassGradientTo]; when both are set the `.icon` canvas renders a top-to-bottom gradient instead of the solid [backgroundColor] (verified against Icon Composer's document model and ictool rendering).
+  @JsonKey(name: 'liquid_glass_gradient_from')
+  final String? liquidGlassGradientFrom;
+
+  /// Second color of an explicit two-stop linear canvas gradient (hex `#RRGGBB`). Requires [liquidGlassGradientFrom].
+  @JsonKey(name: 'liquid_glass_gradient_to')
+  final String? liquidGlassGradientTo;
 
   /// IOS liquid glass translucency
   @JsonKey(name: 'liquid_glass_translucency')
@@ -111,13 +130,17 @@ class IOSConfig {
     this.iconName,
     this.xcodeprojPath,
     this.flavorMode = 'pbxproj',
+    this.iconOnly = false,
     this.imagePathDarkTransparent,
     this.imagePathTintedGrayscale,
     this.liquidGlassLayers,
+    this.liquidGlassGroups,
     this.removeAlpha = false,
     this.removeLiquidGlass = false,
     this.desaturateTintedToGrayscale = false,
     this.backgroundColor = '#ffffff',
+    this.liquidGlassGradientFrom,
+    this.liquidGlassGradientTo,
     this.liquidGlassTranslucency = 0.5,
     this.liquidGlassSpecular = true,
     this.liquidGlassShadowKind = 'Neutral',

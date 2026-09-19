@@ -256,6 +256,138 @@ void main() {
       );
     });
 
+    test('maps none shadow kind to none', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'liquid_glass_shadow_kind': 'None',
+        },
+      });
+
+      final iconJson = generateMacOSIconConfig(config);
+      final groups = iconJson['groups'] as List;
+      final shadow = (groups.first as Map)['shadow'] as Map<String, dynamic>;
+      expect(shadow['kind'], 'none');
+    });
+
+    test('rejects out-of-range optical values with labelled errors', () {
+      Map<String, dynamic> iconJsonFor(Map<String, dynamic> extra) {
+        final config = Config.fromJson(<String, dynamic>{
+          'macos': {
+            'generate': true,
+            'liquid_glass_layers': [
+              {'image_path': 'assets/icon.png'},
+            ],
+            ...extra,
+          },
+        });
+        return generateMacOSIconConfig(config);
+      }
+
+      for (final entry in {
+        'liquid_glass_translucency': 2.0,
+        'liquid_glass_shadow_opacity': -0.1,
+        'liquid_glass_blur': 1.5,
+      }.entries) {
+        expect(
+          () => iconJsonFor({entry.key: entry.value}),
+          throwsA(
+            isA<InvalidConfigException>().having(
+              (e) => e.message,
+              'message',
+              contains('macos.${entry.key}'),
+            ),
+          ),
+        );
+      }
+    });
+
+    test('emits a two-stop linear gradient fill when from/to are set', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'liquid_glass_gradient_from': '#FF0000',
+          'liquid_glass_gradient_to': '#0000FF',
+        },
+      });
+
+      final iconJson = generateMacOSIconConfig(config);
+      expect(
+        iconJson['fill'],
+        <String, dynamic>{
+          'linear-gradient': [
+            'display-p3:1.00000,0.00000,0.00000,1.00000',
+            'display-p3:0.00000,0.00000,1.00000,1.00000',
+          ],
+        },
+      );
+    });
+
+    test('emits explicit groups with per-group overrides', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'liquid_glass_groups': [
+            {
+              'name': 'Background',
+              'layers': [
+                {'image_path': 'assets/background.png'},
+              ],
+            },
+            {
+              'name': 'Glyph',
+              'layers': [
+                {'image_path': 'assets/glyph.png'},
+              ],
+              'remove_liquid_glass': true,
+            },
+          ],
+        },
+      });
+
+      final iconJson = generateMacOSIconConfig(config);
+      final groups = iconJson['groups'] as List;
+      expect(groups, hasLength(2));
+      final glyph = groups[1] as Map<String, dynamic>;
+      expect(glyph['name'], 'Glyph');
+      expect((glyph['translucency'] as Map)['enabled'], isFalse);
+      expect((glyph['layers'] as List).first['glass'], isFalse);
+    });
+
+    test('rejects layers and groups set together', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'liquid_glass_layers': [
+            {'image_path': 'assets/icon.png'},
+          ],
+          'liquid_glass_groups': [
+            {
+              'layers': [
+                {'image_path': 'assets/icon.png'},
+              ],
+            },
+          ],
+        },
+      });
+      expect(
+        () => generateMacOSIconConfig(config),
+        throwsA(
+          isA<InvalidConfigException>().having(
+            (e) => e.message,
+            'message',
+            contains('macos.liquid_glass_groups'),
+          ),
+        ),
+      );
+    });
+
     test('rejects invalid values with macos-labelled errors', () {
       Map<String, dynamic> iconJsonFor(Map<String, dynamic> macos) {
         final config = Config.fromJson(<String, dynamic>{'macos': macos});
@@ -609,6 +741,27 @@ void main() {
       }
     });
 
+    test('validateRequirements fails when a glass source is missing', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'image_path': 'master-light-1024.png',
+          'liquid_glass_layers': [
+            {'image_path': 'missing-layer.png'},
+          ],
+        },
+      });
+      final generator = MacOSIconGenerator(
+        IconGeneratorContext(
+          config: config,
+          logger: LILogger(false),
+          prefixPath: prefixPath,
+        ),
+      );
+
+      expect(generator.validateRequirements(), isFalse);
+    });
+
     test('writes the .icon bundle and pbxproj reference', () async {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
@@ -734,6 +887,175 @@ void main() {
           path.join(prefixPath, 'macos', 'Runner', 'AppIcon.icon'),
         ).existsSync(),
         isFalse,
+      );
+    });
+
+    test('icon_only emits the .icon bundle without PNG icons', () async {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'icon_only': true,
+          'liquid_glass_layers': [
+            {'image_path': 'master-light-1024.png'},
+          ],
+        },
+      });
+      final generator = MacOSIconGenerator(
+        IconGeneratorContext(
+          config: config,
+          logger: LILogger(false),
+          prefixPath: prefixPath,
+        ),
+      );
+
+      expect(generator.validateRequirements(), isTrue);
+      await generator.createIcons();
+
+      expect(
+        File(
+          path.join(
+            prefixPath,
+            'macos',
+            'Runner',
+            'AppIcon.icon',
+            'icon.json',
+          ),
+        ).existsSync(),
+        isTrue,
+      );
+      // The pre-seeded set stays untouched: no PNG icons are rendered.
+      expect(
+        File(
+          path.join(
+            prefixPath,
+            'macos',
+            'Runner',
+            'Assets.xcassets',
+            'AppIcon.appiconset',
+            'app_icon_512.png',
+          ),
+        ).existsSync(),
+        isFalse,
+      );
+    });
+
+    test('icon_only without glass fails validation', () {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'icon_only': true,
+        },
+      });
+      final generator = MacOSIconGenerator(
+        IconGeneratorContext(
+          config: config,
+          logger: LILogger(false),
+          prefixPath: prefixPath,
+        ),
+      );
+
+      expect(generator.validateRequirements(), isFalse);
+    });
+
+    test('icon_name writes a custom set and bundle', () async {
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'image_path': 'master-light-1024.png',
+          'icon_name': 'MyIcon',
+          'liquid_glass_layers': [
+            {'image_path': 'master-light-1024.png'},
+          ],
+        },
+      });
+      final generator = MacOSIconGenerator(
+        IconGeneratorContext(
+          config: config,
+          logger: LILogger(false),
+          prefixPath: prefixPath,
+        ),
+      );
+
+      expect(generator.validateRequirements(), isTrue);
+      await generator.createIcons();
+
+      expect(
+        File(
+          path.join(
+            prefixPath,
+            'macos',
+            'Runner',
+            'Assets.xcassets',
+            'MyIcon.appiconset',
+            'Contents.json',
+          ),
+        ).existsSync(),
+        isTrue,
+      );
+      expect(
+        File(
+          path.join(
+            prefixPath,
+            'macos',
+            'Runner',
+            'MyIcon.icon',
+            'icon.json',
+          ),
+        ).existsSync(),
+        isTrue,
+      );
+    });
+
+    test('removes a stale .icon bundle and its reference when layers are unset', () async {
+      // Seed a stale bundle from an earlier layers run.
+      final staleAsset = File(
+        path.join(
+          prefixPath,
+          'macos',
+          'Runner',
+          'AppIcon.icon',
+          'Assets',
+          'stale-layer.png',
+        ),
+      );
+      await staleAsset.create(recursive: true);
+      final pbxprojFile = File(
+        path.join(
+          prefixPath,
+          'macos',
+          'Runner.xcodeproj',
+          'project.pbxproj',
+        ),
+      );
+      await pbxprojFile.writeAsString(
+        '${await pbxprojFile.readAsString()}\t\tAAA /* AppIcon.icon */ = {isa = PBXFileReference; path = AppIcon.icon; };\n',
+      );
+
+      final config = Config.fromJson(<String, dynamic>{
+        'macos': {
+          'generate': true,
+          'image_path': 'master-light-1024.png',
+        },
+      });
+      final generator = MacOSIconGenerator(
+        IconGeneratorContext(
+          config: config,
+          logger: LILogger(false),
+          prefixPath: prefixPath,
+        ),
+      );
+
+      await generator.createIcons();
+
+      expect(
+        Directory(
+          path.join(prefixPath, 'macos', 'Runner', 'AppIcon.icon'),
+        ).existsSync(),
+        isFalse,
+      );
+      expect(
+        await pbxprojFile.readAsString(),
+        isNot(contains('AppIcon.icon')),
       );
     });
   });
