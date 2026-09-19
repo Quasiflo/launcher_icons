@@ -99,21 +99,28 @@ Future<void> _writeLiquidGlassBundle({
   required LILogger? logger,
   required String prefixPath,
 }) async {
+  // Validate every source before creating any directories so error paths
+  // leave no empty `.icon`/`Assets` litter behind (e.g. unit tests asserting
+  // the missing-source throw at the repo root used to create
+  // `ios/Runner/AppIcon.icon/Assets` as a side effect).
+  final wantedBasenames = <String>{};
+  for (final source in sources) {
+    if (!File(withPrefix(prefixPath, source)).existsSync()) {
+      throw InvalidConfigException(
+        'Liquid glass icon image not found at: $source',
+      );
+    }
+    wantedBasenames.add(path.basename(source));
+  }
+
   await createDirIfNotExist(iconFolderPath);
   await createDirIfNotExist(assetsFolderPath);
 
   // Copy image(s) to Assets folder. Sources pass through verbatim and are
   // never decoded, so SVG layers work as-is.
-  final wantedBasenames = <String>{};
   for (final source in sources) {
     final sourceImageFile = File(withPrefix(prefixPath, source));
-    if (!sourceImageFile.existsSync()) {
-      throw InvalidConfigException(
-        'Liquid glass icon image not found at: $source',
-      );
-    }
     final basename = path.basename(source);
-    wantedBasenames.add(basename);
     await sourceImageFile.copy(path.join(assetsFolderPath, basename));
   }
   // Sweep layers orphaned by source switches (e.g. PNG replaced by SVG):

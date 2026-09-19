@@ -252,7 +252,10 @@ void main() {
   });
 
   group('generateLiquidGlassIcon', () {
-    test('throws InvalidConfigException for invalid shadow kind', () {
+    // Error paths run against a git-ignored sandbox (never the repo root)
+    // so a regression in directory-creation ordering cannot litter
+    // `ios/Runner/AppIcon.icon/Assets` into the working tree.
+    test('throws InvalidConfigException for invalid shadow kind', () async {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
@@ -262,13 +265,30 @@ void main() {
           'liquid_glass_shadow_kind': 'Invalid',
         },
       });
-      expect(
-        () => generateLiquidGlassIcon(config, 'AppIcon'),
+      final errorSandbox = path.join(
+        '.dart_tool',
+        'launcher_icons',
+        'test',
+        'ios_liquid_glass_errors',
+      );
+      await expectLater(
+        () => generateLiquidGlassIcon(
+          config,
+          'AppIcon',
+          prefixPath: errorSandbox,
+        ),
         throwsA(isA<InvalidConfigException>()),
+      );
+      expect(
+        Directory(
+          path.join(errorSandbox, paths.iosLiquidGlassIconPath('AppIcon')),
+        ).existsSync(),
+        isFalse,
+        reason: 'error paths must not leave empty .icon litter behind',
       );
     });
 
-    test('throws InvalidConfigException when source image is missing', () {
+    test('throws InvalidConfigException when source image is missing', () async {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
           'generate': true,
@@ -277,9 +297,26 @@ void main() {
           ],
         },
       });
-      expect(
-        () => generateLiquidGlassIcon(config, 'AppIcon'),
+      final errorSandbox = path.join(
+        '.dart_tool',
+        'launcher_icons',
+        'test',
+        'ios_liquid_glass_errors',
+      );
+      await expectLater(
+        () => generateLiquidGlassIcon(
+          config,
+          'AppIcon',
+          prefixPath: errorSandbox,
+        ),
         throwsA(isA<InvalidConfigException>()),
+      );
+      expect(
+        Directory(
+          path.join(errorSandbox, paths.iosLiquidGlassIconPath('AppIcon')),
+        ).existsSync(),
+        isFalse,
+        reason: 'error paths must not leave empty .icon litter behind',
       );
     });
 

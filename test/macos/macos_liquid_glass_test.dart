@@ -349,7 +349,10 @@ void main() {
   });
 
   group('generateMacOSLiquidGlassIcon', () {
-    test('throws InvalidConfigException for invalid shadow kind', () {
+    // Error paths run against a git-ignored sandbox (never the repo root)
+    // so a regression in directory-creation ordering cannot litter
+    // `macos/Runner/AppIcon.icon/Assets` into the working tree.
+    test('throws InvalidConfigException for invalid shadow kind', () async {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
@@ -359,13 +362,30 @@ void main() {
           'liquid_glass_shadow_kind': 'Invalid',
         },
       });
-      expect(
-        () => generateMacOSLiquidGlassIcon(config, 'AppIcon'),
+      final errorSandbox = path.join(
+        '.dart_tool',
+        'launcher_icons',
+        'test',
+        'macos_liquid_glass_errors',
+      );
+      await expectLater(
+        () => generateMacOSLiquidGlassIcon(
+          config,
+          'AppIcon',
+          prefixPath: errorSandbox,
+        ),
         throwsA(isA<InvalidConfigException>()),
+      );
+      expect(
+        Directory(
+          path.join(errorSandbox, 'macos', 'Runner', 'AppIcon.icon'),
+        ).existsSync(),
+        isFalse,
+        reason: 'error paths must not leave empty .icon litter behind',
       );
     });
 
-    test('throws InvalidConfigException when source image is missing', () {
+    test('throws InvalidConfigException when source image is missing', () async {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
@@ -374,9 +394,26 @@ void main() {
           ],
         },
       });
-      expect(
-        () => generateMacOSLiquidGlassIcon(config, 'AppIcon'),
+      final errorSandbox = path.join(
+        '.dart_tool',
+        'launcher_icons',
+        'test',
+        'macos_liquid_glass_errors',
+      );
+      await expectLater(
+        () => generateMacOSLiquidGlassIcon(
+          config,
+          'AppIcon',
+          prefixPath: errorSandbox,
+        ),
         throwsA(isA<InvalidConfigException>()),
+      );
+      expect(
+        Directory(
+          path.join(errorSandbox, 'macos', 'Runner', 'AppIcon.icon'),
+        ).existsSync(),
+        isFalse,
+        reason: 'error paths must not leave empty .icon litter behind',
       );
     });
 
