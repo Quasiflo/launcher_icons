@@ -86,7 +86,7 @@ void main() {
       expect(index, contains('favicon.png'));
     });
 
-    test('rejects non-hex background_color/theme_color', () {
+    test('rejects non-hex background_color/theme colors', () {
       expect(
         generatorFor(<String, dynamic>{
           'generate': true,
@@ -99,7 +99,15 @@ void main() {
         generatorFor(<String, dynamic>{
           'generate': true,
           'image_path': 'master-light-1024.png',
-          'theme_color': 'red-ish',
+          'theme_color_light': 'red-ish',
+        }).validateRequirements(),
+        isFalse,
+      );
+      expect(
+        generatorFor(<String, dynamic>{
+          'generate': true,
+          'image_path': 'master-light-1024.png',
+          'theme_color_dark': 'red-ish',
         }).validateRequirements(),
         isFalse,
       );
@@ -112,7 +120,8 @@ void main() {
             'generate': true,
             'image_path': 'master-light-1024.png',
             'background_color': color,
-            'theme_color': color,
+            'theme_color_light': color,
+            'theme_color_dark': color,
           }).validateRequirements(),
           isTrue,
         );

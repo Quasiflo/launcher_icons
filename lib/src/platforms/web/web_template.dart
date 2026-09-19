@@ -8,14 +8,17 @@ class WebIconTemplate {
   /// Refer to https://web.dev/maskable-icon/
   final bool maskable;
 
+  /// Monochrome icon for themed PWA icons (`purpose: monochrome`). Combines with [maskable] as `purpose: "maskable monochrome"`.
+  final bool monochrome;
+
   /// Creates an instance of [WebIconTemplate].
-  const WebIconTemplate({
-    required this.size,
-    this.maskable = false,
-  });
+  const WebIconTemplate({required this.size, this.maskable = false, this.monochrome = false});
 
   /// Icon file name
-  String get iconFile => 'Icon${maskable ? '-maskable' : ''}-$size.png';
+  String get iconFile {
+    final qualifiers = '${maskable ? '-maskable' : ''}${monochrome ? '-monochrome' : ''}';
+    return 'Icon$qualifiers-$size.png';
+  }
 
   /// Icon config for manifest.json
   ///
@@ -28,11 +31,12 @@ class WebIconTemplate {
   ///  },
   /// ```
   Map<String, dynamic> get iconManifest {
+    final purposes = <String>[if (maskable) 'maskable', if (monochrome) 'monochrome'];
     return <String, dynamic>{
       'src': 'icons/$iconFile',
       'sizes': '${size}x$size',
       'type': 'image/png',
-      if (maskable) 'purpose': 'maskable',
+      if (purposes.isNotEmpty) 'purpose': purposes.join(' '),
     };
   }
 }

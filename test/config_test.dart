@@ -76,19 +76,26 @@ void main() {
         expect(configs.webConfig!.generate, isTrue);
         expect(configs.webConfig!.backgroundColor, isNotNull);
         expect(configs.webConfig!.imagePath, isNotNull);
-        expect(configs.webConfig!.themeColor, isNotNull);
+        expect(configs.webConfig!.themeColorLight, isNotNull);
         expect(
           configs.webConfig!.toJson(),
           equals(<String, dynamic>{
             'generate': true,
             'image_path': 'master-light-1024.png',
-            'image_path_favicon': null,
+            'image_path_pwa': null,
             'image_path_maskable': null,
-            'favicon_size': 16,
-            'favicon_ico': true,
+            'image_path_monochrome': null,
+            'image_path_monochrome_maskable': null,
+            'image_path_favicon_svg': null,
+            'image_path_opengraph': null,
+            'image_path_twitter': null,
+            'shortcut_icons': null,
             'output_path': 'web',
+            'favicon_size': 32,
+            'favicon_ico': true,
             'background_color': '#0175C2',
-            'theme_color': '#0175C2',
+            'theme_color_light': '#0175C2',
+            'theme_color_dark': null,
           }),
         );
         // windows
@@ -231,19 +238,26 @@ void main() {
         expect(configs.webConfig!.generate, isTrue);
         expect(configs.webConfig!.backgroundColor, isNotNull);
         expect(configs.webConfig!.imagePath, isNotNull);
-        expect(configs.webConfig!.themeColor, isNotNull);
+        expect(configs.webConfig!.themeColorLight, isNotNull);
         expect(
           configs.webConfig!.toJson(),
           equals(<String, dynamic>{
             'generate': true,
             'image_path': 'master-light-1024.png',
-            'image_path_favicon': 'app_icon_favicon.png',
+            'image_path_pwa': null,
             'image_path_maskable': null,
-            'favicon_size': 16,
-            'favicon_ico': true,
+            'image_path_monochrome': null,
+            'image_path_monochrome_maskable': null,
+            'image_path_favicon_svg': null,
+            'image_path_opengraph': null,
+            'image_path_twitter': null,
+            'shortcut_icons': null,
             'output_path': 'web',
+            'favicon_size': 32,
+            'favicon_ico': true,
             'background_color': '#0175C2',
-            'theme_color': '#0175C2',
+            'theme_color_light': '#0175C2',
+            'theme_color_dark': null,
           }),
         );
         // windows
@@ -314,19 +328,26 @@ void main() {
         expect(configs.webConfig!.generate, isTrue);
         expect(configs.webConfig!.backgroundColor, isNotNull);
         expect(configs.webConfig!.imagePath, isNotNull);
-        expect(configs.webConfig!.themeColor, isNotNull);
+        expect(configs.webConfig!.themeColorLight, isNotNull);
         expect(
           configs.webConfig!.toJson(),
           equals(<String, dynamic>{
             'generate': true,
             'image_path': 'master-light-1024.png',
-            'image_path_favicon': null,
+            'image_path_pwa': null,
             'image_path_maskable': null,
-            'favicon_size': 16,
-            'favicon_ico': true,
+            'image_path_monochrome': null,
+            'image_path_monochrome_maskable': null,
+            'image_path_favicon_svg': null,
+            'image_path_opengraph': null,
+            'image_path_twitter': null,
+            'shortcut_icons': null,
             'output_path': 'web',
+            'favicon_size': 32,
+            'favicon_ico': true,
             'background_color': '#0175C2',
-            'theme_color': '#0175C2',
+            'theme_color_light': '#0175C2',
+            'theme_color_dark': null,
           }),
         );
         // windows

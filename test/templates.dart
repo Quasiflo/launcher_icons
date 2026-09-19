@@ -15,7 +15,7 @@ launcher_icons:
     generate: true
     image_path: "master-light-1024.png" # filepath
     background_color: "#0175C2" # hex_color
-    theme_color: "#0175C2" # hex_color
+    theme_color_light: "#0175C2" # hex_color
     apple_mobile_web_app_title: "demo"
     apple_mobile_web_app_status_bar_style: "hex_color"
   windows:
@@ -37,7 +37,7 @@ launcher_icons:
     generate: true
     image_path: "master-light-1024.png" # filepath
     background_color: "#0175C2" # hex_color
-    theme_color: "#0175C2" # hex_color
+    theme_color_light: "#0175C2" # hex_color
     apple_mobile_web_app_title: "demo"
     apple_mobile_web_app_status_bar_style: "hex_color"
 ''';
@@ -64,7 +64,7 @@ web:
   generate: true
   image_path: "master-light-1024.png" # filepath
   background_color: "#0175C2" # hex_color
-  theme_color: "#0175C2" # hex_color
+  theme_color_light: "#0175C2" # hex_color
   apple_mobile_web_app_title: "demo"
   apple_mobile_web_app_status_bar_style: "hex_color"
 ''';
@@ -122,9 +122,8 @@ launcher_icons:
   web:
     generate: true
     image_path: "master-light-1024.png" # filepath
-    image_path_favicon: "app_icon_favicon.png" # filepath
     background_color: "#0175C2" # hex_color
-    theme_color: "#0175C2" # hex_color
+    theme_color_light: "#0175C2" # hex_color
     apple_mobile_web_app_title: "demo"
     apple_mobile_web_app_status_bar_style: "hex_color"
   windows:
@@ -190,7 +189,7 @@ launcher_icons:
     generate: true
     image_path: "master-light-1024.png" # filepath
     background_color: "#0175C2" # hex_color
-    theme_color: "#0175C2" # hex_color
+    theme_color_light: "#0175C2" # hex_color
     apple_mobile_web_app_title: "demo"
     apple_mobile_web_app_status_bar_style: "hex_color"
   windows:

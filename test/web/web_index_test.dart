@@ -46,7 +46,7 @@ void main() {
         'generate': true,
         'image_path': 'master-light-1024.png',
         'background_color': '#0175C2',
-        'theme_color': '#0175C2',
+        'theme_color_light': '#0175C2',
       });
 
       expect(generator.validateRequirements(), isTrue);
@@ -74,6 +74,7 @@ void main() {
       );
       expect(index, contains('<link rel="manifest" href="manifest.json"/>'));
       expect(index, contains('sizes="any" href="favicon.ico"'));
+      expect(index, contains('<style>html, body { background-color: #0175C2; }</style>'));
       expect(
         index,
         contains('<meta name="theme-color" content="#0175C2"/>'),

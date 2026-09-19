@@ -75,7 +75,7 @@ void main() {
         'image_path': 'master-light-1024.png',
         'image_path_maskable': 'maskable.png',
         'background_color': '#0175C2',
-        'theme_color': '#0175C2',
+        'theme_color_light': '#0175C2',
       });
 
       await generator.createIcons();

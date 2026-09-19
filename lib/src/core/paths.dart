@@ -173,7 +173,7 @@ String linuxSnapDesktopFilePath(String appName) => path.join('snap', 'gui', '$ap
 final linuxSnapcraftFilePath = path.join('snap', 'snapcraft.yaml');
 
 //* Web
-/// Relative web directory path
+/// Default web directory path
 const webDirPath = 'web';
 
 /// Relative web icons directory path under [root]
@@ -187,6 +187,15 @@ String webFaviconFilePath([String root = webDirPath]) => path.join(root, 'favico
 
 /// Relative favicon.ico path (browsers request /favicon.ico by default) under [root]
 String webFaviconIcoFilePath([String root = webDirPath]) => path.join(root, 'favicon.ico');
+
+/// Relative favicon.svg path (verbatim copy-through) under [root]
+String webFaviconSvgFilePath([String root = webDirPath]) => path.join(root, 'favicon.svg');
+
+/// Relative Open Graph link-preview image path under [root]
+String webOpengraphFilePath([String root = webDirPath]) => path.join(root, 'opengraph.png');
+
+/// Relative Twitter/X link-preview image path under [root]
+String webTwitterFilePath([String root = webDirPath]) => path.join(root, 'twitter.png');
 
 /// Relative index.html file path under [root]
 String webIndexFilePath([String root = webDirPath]) => path.join(root, 'index.html');
