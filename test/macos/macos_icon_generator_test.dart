@@ -23,8 +23,7 @@ import '../templates.dart' as templates;
 ])
 import 'macos_icon_generator_test.mocks.dart';
 
-// Parses the `launcher_icons:` section of a config-file template string,
-// mirroring what the removed file loaders extracted.
+// Parses the `launcher_icons:` section of a config-file template string, mirroring what the removed file loaders extracted.
 Config parseTemplateSection(String template) => Config.fromJson(
       loadYaml(template)['launcher_icons'] as Map<dynamic, dynamic>,
     );
@@ -65,9 +64,7 @@ void main() {
         when(mockMacOSConfig.generate).thenReturn(true);
         when(mockMacOSConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
         when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
-        // resolveImageFile is mocked: implement the real rule (platform
-        // path wins, top-level fallback, missing file throws) so the unit
-        // tests exercise the generators, not the mock default.
+        // resolveImageFile is mocked: implement the real rule (platform path wins, top-level fallback, missing file throws) so the unit tests exercise the generators, not the mock default.
         when(mockConfig.resolveImageFile(argThat(anything), prefixPath)).thenAnswer(
           (invocation) {
             final platformPath = invocation.positionalArguments.first as String?;
@@ -220,7 +217,7 @@ void main() {
       );
     });
 
-    test('should generate flavor icons into AppIcon-<flavor>.appiconset (fluttercommunity/flutter_launcher_icons#638)', () async {
+    test('should generate flavor icons into AppIcon-<flavor>.appiconset', () async {
       final imageFile = File(path.join(assetPath, 'master-light-1024.png'));
       await d.dir('fli_test_flavor', [
         d.dir('macos/Runner/Assets.xcassets/AppIcon-staging.appiconset', [
@@ -298,7 +295,7 @@ void main() {
         reason: 'Fresh flavor icon set was not bootstrapped',
       );
     });
-    test('rounded config produces transparent corners end-to-end (fluttercommunity/flutter_launcher_icons#463)', () async {
+    test('rounded config produces transparent corners end-to-end', () async {
       final imageFile = File(path.join(assetPath, 'master-light-1024.png'));
       await d.dir('fli_test_rounded', [
         d.dir('macos/Runner/Assets.xcassets/AppIcon.appiconset', [

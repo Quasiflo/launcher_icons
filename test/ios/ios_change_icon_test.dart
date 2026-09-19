@@ -4,7 +4,7 @@ import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-// Tests for changeIosLauncherIcon: scoped rewrites (fluttercommunity/flutter_launcher_icons#565), atomic writes (fluttercommunity/flutter_launcher_icons#636) and the missing-key warning (fluttercommunity/flutter_launcher_icons#341). NOTE: a trailing newline keeps written output byte-identical when nothing is replaced.
+// Tests for changeIosLauncherIcon: scoped rewrites, atomic writes and the missing-key warning. NOTE: a trailing newline keeps written output byte-identical when nothing is replaced.
 const _fixture = r'''
 // !$*UTF8*$!
 {
@@ -34,8 +34,7 @@ void main() {
         sandbox.deleteSync(recursive: true);
       }
       await Directory(path.join(sandboxDir, 'ios', 'Runner.xcodeproj')).create(recursive: true);
-      // Written before chdir (sandbox-relative); every path below is
-      // CWD-relative because the generator resolves against Directory.current.
+      // Written before chdir (sandbox-relative); every path below is CWD-relative because the generator resolves against Directory.current.
       await File(
         path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj'),
       ).writeAsString(_fixture);
@@ -57,14 +56,14 @@ void main() {
         content,
         contains('ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-production;'),
       );
-      // fluttercommunity/flutter_launcher_icons#634: neighboring build settings must survive.
+      // Neighboring build settings must survive.
       expect(
         content,
         contains(
           'ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;',
         ),
       );
-      // fluttercommunity/flutter_launcher_icons#636: no temp file left behind.
+      // No temp file left behind.
       expect(
         File(
           path.join(
@@ -77,7 +76,7 @@ void main() {
       );
     });
 
-    test('warns instead of silently skipping a missing flavor key (fluttercommunity/flutter_launcher_icons#341)', () async {
+    test('warns instead of silently skipping a missing flavor key', () async {
       await ios.changeIosLauncherIcon('AppIcon-staging', 'staging');
       // File content (modulo trailing newline handling) is unchanged.
       final content = await pbxprojFile().readAsString();
@@ -133,7 +132,7 @@ void main() {
       );
     });
 
-    test('falls back to a renamed project (fluttercommunity/flutter_launcher_icons#543)', () async {
+    test('falls back to a renamed project', () async {
       await writePbxproj('Renamed.xcodeproj');
       expect(
         ios.resolveIosPbxprojPath(),
@@ -154,7 +153,7 @@ void main() {
       );
     });
 
-    test('changeIosLauncherIcon works in a renamed project (fluttercommunity/flutter_launcher_icons#543)', () async {
+    test('changeIosLauncherIcon works in a renamed project', () async {
       final renamed = File(
         path.join('ios', 'Renamed.xcodeproj', 'project.pbxproj'),
       );
@@ -170,7 +169,7 @@ void main() {
       );
     });
 
-    test('explicit xcodeproj path wins over the default (fluttercommunity/flutter_launcher_icons#637)', () async {
+    test('explicit xcodeproj path wins over the default', () async {
       await writePbxproj('Runner.xcodeproj');
       final custom = File(path.join('ios', 'Custom.xcodeproj', 'project.pbxproj'));
       await custom.parent.create(recursive: true);

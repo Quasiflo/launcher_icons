@@ -3,9 +3,7 @@ import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/logger.dart';
 import 'package:test/test.dart';
 
-// Unit tests for the IconGenerator base: context construction. (Platform
-// orchestration used to live in generateIconsFor and is now inline in
-// createIconsFromArguments, covered end to end by the cli_flavor suites.)
+// Unit tests for the IconGenerator base: context construction. (Platform orchestration used to live in generateIconsFor and is now inline in createIconsFromArguments, covered end to end by the cli_flavor suites.)
 void main() {
   group('IconGeneratorContext', () {
     test('holds config, logger, prefix and flavor', () {

@@ -17,8 +17,7 @@ const _pbxproj = r'''
 }
 ''';
 
-// In single-size mode dark/tinted variants must be skipped entirely: no
-// decode, no PNG I/O, no Contents.json entries.
+// In single-size mode dark/tinted variants must be skipped entirely: no decode, no PNG I/O, no Contents.json entries.
 void main() {
   group('createIcons single_size', () {
     late String originalDir;

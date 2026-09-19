@@ -6,7 +6,7 @@ import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-// Regression tests for fluttercommunity/flutter_launcher_icons#514: `_alphaBlend` mixed up the background channels (bg.g/bg.a instead of bg.r/bg.g), tinting matted edges green.
+// Regression tests: `_alphaBlend` mixed up the background channels (bg.g/bg.a instead of bg.r/bg.g), tinting matted edges green.
 void main() {
   group('remove_alpha background blending', () {
     late String originalDir;
@@ -80,16 +80,14 @@ void main() {
         ).readAsBytes(),
       )!;
       final pixel = output.getPixel(0, 0);
-      // (128*255 + 127*0)/255 = 128 red, (128*0 + 127*255)/255 = 127 green.
-      // The old channel-swapped math produced red = 255 here.
+      // (128*255 + 127*0)/255 = 128 red, (128*0 + 127*255)/255 = 127 green. The old channel-swapped math produced red = 255 here.
       expect(pixel.r, equals(128));
       expect(pixel.g, equals(127));
       expect(pixel.b, equals(0));
     });
   });
 
-  // remove_alpha is per-variant: the dark image keeps its transparency
-  // (Apple: the system background shows through) while the tinted image is forced opaque like the base image.
+  // remove_alpha is per-variant: the dark image keeps its transparency (Apple: the system background shows through) while the tinted image is forced opaque like the base image.
   group('remove_alpha per-variant behavior', () {
     late String originalDir;
     late String sandboxDir;

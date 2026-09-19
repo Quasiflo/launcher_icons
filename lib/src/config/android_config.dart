@@ -15,8 +15,7 @@ class AndroidConfig {
   @JsonKey(name: 'image_path')
   final String? imagePath;
 
-  /// Custom icon name (e.g. `"ic_launcher"`).
-  /// When set, a new launcher icon is generated without removing the old default one. When `null`, the default existing icon is overridden.
+  /// Custom icon name (e.g. `"ic_launcher"`). When set, a new launcher icon is generated without removing the old default one. When `null`, the default existing icon is overridden.
   @JsonKey(name: 'icon_name')
   final String? iconName;
 

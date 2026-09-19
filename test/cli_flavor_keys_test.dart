@@ -6,12 +6,7 @@ import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-// End-to-end tests for suffixed `launcher_icons-<flavor>:` sections plus
-// `--flavor` selection through createIconsFromArguments. Same sandbox
-// discipline as cli_flavor_test.dart: CWD is process-global, execution is
-// serialized via dart_test.yaml, print output is captured through a zone,
-// and the sandbox path is absolute (a relative one would rebase after the
-// chdir below).
+// End-to-end tests for suffixed `launcher_icons-<flavor>:` sections plus `--flavor` selection through createIconsFromArguments. Same sandbox discipline as cli_flavor_test.dart: CWD is process-global, execution is serialized via dart_test.yaml, print output is captured through a zone, and the sandbox path is absolute (a relative one would rebase after the chdir below).
 void main() {
   group('createIconsFromArguments suffixed flavor sections', () {
     late String originalDir;

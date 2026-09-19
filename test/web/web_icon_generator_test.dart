@@ -76,7 +76,7 @@ void main() {
       );
     });
 
-    test('honors favicon_size (fluttercommunity/flutter_launcher_icons#614)', () async {
+    test('honors favicon_size', () async {
       final sizedConfig = Config.fromJson(<String, dynamic>{
         'web': {
           'generate': true,
@@ -101,7 +101,7 @@ void main() {
       expect(favicon.height, equals(32));
     });
 
-    test('emits a decodable favicon.ico alongside favicon.png (fluttercommunity/flutter_launcher_icons#540)', () async {
+    test('emits a decodable favicon.ico alongside favicon.png', () async {
       expect(generator.validateRequirements(), isTrue);
       await generator.createIcons();
 
@@ -112,7 +112,7 @@ void main() {
       expect(ico.height, equals(16));
     });
 
-    test('honors output_path (fluttercommunity/flutter_launcher_icons#426)', () async {
+    test('honors output_path', () async {
       await d.dir('fli_test', [
         d.dir('web_prod', [
           d.dir('icons'),

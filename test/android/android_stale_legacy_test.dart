@@ -14,8 +14,7 @@ const _manifest = '''
 </manifest>
 ''';
 
-// Switching custom icon names must not pile up stale legacy PNGs: the
-// manifest's previous icon name is the source of truth for what the tool managed before. The default ic_launcher set is never touched (it may be Flutter's originals).
+// Switching custom icon names must not pile up stale legacy PNGs: the manifest's previous icon name is the source of truth for what the tool managed before. The default ic_launcher set is never touched (it may be Flutter's originals).
 void main() {
   group('createDefaultIcons legacy switch cleanup', () {
     late String prefixPath;

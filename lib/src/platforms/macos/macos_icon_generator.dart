@@ -30,7 +30,7 @@ class MacOSIconGenerator extends IconGenerator {
   /// Creates a instance of [MacOSIconGenerator]
   MacOSIconGenerator(IconGeneratorContext context) : super(context, 'MacOS');
 
-  /// Icons directory, flavor-aware: `AppIcon-<flavor>.appiconset` for flavor runs so macOS honors flavors like iOS does (fluttercommunity/flutter_launcher_icons#638).
+  /// Icons directory, flavor-aware: `AppIcon-<flavor>.appiconset` for flavor runs so macOS honors flavors like iOS does.
   String _iconsDirPath() {
     final flavor = context.flavor;
     if (flavor == null) {
@@ -61,8 +61,7 @@ class MacOSIconGenerator extends IconGenerator {
     context.logger.verbose('Updating contents.json');
     _updateContentsFile();
 
-    // Sweep catalogs orphaned by flavor renames (reference-checked against
-    // the macOS project so the build cannot break).
+    // Sweep catalogs orphaned by flavor renames (reference-checked against the macOS project so the build cannot break).
     final pbxprojFile = File(
       path.join(
         context.prefixPath,
@@ -79,11 +78,7 @@ class MacOSIconGenerator extends IconGenerator {
       logger: context.logger,
     );
 
-    // Flavor runs write AppIcon-<flavor>.appiconset/ but Xcode keeps
-    // pointing at AppIcon until ASSETCATALOG_COMPILER_APPICON_NAME is
-    // updated — the same wiring the iOS generator performs. Default runs
-    // need no edit: the template already points at AppIcon. A missing
-    // project file only warns: the icons themselves are still valid.
+    // Flavor runs write AppIcon-<flavor>.appiconset/ but Xcode keeps pointing at AppIcon until ASSETCATALOG_COMPILER_APPICON_NAME is updated — the same wiring the iOS generator performs. Default runs need no edit: the template already points at AppIcon. A missing project file only warns: the icons themselves are still valid.
     final flavor = context.flavor;
     if (flavor != null) {
       final pbxprojPath = path.join(
@@ -112,9 +107,7 @@ class MacOSIconGenerator extends IconGenerator {
       }
     }
 
-    // Generate liquid glass .icon if configured. The bundle shares the
-    // catalog name so Xcode associates it with the icon set; the PNG
-    // catalog stays the fallback on macOS older than Tahoe 26.
+    // Generate liquid glass .icon if configured. The bundle shares the catalog name so Xcode associates it with the icon set; the PNG catalog stays the fallback on macOS older than Tahoe 26.
     if (context.config.macOSConfig?.liquidGlassLayers?.isNotEmpty ?? false) {
       final glassIconName = paths.appIconCatalogName(context.flavor);
       await generateMacOSLiquidGlassIcon(
@@ -127,9 +120,7 @@ class MacOSIconGenerator extends IconGenerator {
     }
   }
 
-  /// Adds the liquid glass `.icon` file reference to the macOS
-  /// project.pbxproj (same reference edit the iOS generator performs). A
-  /// missing project file only warns: the icons themselves are still valid.
+  /// Adds the liquid glass `.icon` file reference to the macOS project.pbxproj (same reference edit the iOS generator performs). A missing project file only warns: the icons themselves are still valid.
   Future<void> _addLiquidGlassIconToProject(String iconName) async {
     final pbxprojPath = path.join(
       context.prefixPath,
@@ -172,8 +163,7 @@ class MacOSIconGenerator extends IconGenerator {
       return false;
     }
 
-    // The asset catalog must exist; the (flavor) icon set inside it is
-    // created on demand, so a new flavor bootstraps from the CLI.
+    // The asset catalog must exist; the (flavor) icon set inside it is created on demand, so a new flavor bootstraps from the CLI.
     final enitiesToCheck = [
       path.join(context.prefixPath, paths.macOSRunnerFolder),
       path.join(context.prefixPath, paths.macOSAssetsDirPath),
@@ -235,10 +225,7 @@ class MacOSIconGenerator extends IconGenerator {
         'info': {'version': 1, 'author': 'xcode'},
       };
     } else {
-      // A pre-existing Contents.json may carry entries from another
-      // platform or stale sizes (8x8, 64x64, 1024x1024/idiom:mac) — a
-      // real-world corruption class. Warn rather than crash, then refresh
-      // the tool-owned images list below.
+      // A pre-existing Contents.json may carry entries from another platform or stale sizes (8x8, 64x64, 1024x1024/idiom:mac) — a real-world corruption class. Warn rather than crash, then refresh the tool-owned images list below.
       final existing = contentsConfig['images'];
       if (existing is List) {
         final foreign = <String>[];

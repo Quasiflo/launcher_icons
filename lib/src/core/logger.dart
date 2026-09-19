@@ -12,9 +12,7 @@ class LILogger {
   /// Gives access to internal logger
   Logger get rawLogger => _logger;
 
-  /// Creates a instance of [LILogger].
-  /// In case [isVerbose] is `true`,
-  /// it logs all the [verbose] logs to console
+  /// Creates a instance of [LILogger]. In case [isVerbose] is `true`, it logs all the [verbose] logs to console
   LILogger(this.isVerbose) {
     final ansi = Ansi(Ansi.terminalSupportsAnsi);
     _logger = isVerbose ? Logger.verbose(ansi: ansi) : Logger.standard(ansi: ansi);

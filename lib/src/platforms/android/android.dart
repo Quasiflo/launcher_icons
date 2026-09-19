@@ -10,8 +10,7 @@ import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/android/xml_templates.dart' as xml_template;
 import 'package:path/path.dart' as path;
 
-/// A legacy launcher icon density target: [directoryName] under the
-/// flavor-aware res folder, rendered at [size] px square.
+/// A legacy launcher icon density target: [directoryName] under the flavor-aware res folder, rendered at [size] px square.
 class AndroidIconTemplate {
   /// Creates an instance of [AndroidIconTemplate].
   AndroidIconTemplate({required this.size, required this.directoryName});
@@ -184,8 +183,7 @@ bool isAndroidIconNameCorrectFormat(String iconName) {
   return true;
 }
 
-/// Creates the adaptive foreground/background icons and `colors.xml`
-/// entries.
+/// Creates the adaptive foreground/background icons and `colors.xml` entries.
 Future<void> createAdaptiveIcons(
   Config config,
   String? flavor, {
@@ -291,8 +289,7 @@ Future<void> createAdaptiveMonochromeIcons(
   await Future.wait(concurrentIconUpdates);
 }
 
-/// Round-icon resource name: `<custom>_round` for custom icons,
-/// `ic_launcher_round` otherwise.
+/// Round-icon resource name: `<custom>_round` for custom icons, `ic_launcher_round` otherwise.
 String androidAdaptiveRoundXmlName(Config config) {
   final customName = config.androidConfig?.iconName;
   return customName != null ? '${customName}_round' : paths.androidAdaptiveRoundIconName;
@@ -376,21 +373,16 @@ Future<void> createPlayStoreIcon(
   }
 }
 
-/// Creates the `mipmap-anydpi-v26` adaptive-icon xml (plus the round
-/// variant when configured), clearing stale adaptive artifacts otherwise.
+/// Creates the `mipmap-anydpi-v26` adaptive-icon xml (plus the round variant when configured), clearing stale adaptive artifacts otherwise.
 Future<void> createMipmapXmlFile(
   Config config,
   String? flavor, {
   LILogger? logger,
   String prefixPath = '.',
 }) async {
-  // Note: Adaptive Icons will only be used when both
-  // `adaptive_icon_background` and `adaptive_icon_foreground` or
-  // `adaptive_icon_monochrome` are specified (The `image_path` is not
-  // automatically taken as foreground)
+  // Note: Adaptive Icons will only be used when both `adaptive_icon_background` and `adaptive_icon_foreground` or `adaptive_icon_monochrome` are specified (The `image_path` is not automatically taken as foreground)
   if (!hasAndroidAdaptiveConfig(config) && !hasAndroidAdaptiveMonochromeConfig(config) && !hasAndroidAdaptiveRoundConfig(config)) {
-    // No adaptive icons requested: clear leftovers from a previous adaptive
-    // configuration so they cannot shadow the fresh icons (fluttercommunity/flutter_launcher_icons#328).
+    // No adaptive icons requested: clear leftovers from a previous adaptive configuration so they cannot shadow the fresh icons.
     await _removeStaleAdaptiveIcons(
       config,
       flavor,
@@ -427,8 +419,7 @@ Future<void> createMipmapXmlFile(
   if (hasAndroidAdaptiveMonochromeConfig(config)) {
     final int monochromeInset = androidConfig.adaptiveIconForegroundInset;
     if (monochromeInset == 0) {
-      // Canonical form per developer.android.com: a direct drawable
-      // attribute with no <inset> wrapper.
+      // Canonical form per developer.android.com: a direct drawable attribute with no <inset> wrapper.
       xmlContent += '  <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n';
     } else {
       xmlContent += '''
@@ -463,8 +454,7 @@ Future<void> createMipmapXmlFile(
   );
 
   if (hasAndroidAdaptiveRoundConfig(config)) {
-    // The round icon is a separate adaptive-icon resource with the same
-    // layers, wired via android:roundIcon.
+    // The round icon is a separate adaptive-icon resource with the same layers, wired via android:roundIcon.
     final roundXmlFile = await utils.createFileIfNotExist(
       utils.withPrefix(
         prefixPath,
@@ -477,8 +467,7 @@ Future<void> createMipmapXmlFile(
   }
 }
 
-/// Deletes adaptive icon artifacts left behind by a previous adaptive
-/// configuration so they cannot shadow freshly generated icons (fluttercommunity/flutter_launcher_icons#328).
+/// Deletes adaptive icon artifacts left behind by a previous adaptive configuration so they cannot shadow freshly generated icons.
 ///
 /// Only tool-owned file names are removed (`colors.xml` is shared and left untouched). Both the default and the custom icon xml names are covered so switching in either direction is cleaned up.
 Future<void> _removeStaleAdaptiveIcons(
@@ -608,8 +597,7 @@ Future<void> createNewColorsFile(
 
 /// Updates the colors.xml with the new adaptive launcher icon color
 Future<void> updateColorsFile(File colorsFile, String backgroundColor) async {
-  // Normalize bare hex colors (`ffffff` -> `#ffffff`, #673). Image paths
-  // never reach this function (see createAdaptiveIcons), so a plain 6/8-digit hex string here is always meant to be a color.
+  // Normalize bare hex colors (`ffffff` -> `#ffffff`, #673). Image paths never reach this function (see createAdaptiveIcons), so a plain 6/8-digit hex string here is always meant to be a color.
   if (RegExp(r'^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$').hasMatch(backgroundColor)) {
     backgroundColor = '#$backgroundColor';
   }
@@ -618,8 +606,7 @@ Future<void> updateColorsFile(File colorsFile, String backgroundColor) async {
   bool foundExisting = false;
   for (int x = 0; x < lines.length; x++) {
     String line = lines[x];
-    // Never touch XML comments: a commented-out entry is documentation,
-    // not configuration.
+    // Never touch XML comments: a commented-out entry is documentation, not configuration.
     if (line.trimLeft().startsWith('<!--')) {
       continue;
     }
@@ -696,8 +683,7 @@ List<String> _transformAndroidManifestWithNewLauncherIcon(
 ]) {
   return oldManifestLines.map((String line) {
     var result = line;
-    // Never touch XML comments: a commented-out attribute is documentation,
-    // not configuration.
+    // Never touch XML comments: a commented-out attribute is documentation, not configuration.
     final isComment = result.trimLeft().startsWith('<!--');
     if (result.contains('android:icon') && !isComment) {
       // Using RegExp replace the value of android:icon to point to the new icon
@@ -738,14 +724,12 @@ bool isAdaptiveIconConfigImageFile(String backgroundFile) {
   return normalizedPath.endsWith('.png') || normalizedPath.endsWith('.jpg') || normalizedPath.endsWith('.jpeg') || normalizedPath.endsWith('.webp') || normalizedPath.endsWith('.svg');
 }
 
-/// Returns true when the adaptive background is the `transparent` keyword (case-insensitive), meaning `@android:color/transparent` with no colors.xml entry (fluttercommunity/flutter_launcher_icons#535).
+/// Returns true when the adaptive background is the `transparent` keyword (case-insensitive), meaning `@android:color/transparent` with no colors.xml entry.
 bool isTransparentAdaptiveBackground(String? backgroundConfig) {
   return backgroundConfig?.toLowerCase() == 'transparent';
 }
 
-/// (NOTE THIS IS JUST USED FOR UNIT TEST)
-/// Ensures the correct path is used for generating adaptive icons
-/// "Next you must create alternative drawable resources in your app for use with Android 8.0 (API level 26) in res/mipmap-anydpi/ic_launcher.xml" Source: https://developer.android.com/develop/ui/compose/system/icon_design_adaptive
+/// (NOTE THIS IS JUST USED FOR UNIT TEST) Ensures the correct path is used for generating adaptive icons "Next you must create alternative drawable resources in your app for use with Android 8.0 (API level 26) in res/mipmap-anydpi/ic_launcher.xml" Source: https://developer.android.com/develop/ui/compose/system/icon_design_adaptive
 bool isCorrectMipmapDirectoryForAdaptiveIcon(String dirPath) {
   return dirPath == paths.androidAdaptiveXmlFolder(null);
 }

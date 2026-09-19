@@ -146,7 +146,7 @@ void main() {
       );
     });
 
-    test('removes stale round artifacts without round config (fluttercommunity/flutter_launcher_icons#328)', () async {
+    test('removes stale round artifacts without round config', () async {
       final staleXml = File(
         path.join(
           prefixPath,

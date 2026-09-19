@@ -2,14 +2,12 @@ import 'package:image/image.dart';
 
 /// Apple-like corner radius as a fraction of the icon size.
 ///
-/// Real Apple icons use continuous (squircle) corners; a plain rounded
-/// rectangle with this radius is a close, cheap approximation.
+/// Real Apple icons use continuous (squircle) corners; a plain rounded rectangle with this radius is a close, cheap approximation.
 const double macOSCornerRadiusFraction = 0.225;
 
 /// Builds one macOS icon of [size] pixels, loading artwork at [artworkSize] through [loadArtwork] (so vector sources rasterize at exact pixels).
 ///
-/// When [paddingPercent] is 0 the artwork fills [size] (historical behavior, byte-identical). Otherwise the artwork is centered on a transparent canvas, leaving a safe-area margin of [paddingPercent]% on every side. When
-/// [roundedCorners] is true the canvas corners are masked off.
+/// When [paddingPercent] is 0 the artwork fills [size] (historical behavior, byte-identical). Otherwise the artwork is centered on a transparent canvas, leaving a safe-area margin of [paddingPercent]% on every side. When [roundedCorners] is true the canvas corners are masked off.
 Future<Image> buildMacOSIconImage(
   Future<Image> Function(int) loadArtwork,
   int size, {
@@ -34,11 +32,9 @@ Future<Image> buildMacOSIconImage(
 
 /// Masks the corners of [image] with an Apple-like continuous corner.
 ///
-/// Returns an RGBA image; pixels outside the rounded shape become
-/// transparent. The input is left unmodified when it already fits.
+/// Returns an RGBA image; pixels outside the rounded shape become transparent. The input is left unmodified when it already fits.
 ///
-/// The mask is a superellipse (|x|^4 + |y|^4 <= r^4) rather than a plain
-/// circular arc: Apple uses continuous-curvature ("squircle") corners, and the superellipse keeps more of the corner diagonal at the same 22.5% radius. Only `rounded_corners: true` output changes.
+/// The mask is a superellipse (|x|^4 + |y|^4 <= r^4) rather than a plain circular arc: Apple uses continuous-curvature ("squircle") corners, and the superellipse keeps more of the corner diagonal at the same 22.5% radius. Only `rounded_corners: true` output changes.
 Image applyRoundedCorners(Image image) {
   final size = image.width;
   assert(image.height == size, 'macOS icons must be square');

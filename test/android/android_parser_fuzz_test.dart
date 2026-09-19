@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 import 'package:test/test.dart';
 
-// Malformed-input coverage for the line-oriented parsers: XML comments,
-// duplicate keys, CRLF, and missing trailing newlines.
+// Malformed-input coverage for the line-oriented parsers: XML comments, duplicate keys, CRLF, and missing trailing newlines.
 void main() {
   group('manifest icon rewriting', () {
     Future<String> rewrite(String input, String iconName) async {

@@ -13,8 +13,7 @@ import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-// SVG sources: detection, rasterization (always once at 1024px, then
-// resized), and one end-to-end platform run.
+// SVG sources: detection, rasterization (always once at 1024px, then resized), and one end-to-end platform run.
 void main() {
   final assetPath = path.join(Directory.current.path, 'test', 'assets');
 
@@ -37,11 +36,9 @@ void main() {
 
       expect(image.width, equals(48));
       expect(image.height, equals(48));
-      // Fully opaque art strips the alpha channel (downstream hasAlpha
-      // checks see it as opaque).
+      // Fully opaque art strips the alpha channel (downstream hasAlpha checks see it as opaque).
       expect(image.numChannels, equals(3));
-      // White ring between the navy core and the gradient edge: the ring
-      // spans radii 150-300 of 1024, so (24,14) sits 10px off-center.
+      // White ring between the navy core and the gradient edge: the ring spans radii 150-300 of 1024, so (24,14) sits 10px off-center.
       final ring = image.getPixel(24, 14);
       expect(ring.r, greaterThan(200));
       expect(ring.g, greaterThan(200));
@@ -59,8 +56,7 @@ void main() {
 
       expect(image.numChannels, equals(4));
       expect(image.getPixel(0, 0).a, equals(0));
-      // Center sits on the semi-transparent teal stripe over the amber
-      // disc: opaque teal after matting.
+      // Center sits on the semi-transparent teal stripe over the amber disc: opaque teal after matting.
       final center = image.getPixel(32, 32);
       expect(center.a, equals(255));
       expect(center.r, closeTo(0, 2));

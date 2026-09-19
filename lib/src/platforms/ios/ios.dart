@@ -26,7 +26,7 @@ class IosIconTemplate {
 
 /// details of the ios icons which need to be generated
 ///
-/// Covers the modern (Xcode 14+) universal set, including the 1x switcher sizes. The legacy iphone/ipad list was removed in v3 (fluttercommunity/flutter_launcher_icons#528): it emitted obsolete sizes (57x57, 50x50, 72x72) that Xcode no longer references.
+/// Covers the modern (Xcode 14+) universal set, including the 1x switcher sizes. The legacy iphone/ipad list was removed in v3: it emitted obsolete sizes (57x57, 50x50, 72x72) that Xcode no longer references.
 List<IosIconTemplate> iosIcons = <IosIconTemplate>[
   IosIconTemplate(name: '-20x20@1x', size: 20),
   IosIconTemplate(name: '-20x20@2x', size: 40),
@@ -62,8 +62,7 @@ Future<void> createIcons(
   final String? darkFilePath = config.iosConfig?.imagePathDarkTransparent;
   final String? tintedFilePath = config.iosConfig?.imagePathTintedGrayscale;
 
-  // decodeImageFile throws on missing/undecodable files, so a specified
-  // but bad path is a hard error rather than a silent skip.
+  // decodeImageFile throws on missing/undecodable files, so a specified but bad path is a hard error rather than a silent skip.
   Image image = await decodeImageFile(
     withPrefix(
       prefixPath,
@@ -71,8 +70,7 @@ Future<void> createIcons(
     ),
     cache: cache,
   );
-  // Single-size mode generates only the 1024px marketing icon (fluttercommunity/flutter_launcher_icons#592):
-  // dark/tinted variants are skipped entirely (no decode, no I/O).
+  // Single-size mode generates only the 1024px marketing icon: dark/tinted variants are skipped entirely (no decode, no I/O).
   final bool singleSize = config.iosConfig?.singleSize == true;
   if (singleSize && (darkFilePath != null || tintedFilePath != null)) {
     printStatus(
@@ -99,12 +97,7 @@ Future<void> createIcons(
       printStatus('Desaturating iOS tinted image to grayscale', logger);
       tintedImage = grayscale(tintedImage);
     } else if (!isGrayscaleImage(tintedImage)) {
-      // Apple's guidance (HIG > App icons,
-      // https://developer.apple.com/design/human-interface-guidelines/app-icons):
-      // the dark variant is a transparent-background design the system
-      // background shows through, while the tinted variant must read as a
-      // single-color silhouette — i.e. grayscale. Never validate dark
-      // transparency away; warn on tinted color instead.
+      // Apple's guidance (HIG > App icons, https://developer.apple.com/design/human-interface-guidelines/app-icons): the dark variant is a transparent-background design the system background shows through, while the tinted variant must read as a single-color silhouette — i.e. grayscale. Never validate dark transparency away; warn on tinted color instead.
       printStatus(
         '\nWARNING: Tinted iOS image is not grayscale.\nSet "ios.desaturate_tinted_to_grayscale: true" to desaturate it.\n',
         logger,
@@ -134,10 +127,7 @@ Future<void> createIcons(
       logger,
     );
   }
-  // Artwork loaders resize the decoded master per output size. Master
-  // pixel transforms (remove_alpha matte, tinted desaturation) already ran
-  // on the masters above, so every size downscales the finished art.
-  // SVG sources rasterize once at 1024px through the shared cache.
+  // Artwork loaders resize the decoded master per output size. Master pixel transforms (remove_alpha matte, tinted desaturation) already ran on the masters above, so every size downscales the finished art. SVG sources rasterize once at 1024px through the shared cache.
   Future<Image> Function(int) sizeLoaderFor({
     required Image master,
   }) {
@@ -145,8 +135,7 @@ Future<void> createIcons(
   }
 
   final loadBase = sizeLoaderFor(master: image);
-  // Null exactly when the matching master is null (unset source or
-  // single-size mode); call sites only run under the same guards.
+  // Null exactly when the matching master is null (unset source or single-size mode); call sites only run under the same guards.
   final loadDark = darkImage == null ? null : sizeLoaderFor(master: darkImage);
   final loadTinted = tintedImage == null ? null : sizeLoaderFor(master: tintedImage);
   final flavorMode = config.iosConfig?.flavorMode ?? 'pbxproj';
@@ -158,7 +147,7 @@ Future<void> createIcons(
   String iconName;
   String? darkIconName;
   String? tintedIconName;
-  // Single-size mode generates only the 1024px marketing icon (fluttercommunity/flutter_launcher_icons#592).
+  // Single-size mode generates only the 1024px marketing icon.
   final List<IosIconTemplate> generateIosIcons = singleSize
       ? <IosIconTemplate>[
           IosIconTemplate(name: '-1024x1024@1x', size: 1024),
@@ -166,9 +155,7 @@ Future<void> createIcons(
       : iosIcons;
   final String? customIconName = config.iosConfig?.iconName;
   final concurrentIconUpdates = <Future<void>>[];
-  // The name of the icon catalog the generated icons are written to. The
-  // liquid glass .icon bundle is created with the same name so Xcode
-  // associates it with the catalog.
+  // The name of the icon catalog the generated icons are written to. The liquid glass .icon bundle is created with the same name so Xcode associates it with the catalog.
   String catalogName = paths.appIconCatalogName(flavor);
   if (flavor != null) {
     printStatus('Building iOS launcher icon for $flavor', logger);
@@ -256,8 +243,7 @@ Future<void> createIcons(
   } else if (customIconName != null) {
     // If a custom icon_name is configured then the user has specified a new icon to be created and for the old icon file to be kept
     final String newIconName = customIconName;
-    // Like the flavor flow, a custom name gets its own catalog so the
-    // folder matches APPICON_NAME (<custom>.appiconset, not AppIcon).
+    // Like the flavor flow, a custom name gets its own catalog so the folder matches APPICON_NAME (<custom>.appiconset, not AppIcon).
     catalogName = newIconName;
     printStatus('Adding new iOS launcher icon', logger);
     for (IosIconTemplate template in generateIosIcons) {
@@ -371,8 +357,7 @@ Future<void> createIcons(
       prefixPath,
       logger,
     );
-    // Still need to modify the Contents.json file
-    // since the user could have added dark and tinted icons
+    // Still need to modify the Contents.json file since the user could have added dark and tinted icons
     await modifyDefaultContentsFile(
       iconName,
       darkIconName,
@@ -383,8 +368,7 @@ Future<void> createIcons(
   }
   await Future.wait(concurrentIconUpdates);
 
-  // Sweep catalogs orphaned by flavor renames. Reference-checked so the
-  // build cannot break; the default set is always kept.
+  // Sweep catalogs orphaned by flavor renames. Reference-checked so the build cannot break; the default set is always kept.
   await removeOrphanedCatalogs(
     assetFolderRelative: paths.iosAssetFolder,
     currentCatalog: catalogName,
@@ -414,11 +398,9 @@ Future<void> createIcons(
   }
 }
 
-/// Whether [image] reads as grayscale, sampled on an 8x8 grid (64 reads
-/// regardless of image size) instead of a full O(n) pixel walk.
+/// Whether [image] reads as grayscale, sampled on an 8x8 grid (64 reads regardless of image size) instead of a full O(n) pixel walk.
 ///
-/// A sample counts as colored when its channel spread exceeds 8 levels,
-/// tolerating JPEG-style compression noise around true gray. Checking one pixel (or every pixel) is the wrong trade-off: a single origin sample misses off-center color, while a full scan costs millions of reads on a 1024px source to answer a boolean.
+/// A sample counts as colored when its channel spread exceeds 8 levels, tolerating JPEG-style compression noise around true gray. Checking one pixel (or every pixel) is the wrong trade-off: a single origin sample misses off-center color, while a full scan costs millions of reads on a 1024px source to answer a boolean.
 bool isGrayscaleImage(Image image, {int gridDivisions = 8}) {
   assert(gridDivisions > 0, 'gridDivisions must be positive');
   for (var row = 0; row < gridDivisions; row++) {
@@ -464,8 +446,7 @@ Future<void> overwriteDefaultIcons(
   ).writeAsBytes(encodePng(newImage));
 }
 
-/// Writes fresh PNGs into `<catalogName>.appiconset/` under [iconName],
-/// keeping any previous set intact.
+/// Writes fresh PNGs into `<catalogName>.appiconset/` under [iconName], keeping any previous set intact.
 Future<void> saveNewIcons({
   required IosIconTemplate template,
   required Image image,
@@ -513,9 +494,7 @@ Future<void> addLiquidGlassIconToProject(
   );
 }
 
-/// Adds the liquid glass `.icon` file references for [iconName] to the given
-/// [pbxprojContent] and returns the modified content. If the reference already
-/// exists, the original content is returned unchanged.
+/// Adds the liquid glass `.icon` file references for [iconName] to the given [pbxprojContent] and returns the modified content. If the reference already exists, the original content is returned unchanged.
 String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
   final List<String> lines = const LineSplitter().convert(pbxprojContent);
   final String iconPath = '$iconName.icon';
@@ -623,8 +602,7 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
   return '${lines.join('\n')}\n';
 }
 
-/// Generate a unique ID for Xcode project file references
-/// Uses a format similar to existing Xcode IDs (24 character hex string)
+/// Generate a unique ID for Xcode project file references. Uses a format similar to existing Xcode IDs (24 character hex string)
 String _generateUniqueId(String fileName, String projectFile) {
   String generateHash(String input) {
     final bytes = utf8.encode(input);
@@ -647,10 +625,7 @@ String _generateUniqueId(String fileName, String projectFile) {
 
 /// Resolves the project.pbxproj file to edit.
 ///
-/// Prefers an explicit [xcodeprojPath], then the standard
-/// `ios/Runner.xcodeproj` location, then the first `*.xcodeproj` found under
-/// `ios/` so renamed Runner projects keep working (fluttercommunity/flutter_launcher_icons#543). Returns `null`
-/// when no project file exists.
+/// Prefers an explicit [xcodeprojPath], then the standard `ios/Runner.xcodeproj` location, then the first `*.xcodeproj` found under `ios/` so renamed Runner projects keep working. Returns `null` when no project file exists.
 String? resolveIosPbxprojPath([
   String? xcodeprojPath,
   String prefixPath = '.',
@@ -683,8 +658,7 @@ Future<void> changeIosLauncherIcon(
   String prefixPath = '.',
   LILogger? logger,
 ]) async {
-  // Falls back to the standard location so a missing project still fails
-  // with the historical PathNotFoundException.
+  // Falls back to the standard location so a missing project still fails with the historical PathNotFoundException.
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   final List<String> lines = await iOSConfigFile.readAsLines();
@@ -702,10 +676,7 @@ Future<void> changeIosLauncherIcon(
       onConfigurationSection = false;
     }
     if (onConfigurationSection) {
-      // Block headers carry the exact configuration name
-      // (`<id> /* Debug-development */ = {`). This is the primary signal:
-      // flavor-duplicated configurations usually keep sharing the base
-      // `.xcconfig`, so the reference below cannot tell them apart.
+      // Block headers carry the exact configuration name (`<id> /* Debug-development */ = {`). This is the primary signal: flavor-duplicated configurations usually keep sharing the base `.xcconfig`, so the reference below cannot tell them apart.
       final header = RegExp(
         r'^\s*\S+ /\* ([^*]+) \*/ = \{$',
       ).firstMatch(line);
@@ -714,8 +685,7 @@ Future<void> changeIosLauncherIcon(
       }
       final match = RegExp('.*/\\* (.*)\.xcconfig \\*/;').firstMatch(line);
       if (match != null) {
-        // A shared base xcconfig must not clobber a flavored block header
-        // (the common Flutter-flavors shape reuses Debug.xcconfig).
+        // A shared base xcconfig must not clobber a flavored block header (the common Flutter-flavors shape reuses Debug.xcconfig).
         final headerIsOurs = currentConfig != null && flavor != null && (currentConfig == flavor || currentConfig.endsWith('-$flavor'));
         if (!headerIsOurs) {
           currentConfig = match.group(1);
@@ -723,8 +693,7 @@ Future<void> changeIosLauncherIcon(
       }
 
       if (currentConfig != null && (flavor == null || currentConfig == flavor || currentConfig.endsWith('-$flavor')) && line.contains('ASSETCATALOG') && line.contains('APPICON_NAME')) {
-        // Targeted replacement: only the APPICON_NAME pair, leaving any
-        // other settings on the line untouched.
+        // Targeted replacement: only the APPICON_NAME pair, leaving any other settings on the line untouched.
         lines[x] = line.replaceFirst(
           RegExp('ASSETCATALOG_COMPILER_APPICON_NAME\\s*=\\s*[^;]*;'),
           'ASSETCATALOG_COMPILER_APPICON_NAME = $iconName;',
@@ -735,9 +704,7 @@ Future<void> changeIosLauncherIcon(
   }
 
   if (flavor != null && !replacedAny) {
-    // The flavor catalog was generated on disk but Xcode will keep building
-    // the previous icon set. Warn loudly instead of reporting silent
-    // success (fluttercommunity/flutter_launcher_icons#341).
+    // The flavor catalog was generated on disk but Xcode will keep building the previous icon set. Warn loudly instead of reporting silent success.
     printStatus(
       '\nWARNING: No ASSETCATALOG_COMPILER_APPICON_NAME entry for "$flavor" '
       'configurations was found in project.pbxproj, so Xcode will keep using '
@@ -749,30 +716,25 @@ Future<void> changeIosLauncherIcon(
   }
 
   final String entireFile = '${lines.join('\n')}\n';
-  // Write via temp-file rename so a crash cannot leave a half-written,
-  // corrupt project file behind (fluttercommunity/flutter_launcher_icons#636).
+  // Write via temp-file rename so a crash cannot leave a half-written, corrupt project file behind.
   final tmpFile = File('${iOSConfigFile.path}.tmp');
   await tmpFile.writeAsString(entireFile);
   await tmpFile.rename(iOSConfigFile.path);
 }
 
-/// Whether [configName] (e.g. `Debug-staging`) belongs to [flavor]:
-/// the name itself or a `-<flavor>` suffix. Substring matching collides
-/// (`tag` must not match `Debug-staging`).
+/// Whether [configName] (e.g. `Debug-staging`) belongs to [flavor]: the name itself or a `-<flavor>` suffix. Substring matching collides (`tag` must not match `Debug-staging`).
 bool _isFlavorConfig(String configName, String flavor) {
   return configName == flavor || configName.endsWith('-$flavor');
 }
 
-/// Removes flavor-matching `ASSETCATALOG_COMPILER_APPICON_NAME` lines from project.pbxproj so `xcconfig` overrides take effect (pbxproj values shadow xcconfig base values — verified with `xcodebuild
-/// -showBuildSettings`). Returns the number of removed lines.
+/// Removes flavor-matching `ASSETCATALOG_COMPILER_APPICON_NAME` lines from project.pbxproj so `xcconfig` overrides take effect (pbxproj values shadow xcconfig base values — verified with `xcodebuild -showBuildSettings`). Returns the number of removed lines.
 Future<int> clearIosFlavorAppIconLines(
   String flavor, [
   String? xcodeprojPath,
   String prefixPath = '.',
   LILogger? logger,
 ]) async {
-  // Falls back to the standard location so a missing project still fails
-  // with the historical PathNotFoundException.
+  // Falls back to the standard location so a missing project still fails with the historical PathNotFoundException.
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
   final File iOSConfigFile = File(resolvedPath);
   final List<String> lines = await iOSConfigFile.readAsLines();
@@ -789,8 +751,7 @@ Future<int> clearIosFlavorAppIconLines(
       onConfigurationSection = false;
     }
     if (onConfigurationSection) {
-      // Same exact-token primary signal as changeIosLauncherIcon: block
-      // headers name the configuration even when it shares a base xcconfig.
+      // Same exact-token primary signal as changeIosLauncherIcon: block headers name the configuration even when it shares a base xcconfig.
       final header = RegExp(
         r'^\s*\S+ /\* ([^*]+) \*/ = \{$',
       ).firstMatch(line);
@@ -826,10 +787,7 @@ Future<int> clearIosFlavorAppIconLines(
   return removed;
 }
 
-/// Writes per-mode `ios/Flutter/<flavor>-<Mode>.xcconfig` overrides pointing
-/// `ASSETCATALOG_COMPILER_APPICON_NAME` at [catalogName], creating missing
-/// files seeded with the Generated include. Assign the files as the base
-/// configuration files in Xcode once; the tool keeps the setting in place after that.
+/// Writes per-mode `ios/Flutter/<flavor>-<Mode>.xcconfig` overrides pointing `ASSETCATALOG_COMPILER_APPICON_NAME` at [catalogName], creating missing files seeded with the Generated include. Assign the files as the base configuration files in Xcode once; the tool keeps the setting in place after that.
 Future<void> writeIosFlavorXcconfigs(
   String flavor,
   String catalogName, {
@@ -862,13 +820,9 @@ Future<void> writeIosFlavorXcconfigs(
   );
 }
 
-/// Deletes `AppIcon-<flavor>` catalogs nothing references anymore (e.g.
-/// after a flavor rename), keeping [currentCatalog] and the default set.
+/// Deletes `AppIcon-<flavor>` catalogs nothing references anymore (e.g. after a flavor rename), keeping [currentCatalog] and the default set.
 ///
-/// A catalog is orphaned when its name appears in none of
-/// [referenceTexts] (project.pbxproj / xcconfig contents). Every deletion
-/// is logged loudly; a still-referenced catalog is always kept so the
-/// build cannot break.
+/// A catalog is orphaned when its name appears in none of [referenceTexts] (project.pbxproj / xcconfig contents). Every deletion is logged loudly; a still-referenced catalog is always kept so the build cannot break.
 Future<void> removeOrphanedCatalogs({
   required String assetFolderRelative,
   required String currentCatalog,
@@ -900,8 +854,7 @@ Future<void> removeOrphanedCatalogs({
   }
 }
 
-/// Reads the reference texts for iOS catalog orphan detection: the
-/// resolved project.pbxproj plus every `ios/Flutter/*.xcconfig`.
+/// Reads the reference texts for iOS catalog orphan detection: the resolved project.pbxproj plus every `ios/Flutter/*.xcconfig`.
 Future<List<String>> iosCatalogReferenceTexts([
   String? xcodeprojPath,
   String prefixPath = '.',
@@ -1067,7 +1020,7 @@ class ContentsInfoObject {
   }
 }
 
-/// Create a single-entry image list for `ios.single_size` mode (fluttercommunity/flutter_launcher_icons#592).
+/// Create a single-entry image list for `ios.single_size` mode.
 List<Map<String, dynamic>> createSingleSizeImageList(String fileNamePrefix) {
   return <Map<String, dynamic>>[
     ContentsImageObject(
@@ -1243,8 +1196,7 @@ ColorUint8 _getBackgroundColor(Config config) {
   return ColorUint8.rgba(r, g, b, 0xff);
 }
 
-/// Mattes [source] onto the configured background color, returning an
-/// opaque 3-channel image.
+/// Mattes [source] onto the configured background color, returning an opaque 3-channel image.
 Image _removeAlphaChannel(Image source, Config config) {
   final backgroundColor = _getBackgroundColor(config);
   final pixel = source.getPixel(0, 0);

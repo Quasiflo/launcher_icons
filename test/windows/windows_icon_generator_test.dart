@@ -18,8 +18,7 @@ import 'package:yaml/yaml.dart';
 import '../templates.dart' as templates;
 import 'windows_icon_generator_test.mocks.dart';
 
-/// Parses the ICONDIR of a `.ico` file, returning one entry per embedded
-/// image. Width/height of `0` means 256 (per the ICO spec).
+/// Parses the ICONDIR of a `.ico` file, returning one entry per embedded image. Width/height of `0` means 256 (per the ICO spec).
 List<({int width, int height, int offset, int size, int planes, int bitCount})> _parseIcoDirectory(
   List<int> bytes,
 ) {
@@ -96,9 +95,7 @@ void main() {
         when(mockWindowsConfig.imagePathLightUnplated).thenReturn(null);
         when(mockWindowsConfig.imagePathWide).thenReturn(null);
         when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
-        // resolveImageFile is mocked: implement the real rule (platform
-        // path wins, top-level fallback, missing file throws) so the unit
-        // tests exercise the generators, not the mock default.
+        // resolveImageFile is mocked: implement the real rule (platform path wins, top-level fallback, missing file throws) so the unit tests exercise the generators, not the mock default.
         when(mockConfig.resolveImageFile(argThat(anything), prefixPath)).thenAnswer(
           (invocation) {
             final platformPath = invocation.positionalArguments.first as String?;
@@ -244,9 +241,7 @@ void main() {
       }
       expect(entries.last.offset + entries.last.size, icoBytes.length);
 
-      // Every frame must stay PNG-compressed 32bpp so a `package:image`
-      // upgrade cannot silently regress to BMP. (`package:image` emits
-      // planes=0, which Windows accepts; locked here to detect change.)
+      // Every frame must stay PNG-compressed 32bpp so a `package:image` upgrade cannot silently regress to BMP. (`package:image` emits planes=0, which Windows accepts; locked here to detect change.)
       for (final entry in entries) {
         expect(
           icoBytes.sublist(entry.offset, entry.offset + 4),

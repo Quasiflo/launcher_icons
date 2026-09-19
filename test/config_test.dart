@@ -8,8 +8,7 @@ import 'package:yaml/yaml.dart';
 
 import './templates.dart' as templates;
 
-/// Parses the `launcher_icons:` section of a config-file template string,
-/// mirroring what the file loaders extracted before their removal.
+/// Parses the `launcher_icons:` section of a config-file template string, mirroring what the file loaders extracted before their removal.
 Config parseTemplateSection(String template) => Config.fromJson(
       loadYaml(template)['launcher_icons'] as Map<dynamic, dynamic>,
     );

@@ -27,8 +27,7 @@ Future<void> generateLiquidGlassIcon(
 
   printStatus('Creating liquid glass .icon for $iconName', logger);
 
-  // Resolve per-appearance sources. Variants fall back to the dark/tinted
-  // app artwork so one file serves both unless explicitly overridden.
+  // Resolve per-appearance sources. Variants fall back to the dark/tinted app artwork so one file serves both unless explicitly overridden.
   final darkFallback = iosConfig.imagePathDarkTransparent;
   final tintedFallback = iosConfig.imagePathTintedGrayscale;
 
@@ -50,8 +49,7 @@ Future<void> generateLiquidGlassIcon(
   );
 }
 
-/// Generate liquid glass .icon file for macOS (Tahoe 26+ renders live glass
-/// from it; the PNG catalog stays the fallback on older systems).
+/// Generate liquid glass .icon file for macOS (Tahoe 26+ renders live glass from it; the PNG catalog stays the fallback on older systems).
 Future<void> generateMacOSLiquidGlassIcon(
   Config config,
   String iconName, {
@@ -66,8 +64,7 @@ Future<void> generateMacOSLiquidGlassIcon(
 
   printStatus('Creating macOS liquid glass .icon for $iconName', logger);
 
-  // macOS has no dark/tinted PNG catalog variants to fall back to: only
-  // explicitly configured layer sources become appearances.
+  // macOS has no dark/tinted PNG catalog variants to fall back to: only explicitly configured layer sources become appearances.
 
   await _writeLiquidGlassBundle(
     sources: {
@@ -87,8 +84,7 @@ Future<void> generateMacOSLiquidGlassIcon(
   );
 }
 
-/// Copies layer [sources] into the `.icon` bundle folders, sweeps orphaned
-/// layers, and writes the `icon.json` document.
+/// Copies layer [sources] into the `.icon` bundle folders, sweeps orphaned layers, and writes the `icon.json` document.
 Future<void> _writeLiquidGlassBundle({
   required Set<String> sources,
   required String iconFolderPath,
@@ -99,10 +95,7 @@ Future<void> _writeLiquidGlassBundle({
   required LILogger? logger,
   required String prefixPath,
 }) async {
-  // Validate every source before creating any directories so error paths
-  // leave no empty `.icon`/`Assets` litter behind (e.g. unit tests asserting
-  // the missing-source throw at the repo root used to create
-  // `ios/Runner/AppIcon.icon/Assets` as a side effect).
+  // Validate every source before creating any directories so error paths leave no empty `.icon`/`Assets` litter behind (e.g. unit tests asserting the missing-source throw at the repo root used to create `ios/Runner/AppIcon.icon/Assets` as a side effect).
   final wantedBasenames = <String>{};
   for (final source in sources) {
     if (!File(withPrefix(prefixPath, source)).existsSync()) {
@@ -116,15 +109,13 @@ Future<void> _writeLiquidGlassBundle({
   await createDirIfNotExist(iconFolderPath);
   await createDirIfNotExist(assetsFolderPath);
 
-  // Copy image(s) to Assets folder. Sources pass through verbatim and are
-  // never decoded, so SVG layers work as-is.
+  // Copy image(s) to Assets folder. Sources pass through verbatim and are never decoded, so SVG layers work as-is.
   for (final source in sources) {
     final sourceImageFile = File(withPrefix(prefixPath, source));
     final basename = path.basename(source);
     await sourceImageFile.copy(path.join(assetsFolderPath, basename));
   }
-  // Sweep layers orphaned by source switches (e.g. PNG replaced by SVG):
-  // the Assets folder is fully tool-owned.
+  // Sweep layers orphaned by source switches (e.g. PNG replaced by SVG): the Assets folder is fully tool-owned.
   for (final entity in Directory(assetsFolderPath).listSync()) {
     if (entity is File && !wantedBasenames.contains(path.basename(entity.path))) {
       printStatus(
@@ -142,9 +133,7 @@ Future<void> _writeLiquidGlassBundle({
   printStatus('Generated liquid glass .icon at $iconFolderDisplayPath', logger);
 }
 
-/// Resolves a per-appearance layer basename: null when unset or identical to
-/// the base image (a present base key silently wins over the specializations
-/// array, so same-file variants must not be emitted).
+/// Resolves a per-appearance layer basename: null when unset or identical to the base image (a present base key silently wins over the specializations array, so same-file variants must not be emitted).
 String? _variantName(String? source, String imageFileName) {
   if (source == null || path.basename(source) == imageFileName) {
     return null;
@@ -179,8 +168,7 @@ Map<String, dynamic> generateIconConfig(Config config) {
 
 /// Generate the macOS icon.json configuration.
 ///
-/// macOS shares Icon Composer's document format with iOS (one shared square
-/// design covers both); only the option source differs.
+/// macOS shares Icon Composer's document format with iOS (one shared square design covers both); only the option source differs.
 @visibleForTesting
 Map<String, dynamic> generateMacOSIconConfig(Config config) {
   // Fall back to defaults so direct callers don't need a macos block.
@@ -228,10 +216,7 @@ String _displayP3(String hex, String key) {
 
 /// Builds the Icon Composer `icon.json` document from explicit values.
 ///
-/// [platform] labels validation errors (`ios` or `macos`). [layers] stack
-/// bottom-to-top in list order inside one group sharing the group's glass
-/// pass. Optical pass-throughs are opt-in so unset keys stay out of the
-/// document and historical output is byte-identical.
+/// [platform] labels validation errors (`ios` or `macos`). [layers] stack bottom-to-top in list order inside one group sharing the group's glass pass. Optical pass-throughs are opt-in so unset keys stay out of the document and historical output is byte-identical.
 @visibleForTesting
 Map<String, dynamic> buildLiquidGlassDocument({
   required String platform,
@@ -261,8 +246,7 @@ Map<String, dynamic> buildLiquidGlassDocument({
     );
   }
 
-  // Optical pass-throughs. All are opt-in so unset keys stay out of the
-  // document and historical output is byte-identical.
+  // Optical pass-throughs. All are opt-in so unset keys stay out of the document and historical output is byte-identical.
   if (lighting != null && lighting != 'individual' && lighting != 'combined') {
     throw InvalidConfigException(
       '$platform.liquid_glass_lighting must be either "individual" or "combined", got: $lighting',
@@ -289,9 +273,7 @@ Map<String, dynamic> buildLiquidGlassDocument({
     );
   }
 
-  // NOTE: no top-level `features` declaration is emitted. It is optional
-  // per the format (the keys below stand alone), and actool rejects the
-  // array with an internal error — verified against Xcode 26.6.
+  // NOTE: no top-level `features` declaration is emitted. It is optional per the format (the keys below stand alone), and actool rejects the array with an internal error — verified against Xcode 26.6.
 
   final layersJson = <Map<String, dynamic>>[];
   for (var i = 0; i < layers.length; i++) {
@@ -336,9 +318,7 @@ Map<String, dynamic> buildLiquidGlassDocument({
   };
 }
 
-/// Builds one Icon Composer layer document from [layer], validating the
-/// per-layer composition keys and resolving appearance variants against
-/// the [darkFallback]/[tintedFallback] catalog sources.
+/// Builds one Icon Composer layer document from [layer], validating the per-layer composition keys and resolving appearance variants against the [darkFallback]/[tintedFallback] catalog sources.
 Map<String, dynamic> _buildLayer(
   String platform,
   int index,
@@ -405,10 +385,7 @@ Map<String, dynamic> _buildLayer(
     ];
   }
 
-  // A recolor tint for the artwork. Like image-name, the plain key and the
-  // specializations array are mutually exclusive (the plain key silently
-  // wins), so a lone fill stays flat and variants become an array. The
-  // base value is the first set key, so a variant-only tint still emits.
+  // A recolor tint for the artwork. Like image-name, the plain key and the specializations array are mutually exclusive (the plain key silently wins), so a lone fill stays flat and variants become an array. The base value is the first set key, so a variant-only tint still emits.
   final fill = layer.fill;
   final fillDark = layer.fillDark;
   final fillTinted = layer.fillTinted;

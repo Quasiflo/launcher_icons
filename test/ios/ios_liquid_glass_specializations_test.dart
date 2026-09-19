@@ -6,9 +6,7 @@ import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dar
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-// Per-appearance layer specializations: dark/tinted glass sources become
-// `image-name-specializations` entries (light is the unmarked entry, and no
-// base `image-name` is emitted alongside the array).
+// Per-appearance layer specializations: dark/tinted glass sources become `image-name-specializations` entries (light is the unmarked entry, and no base `image-name` is emitted alongside the array).
 void main() {
   group('generateIconConfig specializations', () {
     Map<String, dynamic> layerFor(Map<String, dynamic> ios) {

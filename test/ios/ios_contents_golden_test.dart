@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
 import 'package:test/test.dart';
 
-// Golden tests for the Contents.json schema: the modern (Xcode 14+)
-// universal set plus the single-size variant. These lock the entry counts, the shared-1024 dual reference, and the dark/tinted marketing exclusion so future edits cannot silently drift the schema.
+// Golden tests for the Contents.json schema: the modern (Xcode 14+) universal set plus the single-size variant. These lock the entry counts, the shared-1024 dual reference, and the dark/tinted marketing exclusion so future edits cannot silently drift the schema.
 void main() {
   group('createImageList goldens', () {
     test('base list has 21 entries ending in ios-marketing', () {

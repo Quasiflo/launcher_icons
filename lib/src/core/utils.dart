@@ -9,7 +9,7 @@ import 'package:pure_svg/svg.dart' as pure_svg;
 import 'custom_exceptions.dart';
 import 'logger.dart';
 
-/// Note: Do not change interpolation unless you end up with better results (see issue for result when using cubic interpolation) https://github.com/fluttercommunity/launcher_icons/issues/101#issuecomment-495528733
+/// Note: Do not change interpolation unless you end up with better results: cubic interpolation produced worse results in past experiments.
 Image createResizedImage(int iconSize, Image image) {
   if (image.width >= iconSize) {
     return copyResize(
@@ -28,7 +28,7 @@ Image createResizedImage(int iconSize, Image image) {
   }
 }
 
-/// Prints a status bullet, routed through [logger] when provided (fluttercommunity/flutter_launcher_icons#552).
+/// Prints a status bullet, routed through [logger] when provided.
 void printStatus(String message, [LILogger? logger]) {
   if (logger != null) {
     logger.info('• $message');
@@ -63,8 +63,7 @@ bool isSvgPath(String imagePath) => imagePath.toLowerCase().endsWith('.svg');
 /// Raster width/height for SVG sources in single-master mode. Vectors scale losslessly, so one 1024 master feeds every downscale below it.
 const int svgMasterSize = 1024;
 
-/// Rasterizes the SVG at [filePath] to exactly [width]×[height] pixels (defaulting to a [svgMasterSize] square), throwing [InvalidConfigException] when the file is missing, malformed, or declares no dimensions.
-/// Transparency is recovered by difference matting: the source renders twice (over solid white and solid black) because the renderer flattens alpha, and per-pixel alpha is derived from the channel differences.
+/// Rasterizes the SVG at [filePath] to exactly [width]×[height] pixels (defaulting to a [svgMasterSize] square), throwing [InvalidConfigException] when the file is missing, malformed, or declares no dimensions. Transparency is recovered by difference matting: the source renders twice (over solid white and solid black) because the renderer flattens alpha, and per-pixel alpha is derived from the channel differences.
 Future<Image> rasterizeSvgFile(
   String filePath, {
   int width = svgMasterSize,
@@ -140,8 +139,7 @@ String _svgWithBackground(String source, String hexColor, String filePath) {
   );
 }
 
-/// Recovers per-pixel alpha from opaque [white]/[black] background renders of the same artwork: each render composites the art over its background (`observed = art × α + bg × (1 − α)`), so one minus the white-minus-black difference is alpha, and the black render holds the premultiplied color.
-/// The alpha channel is stripped when every pixel is opaque, so downstream `hasAlpha` checks (remove_alpha, store warnings) see opaque art as opaque.
+/// Recovers per-pixel alpha from opaque [white]/[black] background renders of the same artwork: each render composites the art over its background (`observed = art × α + bg × (1 − α)`), so one minus the white-minus-black difference is alpha, and the black render holds the premultiplied color. The alpha channel is stripped when every pixel is opaque, so downstream `hasAlpha` checks (remove_alpha, store warnings) see opaque art as opaque.
 @visibleForTesting
 Image matteWhiteBlack(Image white, Image black) {
   assert(
@@ -187,8 +185,7 @@ Image matteWhiteBlack(Image white, Image black) {
   return allOpaque ? out.convert(numChannels: 3) : out;
 }
 
-/// Builds a per-size artwork loader for [imagePath].
-/// Raster sources decode once and resize per size. SVG sources rasterize once at [svgMasterSize] and resize — equivalent crispness for icon art at a fraction of the cost.
+/// Builds a per-size artwork loader for [imagePath]. Raster sources decode once and resize per size. SVG sources rasterize once at [svgMasterSize] and resize — equivalent crispness for icon art at a fraction of the cost.
 typedef SizeImageLoader = Future<Image> Function(int size);
 
 /// Builds a [SizeImageLoader] for [imagePath] — see [SizeImageLoader].
@@ -210,8 +207,7 @@ Future<SizeImageLoader> sizeImageLoaderFor(
   return (int size) async => createResizedImage(size, master);
 }
 
-/// Single-run memo of SVG rasterizations, keyed by absolute path and dimensions.
-/// Lives on [IconGeneratorContext] so every platform generator in one CLI run shares rasters instead of re-rendering the same source per platform — and so nothing leaks across runs. There is intentionally no disk or process-wide cache: staleness across runs is impossible by construction.
+/// Single-run memo of SVG rasterizations, keyed by absolute path and dimensions. Lives on [IconGeneratorContext] so every platform generator in one CLI run shares rasters instead of re-rendering the same source per platform — and so nothing leaks across runs. There is intentionally no disk or process-wide cache: staleness across runs is impossible by construction.
 class SvgRasterCache {
   /// In-flight and completed rasterizations by cache key.
   final Map<String, Future<Image>> _entries = {};
@@ -222,14 +218,11 @@ class SvgRasterCache {
   /// Whether [key] (see [key]) already has an entry.
   bool contains(String key) => _entries.containsKey(key);
 
-  /// Returns the entry for [key], running [load] to create it when absent.
-  /// The contains-then-load sequence runs synchronously, so concurrent
-  /// callers share one rasterization.
+  /// Returns the entry for [key], running [load] to create it when absent. The contains-then-load sequence runs synchronously, so concurrent callers share one rasterization.
   Future<Image> load(String key, Future<Image> Function() load) => _entries.putIfAbsent(key, load);
 }
 
-/// Rasterizes the SVG at [filePath] to [width]×[height], sharing the rasterization work through [cache] when provided. Prints [message] (when non-null) only when a rasterization actually runs, so shared hits stay silent.
-/// Every caller receives an independent copy: downstream transforms (`grayscale`, matte blending) mutate in place, so handing out the canonical instance would corrupt later consumers.
+/// Rasterizes the SVG at [filePath] to [width]×[height], sharing the rasterization work through [cache] when provided. Prints [message] (when non-null) only when a rasterization actually runs, so shared hits stay silent. Every caller receives an independent copy: downstream transforms (`grayscale`, matte blending) mutate in place, so handing out the canonical instance would corrupt later consumers.
 Future<Image> cachedSvgRaster(
   SvgRasterCache? cache,
   String filePath,
@@ -251,12 +244,10 @@ Future<Image> cachedSvgRaster(
   return cache.load(key, () => rasterizeSvgFile(filePath, width: width, height: height)).then((master) => master.clone());
 }
 
-/// Joins [prefixPath] with a project-relative [target] path.
-/// The default `'.'` prefix leaves [target] untouched so default runs keep their historical relative paths; any other prefix is joined normally.
+/// Joins [prefixPath] with a project-relative [target] path. The default `'.'` prefix leaves [target] untouched so default runs keep their historical relative paths; any other prefix is joined normally.
 String withPrefix(String prefixPath, String target) => prefixPath == '.' ? target : path.join(prefixPath, target);
 
-/// Parses a `#rrggbb` (or `rrggbb`) hex color into its channels.
-/// Only the 6-digit form is accepted; anything else throws [InvalidConfigException].
+/// Parses a `#rrggbb` (or `rrggbb`) hex color into its channels. Only the 6-digit form is accepted; anything else throws [InvalidConfigException].
 ({int r, int g, int b}) parseHexColor(String hexColor) {
   final cleanHex = hexColor.startsWith('#') ? hexColor.substring(1) : hexColor;
   final hexValue = int.tryParse(cleanHex, radix: 16);
@@ -307,8 +298,7 @@ Future<Directory> createDirIfNotExist(String dirPath) async {
 /// Returns a prettified json string
 String prettifyJsonEncode(Object? map) => JsonEncoder.withIndent(' ' * 4).convert(map);
 
-/// Check if give [File] or [Directory] exists at the give [paths],
-/// if not returns the failed [FileSystemEntity] path
+/// Check if give [File] or [Directory] exists at the give [paths], if not returns the failed [FileSystemEntity] path
 String? areFSEntiesExist(List<String> paths) {
   for (final path in paths) {
     // Using the sync method here due to `avoid_slow_async_io` lint suggestion.

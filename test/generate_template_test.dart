@@ -10,10 +10,7 @@ import 'package:yaml/yaml.dart';
 
 import '../bin/generate.dart' as generate;
 
-// The `:generate` template must cover every schema key the loader
-// validates: new keys without template coverage silently drift
-// (fluttercommunity/flutter_launcher_icons#628 class of bug — the phantom
-// because template and schema already diverged once).
+// The `:generate` template must cover every schema key the loader validates: new keys without template coverage silently drift (template and schema already diverged once).
 void main() {
   group('configFileTemplate', () {
     Map<String, Set<String>> schemaKeys() => {
@@ -29,8 +26,7 @@ void main() {
       const template = generate.configFileTemplate;
       final missing = <String>[];
       for (final section in schemaKeys().entries) {
-        // Find the section block, then look for each key as an active or
-        // commented `key:` line within it.
+        // Find the section block, then look for each key as an active or commented `key:` line within it.
         final sectionStart = template.indexOf('\n  ${section.key}:');
         expect(sectionStart, isNot(-1), reason: section.key);
         final nextSection = RegExp(r'\n  \w+:').firstMatch(

@@ -1,28 +1,18 @@
 // Developer tool: re-renders derived fixture artwork from the SVG masters.
 //
-// The PNG/JPG/WebP inputs under test/assets and
-// example/default/assets/icon are build artifacts of the SVG
-// masters checked in next to them. Edit the SVG, then run:
+// The PNG/JPG/WebP inputs under test/assets and example/default/assets/icon are build artifacts of the SVG masters checked in next to them. Edit the SVG, then run:
 //
 //   dart run tool/render_fixtures.dart [--check]
 //
-// With --check, renders in memory and verifies the test-critical pixel
-// contracts without writing (handy for art PRs). Without it, writes the
-// outputs and gates on the same contracts, so a bad master fails loudly
-// instead of silently breaking the suite. Uses the repo's own rasterizer,
-// so rendering also dogfoods the SVG pipeline under test.
+// With --check, renders in memory and verifies the test-critical pixel contracts without writing (handy for art PRs). Without it, writes the outputs and gates on the same contracts, so a bad master fails loudly instead of silently breaking the suite. Uses the repo's own rasterizer, so rendering also dogfoods the SVG pipeline under test.
 import 'dart:io';
 
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 
-/// One derived fixture: [svg] master rendered at [width]x[height], encoded
-/// with [encode], asserting [gate] on the raster before writing.
+/// One derived fixture: [svg] master rendered at [width]x[height], encoded with [encode], asserting [gate] on the raster before writing.
 ///
-/// [gate] is the test-contract check and only applies to `test/assets`
-/// fixtures. Example projects render like a normal user project would —
-/// no gates — so their art stays free to follow product rules
-/// (e.g. full-bleed squares) instead of test rules.
+/// [gate] is the test-contract check and only applies to `test/assets` fixtures. Example projects render like a normal user project would — no gates — so their art stays free to follow product rules (e.g. full-bleed squares) instead of test rules.
 class _Job {
   const _Job({
     required this.svg,

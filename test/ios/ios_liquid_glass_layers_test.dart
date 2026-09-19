@@ -3,8 +3,7 @@ import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dart';
 import 'package:test/test.dart';
 
-// Multi-layer composition: layers stack bottom-to-top in list order, each
-// with its own artwork variants, position, and composition keys.
+// Multi-layer composition: layers stack bottom-to-top in list order, each with its own artwork variants, position, and composition keys.
 void main() {
   group('generateIconConfig layers', () {
     List<dynamic> layersFor(Map<String, dynamic> ios) {

@@ -4,8 +4,7 @@ part 'web_shortcut_icon.g.dart';
 
 /// A single PWA press-and-hold shortcut icon.
 ///
-/// Rendered at 96px into `icons/` and wired into `manifest.json`
-/// `shortcuts[]` with its own `icons` entry.
+/// Rendered at 96px into `icons/` and wired into `manifest.json` `shortcuts[]` with its own `icons` entry.
 @JsonSerializable(anyMap: true, checked: true)
 class WebShortcutIcon {
   /// Source image for this shortcut (PNG or SVG).

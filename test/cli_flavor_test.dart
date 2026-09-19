@@ -5,16 +5,11 @@ import 'package:launcher_icons/src/cli.dart' as main_dart;
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-// End-to-end tests for flavor selection through createIconsFromArguments.
-// These change the process working directory (the CLI resolves everything
-// against CWD); test execution is serialized via dart_test.yaml.
+// End-to-end tests for flavor selection through createIconsFromArguments. These change the process working directory (the CLI resolves everything against CWD); test execution is serialized via dart_test.yaml.
 //
-// LILogger routes info output through top-level print (via cli_util's
-// StandardLogger), so a print zone captures the CLI banners below.
+// LILogger routes info output through top-level print (via cli_util's StandardLogger), so a print zone captures the CLI banners below.
 
-// End-to-end tests for flavor selection through createIconsFromArguments.
-// These change the process working directory (the CLI resolves everything
-// against CWD); test execution is serialized via dart_test.yaml.
+// End-to-end tests for flavor selection through createIconsFromArguments. These change the process working directory (the CLI resolves everything against CWD); test execution is serialized via dart_test.yaml.
 void main() {
   group('createIconsFromArguments flavor selection', () {
     late String originalDir;
@@ -86,7 +81,7 @@ launcher_icons-$flavor:
       );
     });
 
-    test('explicit --flavor runs only that flavor (fluttercommunity/flutter_launcher_icons#215)', () async {
+    test('explicit --flavor runs only that flavor', () async {
       final printed = await runCli(['--flavor', 'staging']);
       expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
       expect(
@@ -95,7 +90,7 @@ launcher_icons-$flavor:
       );
     });
 
-    test('explicit -c folder with a default file bypasses the flavor loop (fluttercommunity/flutter_launcher_icons#426)', () async {
+    test('explicit -c folder with a default file bypasses the flavor loop', () async {
       final custom = path.join(Directory.current.path, 'customdir');
       await Directory(custom).create();
       await File(
@@ -116,8 +111,7 @@ launcher_icons-$flavor:
     });
 
     test('explicit -c folder discovers flavors inside it', () async {
-      // NOTE: Directory.current is already the sandbox here (see setUp),
-      // so folder paths must be absolute.
+      // NOTE: Directory.current is already the sandbox here (see setUp), so folder paths must be absolute.
       final sub = path.join(Directory.current.path, 'sub');
       await Directory(sub).create();
       await File(

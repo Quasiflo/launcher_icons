@@ -22,11 +22,10 @@ class _RecordingLogger extends LILogger {
 
 // unit tests for android.dart
 void main() {
-  group('printStatus logger routing (fluttercommunity/flutter_launcher_icons#552)', () {
+  group('printStatus logger routing', () {
     test('status messages route through the provided logger', () async {
       final logger = _RecordingLogger();
-      // Exercise the nested pass-through (updateColorsXmlFile) with a color
-      // background inside the adaptive sandbox below.
+      // Exercise the nested pass-through (updateColorsXmlFile) with a color background inside the adaptive sandbox below.
       final config = Config.fromJson(<String, dynamic>{
         'android': {
           'generate': true,
@@ -252,7 +251,7 @@ void main() {
       expect(mipmapXml, contains('@color/ic_launcher_background'));
     });
 
-    test('bare hex background gains a # prefix in colors.xml (fluttercommunity/flutter_launcher_icons#673)', () async {
+    test('bare hex background gains a # prefix in colors.xml', () async {
       final config = Config.fromJson(<String, dynamic>{
         'android': {
           'generate': true,
@@ -273,7 +272,7 @@ void main() {
       );
     });
 
-    test('transparent background skips colors.xml, uses system color (fluttercommunity/flutter_launcher_icons#535)', () async {
+    test('transparent background skips colors.xml, uses system color', () async {
       final config = Config.fromJson(<String, dynamic>{
         'android': {
           'generate': true,
@@ -302,7 +301,7 @@ void main() {
       expect(mipmapXml, isNot(contains('@color/ic_launcher_background')));
     });
 
-    test('removes stale adaptive artifacts without adaptive config (fluttercommunity/flutter_launcher_icons#328)', () async {
+    test('removes stale adaptive artifacts without adaptive config', () async {
       final staleXml = File(
         path.join(
               paths.androidAdaptiveXmlFolder(null),

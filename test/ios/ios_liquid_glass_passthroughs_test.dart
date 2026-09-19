@@ -3,9 +3,7 @@ import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/platforms/ios/liquid_glass_icon_generator.dart';
 import 'package:test/test.dart';
 
-// Pass-throughs for Icon Composer engine features: group lighting,
-// refractivity, and specular highlight placement, plus the top-level
-// `features` declarations actool expects.
+// Pass-throughs for Icon Composer engine features: group lighting, refractivity, and specular highlight placement, plus the top-level `features` declarations actool expects.
 void main() {
   group('generateIconConfig optical pass-throughs', () {
     Map<String, dynamic> iconJsonFor(Map<String, dynamic> ios) {
@@ -51,8 +49,7 @@ void main() {
         group['refractivity'],
         equals({'enabled': true, 'depth': 0.6, 'strength': 0.7}),
       );
-      // actool rejects the `features` declaration (verified: Xcode 26.6
-      // crashes compiling any `features` array), and the keys stand alone.
+      // actool rejects the `features` declaration (verified: Xcode 26.6 crashes compiling any `features` array), and the keys stand alone.
       expect(json.containsKey('features'), isFalse);
     });
 

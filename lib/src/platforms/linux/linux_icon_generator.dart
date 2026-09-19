@@ -33,8 +33,7 @@ class LinuxIconGenerator extends IconGenerator {
       await _writeDerivedRuntimeIcon(sourcePath, iconPath);
     }
 
-    // The icon must be a bundled flutter asset: the runner resolves it at runtime via data/flutter_assets (a filesystem path, not an asset handle), so an absolute host path would not be portable.
-    // Bundling is enforced by validateRequirements() via _hasPubspecAsset.
+    // The icon must be a bundled flutter asset: the runner resolves it at runtime via data/flutter_assets (a filesystem path, not an asset handle), so an absolute host path would not be portable. Bundling is enforced by validateRequirements() via _hasPubspecAsset.
 
     // Update my_application.cc file with the icon path (X11 window icon). On Wayland there is no window-icon protocol: the compositor matches the window to the installed .desktop file instead, which the packaging files below provide.
     await _updateMyApplicationFile(iconPath);

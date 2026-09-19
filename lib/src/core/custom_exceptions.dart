@@ -1,5 +1,4 @@
-/// Base class for all launcher_icons exceptions.
-/// Catching `LIException` handles every error thrown by this package while the specific subtypes stay available for fine-grained handling.
+/// Base class for all launcher_icons exceptions. Catching `LIException` handles every error thrown by this package while the specific subtypes stay available for fine-grained handling.
 abstract class LIException implements Exception {
   /// Constructs instance
   const LIException([this.message]);

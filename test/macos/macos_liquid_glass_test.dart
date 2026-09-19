@@ -12,8 +12,7 @@ import 'package:test/test.dart';
 
 import '../templates.dart' as templates;
 
-// Minimal macOS project.pbxproj carrying every section the .icon reference
-// edit needs (file references, build files, Runner group, Resources phase).
+// Minimal macOS project.pbxproj carrying every section the .icon reference edit needs (file references, build files, Runner group, Resources phase).
 const _pbxproj = r'''
 // !$*UTF8*$!
 {
@@ -218,8 +217,7 @@ void main() {
     });
 
     test('does not fall back to catalog artwork for variants', () {
-      // Unlike iOS, macOS has no dark/tinted PNG catalog variants to reuse,
-      // so variant keys stay unset without explicit layer sources.
+      // Unlike iOS, macOS has no dark/tinted PNG catalog variants to reuse, so variant keys stay unset without explicit layer sources.
       final config = Config.fromJson(<String, dynamic>{
         'macos': {
           'generate': true,
@@ -349,9 +347,7 @@ void main() {
   });
 
   group('generateMacOSLiquidGlassIcon', () {
-    // Error paths run against a git-ignored sandbox (never the repo root)
-    // so a regression in directory-creation ordering cannot litter
-    // `macos/Runner/AppIcon.icon/Assets` into the working tree.
+    // Error paths run against a git-ignored sandbox (never the repo root) so a regression in directory-creation ordering cannot litter `macos/Runner/AppIcon.icon/Assets` into the working tree.
     test('throws InvalidConfigException for invalid shadow kind', () async {
       final config = Config.fromJson(<String, dynamic>{
         'macos': {

@@ -94,8 +94,7 @@ void _generateConfigFile(File configFile) {
   }
 }
 
-/// Default `launcher_icons.yaml` template.
-/// Public so tests can assert it covers every schema key the loader validates (see `test/generate_template_test.dart`): add new config keys here when they are introduced.
+/// Default `launcher_icons.yaml` template. Public so tests can assert it covers every schema key the loader validates (see `test/generate_template_test.dart`): add new config keys here when they are introduced.
 const configFileTemplate = '''
 # dart run launcher_icons
 launcher_icons:

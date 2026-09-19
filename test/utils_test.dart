@@ -143,8 +143,7 @@ void main() {
     });
   });
 
-  // Regression tests for fluttercommunity/flutter_launcher_icons#615: indexed-color (palette) PNGs used to throw
-  // RangeError in downstream pixel operations on older `image` versions.
+  // Regression tests: indexed-color (palette) PNGs used to throw RangeError in downstream pixel operations on older `image` versions.
   group('#decodeImageFile exotic PNG variants', () {
     test('decodes indexed-color PNG and survives icon ops', () async {
       final image = await utils.decodeImageFile('test/assets/paletted-opaque-2x2.png');
@@ -162,9 +161,7 @@ void main() {
     });
   });
 
-  // The loader contract: it never returns null — missing files raise
-  // FileSystemException, undecodable files raise
-  // NoDecoderForImageFormatException.
+  // The loader contract: it never returns null — missing files raise FileSystemException, undecodable files raise NoDecoderForImageFormatException.
   group('#decodeImageFile error contract', () {
     test('throws FileSystemException for a missing file', () async {
       await expectLater(
@@ -175,8 +172,7 @@ void main() {
 
     test('throws NoDecoderForImageFormatException for garbage bytes', () async {
       final garbage = File(path.join(d.sandbox, 'garbage.png'))..createSync(recursive: true);
-      // Plain text: every decoder probe rejects it and decodeImage returns
-      // null (short binary blobs can throw inside a probe instead).
+      // Plain text: every decoder probe rejects it and decodeImage returns null (short binary blobs can throw inside a probe instead).
       await garbage.writeAsString(
         'this is definitely not an image file, just plain text....',
       );

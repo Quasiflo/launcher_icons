@@ -8,9 +8,7 @@ import 'package:launcher_icons/src/core/utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
 
-// The single-run SVG raster memo: platforms in one CLI run share
-// rasterizations through the context-owned cache, and nothing persists
-// across runs (there is no disk or process-wide cache by design).
+// The single-run SVG raster memo: platforms in one CLI run share rasterizations through the context-owned cache, and nothing persists across runs (there is no disk or process-wide cache by design).
 void main() {
   group('SvgRasterCache', () {
     test('shares one rasterization across concurrent callers', () async {

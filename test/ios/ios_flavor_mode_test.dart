@@ -38,8 +38,7 @@ const _pbxproj = r'''
 }
 ''';
 
-// Flavor wiring: exact-token config matching, a non-greedy APPICON_NAME
-// rewrite, and the opt-in xcconfig-override mode.
+// Flavor wiring: exact-token config matching, a non-greedy APPICON_NAME rewrite, and the opt-in xcconfig-override mode.
 void main() {
   group('changeIosLauncherIcon matching', () {
     late String originalDir;
@@ -106,10 +105,7 @@ void main() {
     });
 
     test('shared base xcconfigs still wire via block headers', () async {
-      // The common Flutter-flavors shape: duplicated configurations that
-      // keep pointing at the base Debug/Release xcconfigs (no
-      // per-flavor xcconfig files). Matching keys off the exact block
-      // header names.
+      // The common Flutter-flavors shape: duplicated configurations that keep pointing at the base Debug/Release xcconfigs (no per-flavor xcconfig files). Matching keys off the exact block header names.
       const shared = r'''
 // !$*UTF8*$!
 {
@@ -208,8 +204,7 @@ void main() {
         ).existsSync(),
         isTrue,
       );
-      // Staging lines removed from the pbxproj so the xcconfig value wins;
-      // Debug + production entries untouched.
+      // Staging lines removed from the pbxproj so the xcconfig value wins; Debug + production entries untouched.
       final pbxprojContent = File(
         path.join('ios', 'Runner.xcodeproj', 'project.pbxproj'),
       ).readAsStringSync();

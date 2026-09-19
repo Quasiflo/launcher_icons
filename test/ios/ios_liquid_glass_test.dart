@@ -252,9 +252,7 @@ void main() {
   });
 
   group('generateLiquidGlassIcon', () {
-    // Error paths run against a git-ignored sandbox (never the repo root)
-    // so a regression in directory-creation ordering cannot litter
-    // `ios/Runner/AppIcon.icon/Assets` into the working tree.
+    // Error paths run against a git-ignored sandbox (never the repo root) so a regression in directory-creation ordering cannot litter `ios/Runner/AppIcon.icon/Assets` into the working tree.
     test('throws InvalidConfigException for invalid shadow kind', () async {
       final config = Config.fromJson(<String, dynamic>{
         'ios': {
