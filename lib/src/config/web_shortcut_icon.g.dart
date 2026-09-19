@@ -22,8 +22,7 @@ WebShortcutIcon _$WebShortcutIconFromJson(Map json) => $checkedCreate(
       fieldKeyMap: const {'imagePath': 'image_path', 'shortName': 'short_name'},
     );
 
-Map<String, dynamic> _$WebShortcutIconToJson(WebShortcutIcon instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$WebShortcutIconToJson(WebShortcutIcon instance) => <String, dynamic>{
       'image_path': instance.imagePath,
       'name': instance.name,
       'short_name': instance.shortName,

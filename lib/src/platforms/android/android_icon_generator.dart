@@ -87,6 +87,17 @@ class AndroidIconGenerator extends IconGenerator {
         ),
       );
     }
+    if (android.hasAndroidNotificationConfig(config)) {
+      concurrentIconCreation.add(
+        android.createNotificationIcons(
+          config,
+          flavor,
+          logger: logger,
+          prefixPath: prefixPath,
+          cache: context.svgRasterCache,
+        ),
+      );
+    }
     await Future.wait(concurrentIconCreation);
     if (config.androidEnabled) {
       await android.createMipmapXmlFile(
@@ -94,14 +105,6 @@ class AndroidIconGenerator extends IconGenerator {
         flavor,
         logger: logger,
         prefixPath: prefixPath,
-      );
-    }
-    if (config.androidConfig?.playStoreIcon == true) {
-      await android.createPlayStoreIcon(
-        config,
-        prefixPath,
-        logger,
-        context.svgRasterCache,
       );
     }
   }

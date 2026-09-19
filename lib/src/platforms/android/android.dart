@@ -32,6 +32,11 @@ List<AndroidIconTemplate> get androidIcons => [
       for (final density in paths.androidDensities.entries) AndroidIconTemplate(directoryName: 'mipmap-${density.key}', size: (48 * density.value).round()),
     ];
 
+/// Notification (status-bar) small-icon density targets (24dp, scaled per density).
+List<AndroidIconTemplate> get notificationIcons => [
+      for (final density in paths.androidDensities.entries) AndroidIconTemplate(directoryName: 'drawable-${density.key}', size: (constants.androidNotificationIconDp * density.value).round()),
+    ];
+
 /// Whether [config] requests the adaptive pair: enabled with both background and foreground layers. Only Android reads these keys, so the rule lives here rather than on Config.
 bool hasAndroidAdaptiveConfig(Config config) {
   final androidConfig = config.androidConfig;
@@ -50,8 +55,56 @@ bool hasAndroidAdaptiveRoundConfig(Config config) {
   return config.androidEnabled && androidConfig?.adaptiveIconRound != null;
 }
 
+/// Whether [config] requests the notification (status-bar) icon: enabled with a notification layer.
+bool hasAndroidNotificationConfig(Config config) {
+  final androidConfig = config.androidConfig;
+  return config.androidEnabled && androidConfig?.notificationIcon != null;
+}
+
 /// Whether a custom Android `icon_name` was specified. When set, a new launcher icon is generated without removing the old default existing Flutter launcher icon.
 bool isCustomAndroidFile(Config config) => config.androidConfig?.iconName != null;
+
+/// Whether [sourcePath] is an Android vector drawable source (`.xml`), copied verbatim into `drawable/` instead of rasterized into density PNGs.
+bool isVectorDrawableSource(String sourcePath) => sourcePath.toLowerCase().endsWith('.xml');
+
+/// Vector drawable file name for a raster layer file (e.g. `ic_launcher_foreground.png` -> `ic_launcher_foreground.xml`).
+String vectorDrawableFileName(String rasterFileName) => '${path.basenameWithoutExtension(rasterFileName)}.xml';
+
+/// Copies a user-supplied vector drawable [sourcePath] verbatim to `drawable/[fileName]` (density-independent, flavor-aware res). The file must be a valid Android drawable XML; build-time `aapt` errors point at the source when it is not. PNG fallbacks are skipped for vector layers: the vector itself scales, while legacy mipmaps from `image_path` keep covering pre-26 devices.
+Future<void> writeVectorDrawable(
+  String sourcePath,
+  String fileName,
+  String? flavor, {
+  String prefixPath = '.',
+  LILogger? logger,
+}) async {
+  final source = File(utils.withPrefix(prefixPath, sourcePath));
+  if (!source.existsSync()) {
+    throw InvalidConfigException('Vector drawable source not found: "$sourcePath"');
+  }
+  final out = await utils.createFileIfNotExist(
+    utils.withPrefix(
+      prefixPath,
+      path.join(paths.androidResFolder(flavor), 'drawable', fileName),
+    ),
+  );
+  await out.writeAsBytes(await source.readAsBytes());
+  utils.printStatus('Copied vector drawable $sourcePath to drawable/$fileName', logger);
+}
+
+/// Deletes [relativePath] (under [prefixPath]) when present, e.g. a superseded vector/PNG twin that would otherwise collide as a duplicate resource.
+Future<void> _deleteIfExists(
+  String relativePath, {
+  String prefixPath = '.',
+  LILogger? logger,
+}) async {
+  final file = File(utils.withPrefix(prefixPath, relativePath));
+  // Using the sync method here due to `avoid_slow_async_io` lint suggestion.
+  if (file.existsSync()) {
+    utils.printStatus('Removing superseded icon file $relativePath', logger);
+    await file.delete();
+  }
+}
 
 /// Creates the legacy mipmap icons (overwriting defaults, or adding a new icon when `android.icon_name` is set) and wires the manifest.
 Future<void> createDefaultIcons(
@@ -200,24 +253,50 @@ Future<void> createAdaptiveIcons(
   if (backgroundConfig == null || foregroundImagePath == null) {
     throw const InvalidConfigException('Missing "adaptive_icon_background" and "adaptive_icon_foreground" within android configuration.');
   }
-  final loadForegroundSize = await utils.sizeImageLoaderFor(
-    utils.withPrefix(prefixPath, foregroundImagePath),
-    logger: logger,
-    cache: cache,
-  );
 
   final concurrentImageUpdates = <Future<void>>[];
-  // Create adaptive icon foreground images
-  for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
-    concurrentImageUpdates.add(
-      loadForegroundSize(androidIcon.size).then(
-        (foregroundImage) => writeResizedPng(
-          androidIcon,
-          foregroundImage,
-          paths.androidAdaptiveForegroundFileName,
-          flavor,
+  // Create adaptive icon foreground images (or pass a vector drawable through verbatim, awaited inline so failures surface on this future instead of an unlistened batch entry).
+  if (isVectorDrawableSource(foregroundImagePath)) {
+    await writeVectorDrawable(
+      foregroundImagePath,
+      vectorDrawableFileName(paths.androidAdaptiveForegroundFileName),
+      flavor,
+      prefixPath: prefixPath,
+      logger: logger,
+    );
+    for (final template in adaptiveForegroundIcons) {
+      concurrentImageUpdates.add(
+        _deleteIfExists(
+          path.join(paths.androidResFolder(flavor), template.directoryName, paths.androidAdaptiveForegroundFileName),
           prefixPath: prefixPath,
+          logger: logger,
         ),
+      );
+    }
+  } else {
+    final loadForegroundSize = await utils.sizeImageLoaderFor(
+      utils.withPrefix(prefixPath, foregroundImagePath),
+      logger: logger,
+      cache: cache,
+    );
+    for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
+      concurrentImageUpdates.add(
+        loadForegroundSize(androidIcon.size).then(
+          (foregroundImage) => writeResizedPng(
+            androidIcon,
+            foregroundImage,
+            paths.androidAdaptiveForegroundFileName,
+            flavor,
+            prefixPath: prefixPath,
+          ),
+        ),
+      );
+    }
+    concurrentImageUpdates.add(
+      _deleteIfExists(
+        path.join(paths.androidResFolder(flavor), 'drawable', vectorDrawableFileName(paths.androidAdaptiveForegroundFileName)),
+        prefixPath: prefixPath,
+        logger: logger,
       ),
     );
   }
@@ -228,6 +307,23 @@ Future<void> createAdaptiveIcons(
       'Using transparent adaptive icon background (@android:color/transparent)',
       logger,
     );
+  } else if (isVectorDrawableSource(backgroundConfig)) {
+    await writeVectorDrawable(
+      backgroundConfig,
+      vectorDrawableFileName(paths.androidAdaptiveBackgroundFileName),
+      flavor,
+      prefixPath: prefixPath,
+      logger: logger,
+    );
+    for (final template in adaptiveForegroundIcons) {
+      concurrentImageUpdates.add(
+        _deleteIfExists(
+          path.join(paths.androidResFolder(flavor), template.directoryName, paths.androidAdaptiveBackgroundFileName),
+          prefixPath: prefixPath,
+          logger: logger,
+        ),
+      );
+    }
   } else if (isAdaptiveIconConfigImageFile(backgroundConfig)) {
     concurrentImageUpdates.add(
       _createAdaptiveBackgrounds(
@@ -236,6 +332,13 @@ Future<void> createAdaptiveIcons(
         flavor,
         prefixPath: prefixPath,
         cache: cache,
+      ),
+    );
+    concurrentImageUpdates.add(
+      _deleteIfExists(
+        path.join(paths.androidResFolder(flavor), 'drawable', vectorDrawableFileName(paths.androidAdaptiveBackgroundFileName)),
+        prefixPath: prefixPath,
+        logger: logger,
       ),
     );
   } else {
@@ -265,28 +368,63 @@ Future<void> createAdaptiveMonochromeIcons(
   if (monochromeImagePath == null) {
     throw const InvalidConfigException('Missing "adaptive_icon_monochrome" within android configuration.');
   }
-  final loadMonochromeSize = await utils.sizeImageLoaderFor(
-    utils.withPrefix(prefixPath, monochromeImagePath),
-    logger: logger,
-    cache: cache,
-  );
+  if (!hasAndroidAdaptiveConfig(config)) {
+    throw const InvalidConfigException('Invalid `adaptive_icon_monochrome`: requires `adaptive_icon_background` and `adaptive_icon_foreground`.');
+  }
 
   final concurrentIconUpdates = <Future<void>>[];
-  // Create adaptive icon monochrome images
-  for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
-    concurrentIconUpdates.add(
-      loadMonochromeSize(androidIcon.size).then(
-        (monochromeImage) => writeResizedPng(
-          androidIcon,
-          monochromeImage,
-          paths.androidAdaptiveMonochromeFileName,
-          flavor,
+  if (isVectorDrawableSource(monochromeImagePath)) {
+    await writeVectorDrawable(
+      monochromeImagePath,
+      vectorDrawableFileName(paths.androidAdaptiveMonochromeFileName),
+      flavor,
+      prefixPath: prefixPath,
+      logger: logger,
+    );
+    for (final template in adaptiveForegroundIcons) {
+      concurrentIconUpdates.add(
+        _deleteIfExists(
+          path.join(paths.androidResFolder(flavor), template.directoryName, paths.androidAdaptiveMonochromeFileName),
           prefixPath: prefixPath,
+          logger: logger,
         ),
+      );
+    }
+  } else {
+    final loadMonochromeSize = await utils.sizeImageLoaderFor(
+      utils.withPrefix(prefixPath, monochromeImagePath),
+      logger: logger,
+      cache: cache,
+    );
+    // Create adaptive icon monochrome images
+    for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
+      concurrentIconUpdates.add(
+        loadMonochromeSize(androidIcon.size).then(
+          (monochromeImage) => writeResizedPng(
+            androidIcon,
+            monochromeImage,
+            paths.androidAdaptiveMonochromeFileName,
+            flavor,
+            prefixPath: prefixPath,
+          ),
+        ),
+      );
+    }
+    concurrentIconUpdates.add(
+      _deleteIfExists(
+        path.join(paths.androidResFolder(flavor), 'drawable', vectorDrawableFileName(paths.androidAdaptiveMonochromeFileName)),
+        prefixPath: prefixPath,
+        logger: logger,
       ),
     );
   }
   await Future.wait(concurrentIconUpdates);
+}
+
+/// Round-icon drawable file name: `<custom>_round.png` for custom icons, `ic_launcher_round.png` otherwise.
+String androidAdaptiveRoundFileName(Config config) {
+  final customName = config.androidConfig?.iconName;
+  return customName != null ? '${customName}_round.png' : paths.androidAdaptiveRoundFileName;
 }
 
 /// Round-icon resource name: `<custom>_round` for custom icons, `ic_launcher_round` otherwise.
@@ -310,67 +448,162 @@ Future<void> createAdaptiveRoundIcons(
     throw const InvalidConfigException('Missing "adaptive_icon_round" within android configuration.');
   }
   if (!hasAndroidAdaptiveConfig(config)) {
-    throw const InvalidConfigException(
-      'Invalid `adaptive_icon_round`: requires `adaptive_icon_background` '
-      'and `adaptive_icon_foreground`.',
-    );
+    throw const InvalidConfigException('Invalid `adaptive_icon_round`: requires `adaptive_icon_background` and `adaptive_icon_foreground`.');
   }
-  final loadRoundSize = await utils.sizeImageLoaderFor(
-    utils.withPrefix(prefixPath, roundImagePath),
-    logger: logger,
-    cache: cache,
-  );
 
   final concurrentIconUpdates = <Future<void>>[];
-  // Create adaptive icon round images
-  for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
-    concurrentIconUpdates.add(
-      loadRoundSize(androidIcon.size).then(
-        (roundImage) => writeResizedPng(
-          androidIcon,
-          roundImage,
-          paths.androidAdaptiveRoundFileName,
-          flavor,
+  final roundFileName = androidAdaptiveRoundFileName(config);
+  if (isVectorDrawableSource(roundImagePath)) {
+    await writeVectorDrawable(
+      roundImagePath,
+      vectorDrawableFileName(roundFileName),
+      flavor,
+      prefixPath: prefixPath,
+      logger: logger,
+    );
+    for (final template in adaptiveForegroundIcons) {
+      concurrentIconUpdates.add(
+        _deleteIfExists(
+          path.join(paths.androidResFolder(flavor), template.directoryName, roundFileName),
           prefixPath: prefixPath,
+          logger: logger,
         ),
+      );
+    }
+  } else {
+    final loadRoundSize = await utils.sizeImageLoaderFor(
+      utils.withPrefix(prefixPath, roundImagePath),
+      logger: logger,
+      cache: cache,
+    );
+    // Create adaptive icon round images
+    for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
+      concurrentIconUpdates.add(
+        loadRoundSize(androidIcon.size).then(
+          (roundImage) => writeResizedPng(
+            androidIcon,
+            roundImage,
+            roundFileName,
+            flavor,
+            prefixPath: prefixPath,
+          ),
+        ),
+      );
+    }
+    concurrentIconUpdates.add(
+      _deleteIfExists(
+        path.join(paths.androidResFolder(flavor), 'drawable', vectorDrawableFileName(roundFileName)),
+        prefixPath: prefixPath,
+        logger: logger,
       ),
     );
   }
   await Future.wait(concurrentIconUpdates);
 }
 
-/// Emits the 512x512 Play Store upload icon next to the project.
-///
-/// This is a store-upload artifact, never an `android/res` deliverable.
-Future<void> createPlayStoreIcon(
+/// FCM manifest key for the default notification (status-bar) small icon.
+const String fcmNotificationIconMetaDataName = 'com.google.firebase.messaging.default_notification_icon';
+
+/// Creates the notification (status-bar) small icons and wires the FCM `default_notification_icon` meta-data in the manifest.
+Future<void> createNotificationIcons(
   Config config,
-  String prefixPath, [
+  String? flavor, {
   LILogger? logger,
+  String prefixPath = '.',
   utils.SvgRasterCache? cache,
-]) async {
-  final String filePath = config.resolveImageFile(config.androidConfig?.imagePath, prefixPath);
-  final loadSize = await utils.sizeImageLoaderFor(
-    utils.withPrefix(prefixPath, filePath),
-    logger: logger,
-    cache: cache,
-  );
-  final bytes = encodePng(await loadSize(512));
-  final outFile = await utils.createFileIfNotExist(
-    utils.withPrefix(prefixPath, paths.androidPlayStoreIconFile),
-  );
-  await outFile.writeAsBytes(bytes);
-  utils.printStatus(
-    'Created Play Store icon ${paths.androidPlayStoreIconFile} '
-    '(${bytes.length ~/ 1024}KB)',
-    logger,
-  );
-  if (bytes.length > 1024 * 1024) {
-    utils.printStatus(
-      'WARNING: Play Store icon exceeds the 1024KB upload budget; '
-      'use a simpler source image.',
-      logger,
-    );
+}) async {
+  utils.printStatus('Creating notification icons Android', logger);
+
+  final androidConfig = config.androidConfig!;
+  final String? sourcePath = androidConfig.notificationIcon;
+  if (sourcePath == null) {
+    throw const InvalidConfigException('Missing "notification_icon" within android configuration.');
   }
+  final resourceName = androidConfig.notificationIconName;
+  isAndroidIconNameCorrectFormat(resourceName);
+
+  if (isVectorDrawableSource(sourcePath)) {
+    await writeVectorDrawable(
+      sourcePath,
+      '$resourceName.xml',
+      flavor,
+      prefixPath: prefixPath,
+      logger: logger,
+    );
+    for (final template in notificationIcons) {
+      await _deleteIfExists(
+        path.join(paths.androidResFolder(flavor), template.directoryName, '$resourceName.png'),
+        prefixPath: prefixPath,
+        logger: logger,
+      );
+    }
+  } else {
+    final loadSize = await utils.sizeImageLoaderFor(
+      utils.withPrefix(prefixPath, sourcePath),
+      logger: logger,
+      cache: cache,
+    );
+    final concurrentIconUpdates = <Future<void>>[];
+    for (AndroidIconTemplate template in notificationIcons) {
+      concurrentIconUpdates.add(
+        loadSize(template.size).then(
+          (image) => writeResizedPng(
+            template,
+            image,
+            '$resourceName.png',
+            flavor,
+            prefixPath: prefixPath,
+          ),
+        ),
+      );
+    }
+    concurrentIconUpdates.add(
+      _deleteIfExists(
+        path.join(paths.androidResFolder(flavor), 'drawable', '$resourceName.xml'),
+        prefixPath: prefixPath,
+        logger: logger,
+      ),
+    );
+    await Future.wait(concurrentIconUpdates);
+  }
+  await ensureFcmNotificationIconMetaData(
+    resourceName,
+    logger: logger,
+    prefixPath: prefixPath,
+  );
+}
+
+/// Ensures `<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/<resourceName>" />` inside `<application>`: inserted before `</application>` when absent, updated in place when present with a different value. Missing manifests are skipped with a warning.
+Future<void> ensureFcmNotificationIconMetaData(
+  String resourceName, {
+  LILogger? logger,
+  String prefixPath = '.',
+}) async {
+  final manifestFile = File(utils.withPrefix(prefixPath, paths.androidManifestFile));
+  if (!manifestFile.existsSync()) {
+    utils.printStatus('WARNING: AndroidManifest.xml not found, skipping FCM notification icon meta-data.', logger);
+    return;
+  }
+  final lines = (await manifestFile.readAsString()).split('\n');
+  final reference = '@drawable/$resourceName';
+  var found = false;
+  for (var i = 0; i < lines.length; i++) {
+    if (lines[i].contains(fcmNotificationIconMetaDataName)) {
+      found = true;
+      lines[i] = lines[i].replaceAll(RegExp(r'@drawable/[^"]*'), reference);
+    }
+  }
+  if (!found) {
+    final closeIndex = lines.indexWhere((line) => line.contains('</application>'));
+    if (closeIndex == -1) {
+      utils.printStatus('WARNING: no <application> block in AndroidManifest.xml, skipping FCM notification icon meta-data.', logger);
+      return;
+    }
+    final indent = RegExp(r'^(\s*)').firstMatch(lines[closeIndex])?.group(1) ?? '    ';
+    lines.insert(closeIndex, '$indent<meta-data android:name="$fcmNotificationIconMetaDataName" android:resource="$reference" />');
+  }
+  await manifestFile.writeAsString(lines.join('\n'));
+  utils.printStatus('Wired FCM default notification icon to $reference', logger);
 }
 
 /// Creates the `mipmap-anydpi-v26` adaptive-icon xml (plus the round variant when configured), clearing stale adaptive artifacts otherwise.
@@ -380,7 +613,7 @@ Future<void> createMipmapXmlFile(
   LILogger? logger,
   String prefixPath = '.',
 }) async {
-  // Note: Adaptive Icons will only be used when both `adaptive_icon_background` and `adaptive_icon_foreground` or `adaptive_icon_monochrome` are specified (The `image_path` is not automatically taken as foreground)
+  // Note: adaptive icons are only used when the adaptive pair (`adaptive_icon_background` + `adaptive_icon_foreground`) is specified. Monochrome and round layers require the pair (`image_path` is never taken as a layer).
   if (!hasAndroidAdaptiveConfig(config) && !hasAndroidAdaptiveMonochromeConfig(config) && !hasAndroidAdaptiveRoundConfig(config)) {
     // No adaptive icons requested: clear leftovers from a previous adaptive configuration so they cannot shadow the fresh icons.
     await _removeStaleAdaptiveIcons(
@@ -390,6 +623,12 @@ Future<void> createMipmapXmlFile(
       prefixPath: prefixPath,
     );
     return;
+  }
+  if (hasAndroidAdaptiveMonochromeConfig(config) && !hasAndroidAdaptiveConfig(config)) {
+    throw const InvalidConfigException('Invalid `adaptive_icon_monochrome`: requires `adaptive_icon_background` and `adaptive_icon_foreground`.');
+  }
+  if (hasAndroidAdaptiveRoundConfig(config) && !hasAndroidAdaptiveConfig(config)) {
+    throw const InvalidConfigException('Invalid `adaptive_icon_round`: requires `adaptive_icon_background` and `adaptive_icon_foreground`.');
   }
 
   utils.printStatus('Creating mipmap xml file Android', logger);
@@ -401,23 +640,29 @@ Future<void> createMipmapXmlFile(
     final background = androidConfig.adaptiveIconBackground!;
     if (isTransparentAdaptiveBackground(background)) {
       xmlContent += '  <background android:drawable="@android:color/transparent"/>\n';
-    } else if (isAdaptiveIconConfigImageFile(background)) {
+    } else if (isAdaptiveIconConfigImageFile(background) || isVectorDrawableSource(background)) {
       xmlContent += '  <background android:drawable="@drawable/ic_launcher_background"/>\n';
     } else {
       xmlContent += '  <background android:drawable="@color/ic_launcher_background"/>\n';
     }
 
-    xmlContent += '''
+    final int foregroundInset = androidConfig.adaptiveIconForegroundInset;
+    if (foregroundInset == 0) {
+      // Canonical form per developer.android.com: a direct drawable attribute with no <inset> wrapper.
+      xmlContent += '  <foreground android:drawable="@drawable/ic_launcher_foreground" />\n';
+    } else {
+      xmlContent += '''
   <foreground>
       <inset
           android:drawable="@drawable/ic_launcher_foreground"
-          android:inset="${androidConfig.adaptiveIconForegroundInset}%" />
+          android:inset="$foregroundInset%" />
   </foreground>
 ''';
+    }
   }
 
   if (hasAndroidAdaptiveMonochromeConfig(config)) {
-    final int monochromeInset = androidConfig.adaptiveIconForegroundInset;
+    final int monochromeInset = androidConfig.adaptiveIconMonochromeInset;
     if (monochromeInset == 0) {
       // Canonical form per developer.android.com: a direct drawable attribute with no <inset> wrapper.
       xmlContent += '  <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n';
@@ -481,6 +726,8 @@ Future<void> _removeStaleAdaptiveIcons(
   if (customName != null) {
     xmlNames.add(customName);
   }
+  // Round drawables honor `icon_name` since their introduction, but older runs always wrote the default name: cover both so neither direction orphans a file.
+  final roundFileNames = <String>{androidAdaptiveRoundFileName(config), paths.androidAdaptiveRoundFileName};
   final stalePaths = <String>[
     for (final name in xmlNames)
       utils.withPrefix(
@@ -497,12 +744,23 @@ Future<void> _removeStaleAdaptiveIcons(
         paths.androidAdaptiveForegroundFileName,
         paths.androidAdaptiveBackgroundFileName,
         paths.androidAdaptiveMonochromeFileName,
-        paths.androidAdaptiveRoundFileName,
+        ...roundFileNames,
       ])
         utils.withPrefix(
           prefixPath,
           path.join(paths.androidResFolder(flavor), template.directoryName, fileName),
         ),
+    // Superseded vector twins: a PNG-named layer and its `.xml` twin are duplicate resources, so a layer-type switch must clear the other side.
+    for (final fileName in [
+      vectorDrawableFileName(paths.androidAdaptiveForegroundFileName),
+      vectorDrawableFileName(paths.androidAdaptiveBackgroundFileName),
+      vectorDrawableFileName(paths.androidAdaptiveMonochromeFileName),
+      for (final roundFileName in roundFileNames) vectorDrawableFileName(roundFileName),
+    ])
+      utils.withPrefix(
+        prefixPath,
+        path.join(paths.androidResFolder(flavor), 'drawable', fileName),
+      ),
   ];
   for (final filePath in stalePaths) {
     final file = File(filePath);

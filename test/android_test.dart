@@ -380,8 +380,11 @@ void main() {
     test('zero inset emits the canonical plain monochrome form', () async {
       final mipmapXml = await mipmapXmlFor(<String, dynamic>{
         'generate': true,
+        'adaptive_icon_background': '#ffffff',
+        'adaptive_icon_foreground': 'master-light-1024.png',
         'adaptive_icon_monochrome': 'master-light-1024.png',
         'adaptive_icon_foreground_inset': 0,
+        'adaptive_icon_monochrome_inset': 0,
       });
       expect(
         mipmapXml,
@@ -395,6 +398,8 @@ void main() {
     test('nonzero inset wraps monochrome in an inset block', () async {
       final mipmapXml = await mipmapXmlFor(<String, dynamic>{
         'generate': true,
+        'adaptive_icon_background': '#ffffff',
+        'adaptive_icon_foreground': 'master-light-1024.png',
         'adaptive_icon_monochrome': 'master-light-1024.png',
       });
       expect(mipmapXml, contains('<monochrome>'));

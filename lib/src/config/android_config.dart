@@ -37,15 +37,23 @@ class AndroidConfig {
   @JsonKey(name: 'adaptive_icon_monochrome')
   final String? adaptiveIconMonochrome;
 
+  /// android adaptive_icon_monochrome inset (defaults to 16 like the foreground inset; 0 emits the canonical plain `<monochrome android:drawable>` form).
+  @JsonKey(name: 'adaptive_icon_monochrome_inset')
+  final int adaptiveIconMonochromeInset;
+
   /// android adaptive_icon_round image (opt-in round icon).
   ///
-  /// When set, `ic_launcher_round.png` drawables plus an `ic_launcher_round.xml` adaptive icon are generated and the manifest gains `android:roundIcon`. Requires the adaptive pair (`adaptive_icon_background` + `adaptive_icon_foreground`).
+  /// When set, `<icon>_round.png` drawables plus an `<icon>_round.xml` adaptive icon are generated and the manifest gains `android:roundIcon`. Requires the adaptive pair (`adaptive_icon_background` + `adaptive_icon_foreground`).
   @JsonKey(name: 'adaptive_icon_round')
   final String? adaptiveIconRound;
 
-  /// Whether to emit a 512x512 Play Store upload icon (`play_store_icon.png` next to the project). Off by default: it is a store-upload artifact, never an `android/res` deliverable.
-  @JsonKey(name: 'play_store_icon')
-  final bool playStoreIcon;
+  /// android notification icon image (small status-bar icon, white silhouette on transparency). Rendered at 24dp across densities into `drawable-*` and wired as the FCM `default_notification_icon` in the manifest.
+  @JsonKey(name: 'notification_icon')
+  final String? notificationIcon;
+
+  /// android notification icon resource name (defaults to `ic_notification`).
+  @JsonKey(name: 'notification_icon_name')
+  final String notificationIconName;
 
   /// Creates a instance of [AndroidConfig]
   const AndroidConfig({
@@ -56,8 +64,10 @@ class AndroidConfig {
     this.adaptiveIconForegroundInset = 16,
     this.adaptiveIconBackground,
     this.adaptiveIconMonochrome,
+    this.adaptiveIconMonochromeInset = 16,
     this.adaptiveIconRound,
-    this.playStoreIcon = false,
+    this.notificationIcon,
+    this.notificationIconName = 'ic_notification',
   });
 
   /// Creates [AndroidConfig] from [json]

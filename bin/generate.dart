@@ -104,12 +104,14 @@ launcher_icons:
     generate: true
     # image_path: "assets/icon/icon-android.png"
     # icon_name: "launcher_icon" # generate a new icon without removing the old default
-    # adaptive_icon_background: "assets/icon/background.png"  # color or png/jpg/jpeg/webp image
-    # adaptive_icon_foreground: "assets/icon/foreground.png"
+    # adaptive_icon_background: "assets/icon/background.png"  # color, png/jpg/jpeg/webp/svg image, or xml vector drawable
+    # adaptive_icon_foreground: "assets/icon/foreground.png" # png/svg image or xml vector drawable
     # adaptive_icon_foreground_inset: 16
     # adaptive_icon_monochrome: "assets/icon/monochrome.png"
+    # adaptive_icon_monochrome_inset: 16
     # adaptive_icon_round: "assets/icon/round.png" # opt-in round icon + manifest roundIcon
-    # play_store_icon: true # 512px store-upload sidecar next to the project, off by default
+    # notification_icon: "assets/icon/notification.png" # small status-bar icon + FCM default_notification_icon wiring
+    # notification_icon_name: "ic_notification" # resource name for the notification icon
 
   ios:
     generate: true

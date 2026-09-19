@@ -4,6 +4,12 @@ import 'package:launcher_icons/src/version.dart';
 /// Default Android icon resource name
 const String androidDefaultIconName = 'ic_launcher';
 
+/// Default Android notification icon resource name
+const String androidDefaultNotificationIconName = 'ic_notification';
+
+/// Notification (status-bar) small-icon size in dp, scaled per density (24/36/48/72/96 px).
+const int androidNotificationIconDp = 24;
+
 //* iOS
 /// Default iOS icon file name prefix
 const String iosDefaultIconName = 'Icon-App';

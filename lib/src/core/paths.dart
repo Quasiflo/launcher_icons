@@ -32,9 +32,6 @@ const androidAdaptiveRoundFileName = 'ic_launcher_round.png';
 /// Default Android adaptive round icon resource name
 const androidAdaptiveRoundIconName = 'ic_launcher_round';
 
-/// Play Store upload sidecar, written next to the project (never res/).
-const androidPlayStoreIconFile = 'play_store_icon.png';
-
 /// Relative path to the AndroidManifest.xml file
 final androidManifestFile = path.join('android', 'app', 'src', 'main', 'AndroidManifest.xml');
 
