@@ -1,5 +1,7 @@
 # Flutter Launcher Icons Examples
 
-- [default_example](https://github.com/Quasiflo/launcher_icons/tree/main/example/default_example)
+- [minimal](https://github.com/Quasiflo/launcher_icons/tree/main/example/minimal)
 
-- [flavors_example](https://github.com/Quasiflo/launcher_icons/tree/main/example/flavors)
+- [default](https://github.com/Quasiflo/launcher_icons/tree/main/example/default)
+
+- [flavors](https://github.com/Quasiflo/launcher_icons/tree/main/example/flavors)

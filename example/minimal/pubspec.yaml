@@ -1,0 +1,31 @@
+name: example
+description: A new Flutter project to quickly test launcher_icons.
+
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  cupertino_icons: ^1.0.3
+  flutter:
+    sdk: flutter
+  launcher_icons:
+    path: ../..
+
+launcher_icons:
+  image_path: "assets/icon/icon-master-1024.png"
+  android: {generate: true}
+  ios: {generate: true, remove_alpha: true}
+  macos: {generate: true}
+  windows: {generate: false}
+  linux: {generate: false}
+  web: {generate: true, background_color: "#ffffff", theme_color: "#ffffff"}
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
