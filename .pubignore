@@ -5,3 +5,7 @@
 /test/*
 /tool/*
 /example/flavors/*
+/example/default/*
+AGENTS.md
+dart_test.yaml
+build.yaml
