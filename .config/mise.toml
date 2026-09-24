@@ -28,7 +28,7 @@ GRADLE_OPTS = "--enable-native-access=ALL-UNNAMED"              # Don't warn abo
 "pipx:yamllint" = "1.38.0"             # Used for linting YAML
 
 [tools."http:flutter"]
-version = "3.47.2"
+version = "3.47.5"
 version_expr = 'fromJSON(body).releases | filter({ #.channel == "stable" }) | map({ replace(#.version, "-stable", "") }) | sortVersions()'
 checksum_expr = '"sha256:" + filter(fromJSON(body).releases, { #.archive endsWith filename })[0].sha256'
 version_list_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
