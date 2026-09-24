@@ -10,8 +10,8 @@ import 'package:test/test.dart';
 // Tinted validation: a sampled chroma scan (not a single pixel, not a full O(n) walk) warns when the tinted source carries real color.
 void main() {
   group('isGrayscaleImage', () {
-    Image solid(int size, int r, int g, int b) {
-      final image = Image(width: size, height: size, numChannels: 3);
+    Image solid(final int size, final int r, final int g, final int b) {
+      final image = Image(width: size, height: size);
       for (var y = 0; y < size; y++) {
         for (var x = 0; x < size; x++) {
           image.setPixelRgb(x, y, r, g, b);
@@ -29,14 +29,12 @@ void main() {
     });
 
     test('finds color away from the origin', () {
-      final image = solid(64, 128, 128, 128);
-      image.setPixelRgb(60, 60, 200, 50, 50);
+      final image = solid(64, 128, 128, 128)..setPixelRgb(60, 60, 200, 50, 50);
       expect(ios.isGrayscaleImage(image), isFalse);
     });
 
     test('tolerates compression-level noise', () {
-      final image = solid(64, 128, 128, 128);
-      image.setPixelRgb(10, 10, 130, 128, 126);
+      final image = solid(64, 128, 128, 128)..setPixelRgb(10, 10, 130, 128, 126);
       expect(ios.isGrayscaleImage(image), isTrue);
     });
   });
@@ -59,7 +57,7 @@ void main() {
       }
       sandbox.createSync(recursive: true);
       File(path.join(originalDir, 'test', 'assets', 'master-light-1024.png')).copySync(path.join(sandboxDir, 'icon.png'));
-      final red = Image(width: 16, height: 16, numChannels: 3);
+      final red = Image(width: 16, height: 16);
       for (var y = 0; y < 16; y++) {
         for (var x = 0; x < 16; x++) {
           red.setPixelRgb(x, y, 200, 50, 50);
@@ -96,7 +94,7 @@ void main() {
       await ios.createIcons(config, null, logger: logger);
 
       expect(
-        messages.any((m) => m.contains('not grayscale')),
+        messages.any((final m) => m.contains('not grayscale')),
         isTrue,
       );
     });
@@ -105,12 +103,12 @@ void main() {
 
 /// Captures `info` output so warning routing can be asserted.
 class _RecordingLogger extends LILogger {
-  _RecordingLogger(this.messages) : super(false);
+  _RecordingLogger(this.messages) : super(isVerbose: false);
 
   final List<String> messages;
 
   @override
-  void info(Object? message) {
+  void info(final Object? message) {
     messages.add(message.toString());
   }
 }

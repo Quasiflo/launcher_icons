@@ -1,0 +1,4 @@
+[daemons.templatry]
+run = "templatry generate --watch --no-color"
+auto = ["start", "stop"]
+mise = true

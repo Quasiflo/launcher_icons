@@ -23,7 +23,7 @@ void main() {
       expect(imageFile.existsSync(), isTrue);
       expect(svgFile.existsSync(), isTrue);
       // solid-red PWA override so tests can distinguish sources by pixel.
-      final red = Image(width: 64, height: 64, numChannels: 3);
+      final red = Image(width: 64, height: 64);
       for (var y = 0; y < 64; y++) {
         for (var x = 0; x < 64; x++) {
           red.setPixelRgb(x, y, 255, 0, 0);
@@ -50,11 +50,11 @@ void main() {
       prefixPath = path.join(d.sandbox, 'fli_test');
     });
 
-    IconGenerator generatorFor(Map<String, dynamic> web) => WebIconGenerator(
+    IconGenerator generatorFor(final Map<String, dynamic> web) => WebIconGenerator(
           IconGeneratorContext(
             config: Config.fromJson(<String, dynamic>{'web': web}),
             prefixPath: prefixPath,
-            logger: LILogger(false),
+            logger: LILogger(isVerbose: false),
           ),
         );
 
@@ -120,8 +120,8 @@ void main() {
         await File(path.join(prefixPath, 'web', 'manifest.json')).readAsString(),
       ) as Map<String, dynamic>;
       final icons = (manifest['icons'] as List).cast<Map<String, dynamic>>();
-      expect(icons.any((e) => e['purpose'] == 'monochrome'), isTrue);
-      expect(icons.any((e) => e['purpose'] == 'maskable monochrome'), isTrue);
+      expect(icons.any((final e) => e['purpose'] == 'monochrome'), isTrue);
+      expect(icons.any((final e) => e['purpose'] == 'maskable monochrome'), isTrue);
     });
 
     test('generates opengraph/twitter images with meta tags', () async {

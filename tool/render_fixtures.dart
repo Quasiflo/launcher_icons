@@ -31,19 +31,19 @@ class _Job {
   final void Function(Image image)? gate;
 }
 
-void _opaque(Image image, String name) {
+void _opaque(final Image image, final String name) {
   if (image.numChannels != 3) {
     throw StateError('$name must rasterize fully opaque');
   }
 }
 
-void _expect(bool cond, String message) {
+void _expect(final bool cond, final String message) {
   if (!cond) {
     throw StateError(message);
   }
 }
 
-Future<void> main(List<String> arguments) async {
+Future<void> main(final List<String> arguments) async {
   final checkOnly = arguments.contains('--check');
 
   final jobs = <_Job>[
@@ -53,8 +53,8 @@ Future<void> main(List<String> arguments) async {
       out: '',
       width: 48,
       height: 48,
-      encode: (_) => const <int>[],
-      gate: (image) {
+      encode: (final _) => const <int>[],
+      gate: (final image) {
         _opaque(image, 'vector-opaque-1024.svg');
         final ring = image.getPixel(24, 14);
         _expect(
@@ -70,8 +70,8 @@ Future<void> main(List<String> arguments) async {
       out: '',
       width: 64,
       height: 64,
-      encode: (_) => const <int>[],
-      gate: (image) {
+      encode: (final _) => const <int>[],
+      gate: (final image) {
         _expect(image.numChannels == 4, 'must keep alpha');
         _expect(image.getPixel(0, 0).a == 0, 'corner must be transparent');
         final center = image.getPixel(32, 32);
@@ -87,7 +87,7 @@ Future<void> main(List<String> arguments) async {
       width: 1024,
       height: 1024,
       encode: encodePng,
-      gate: (image) {
+      gate: (final image) {
         _expect(image.numChannels == 4, 'master must keep alpha');
         // Transparent corners (maskable-derivation warning path) + opaque art.
         _expect(image.getPixel(0, 0).a == 0, 'corner must be transparent');
@@ -99,16 +99,16 @@ Future<void> main(List<String> arguments) async {
       out: 'test/assets/adaptive-bg-1024.jpg',
       width: 1024,
       height: 1024,
-      encode: (image) => encodeJpg(image, quality: 90),
-      gate: (image) => _opaque(image, 'adaptive-bg-1024.svg'),
+      encode: (final image) => encodeJpg(image, quality: 90),
+      gate: (final image) => _opaque(image, 'adaptive-bg-1024.svg'),
     ),
     _Job(
       svg: 'test/assets/adaptive-bg-1024.svg',
       out: 'test/assets/adaptive-bg-1024.webp',
       width: 1024,
       height: 1024,
-      encode: (image) => encodeWebP(image),
-      gate: (image) => _opaque(image, 'adaptive-bg-1024.svg'),
+      encode: encodeWebP,
+      gate: (final image) => _opaque(image, 'adaptive-bg-1024.svg'),
     ),
     const _Job(
       svg: 'example/minimal/assets/icon/icon-master-1024.svg',
@@ -175,7 +175,7 @@ Future<void> main(List<String> arguments) async {
       continue;
     }
     await File(job.out).writeAsBytes(job.encode(image));
-    print('wrote ${job.out}');
+    stdout.writeln('wrote ${job.out}');
   }
-  print(checkOnly ? 'all gates passed' : 'rendered ${jobs.length} fixtures');
+  stdout.writeln(checkOnly ? 'all gates passed' : 'rendered ${jobs.length} fixtures');
 }

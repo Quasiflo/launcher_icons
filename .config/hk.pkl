@@ -1,40 +1,27 @@
 // * HK - Git Hook Configuration
 // This file ensures you are committing properly linted and formatted files which will pass ci
+amends "package://github.com/jdx/hk/releases/download/v2.1.0/hk@2.1.0#/Config.pkl"
 
-amends "package://github.com/jdx/hk/releases/download/v2.0.0/hk@2.0.0#/Config.pkl"
-import "package://github.com/jdx/hk/releases/download/v2.0.0/hk@2.0.0#/Builtins.pkl"
+import "generated/generated.pkl"
 
-local dart_globs = List("**/*.dart", "**/analysis_options.yaml", "**/pubspec.yaml")
+steps =
+  generated.addSteps((generated.steps) {
+    ["[fix] dart_codegen"] {
+      // Regenerates .g.dart / .mocks.dart. Check-only; there is no read-only freshness probe, so this runs in fix mode (pre-commit, hk fix) and is skipped by hk check. Plain `build` on purpose: never --delete-conflicting-outputs (it deletes the hand-maintained lib/src/version.dart).
+      glob = List(
+        "lib/**/*.dart",
+        "bin/**/*.dart",
+        "test/**/*.dart",
+        "pubspec.yaml",
+        "build.yaml",
+      )
+      fix = "dart run build_runner build"
+    }
+  })
 
-exclude = List("examples/**")
+exclude = List("example/**")
 
-steps {
-  ["rumdl"] = Builtins.rumdl
-  ["zizmor"] = Builtins.zizmor
-  ["dart_fix"] {
-    glob = dart_globs
-    check = "dart fix --dry-run"
-    fix = "dart fix --apply"
-  }
-  ["dart_codegen"] {
-    // Regenerates .g.dart / .mocks.dart. Check-only; there is no read-only freshness probe, so this runs in fix mode (pre-commit, hk fix) and is skipped by hk check. Plain `build` on purpose: never --delete-conflicting-outputs (it deletes the hand-maintained lib/src/version.dart).
-    glob = List(
-      "lib/**/*.dart",
-      "bin/**/*.dart",
-      "test/**/*.dart",
-      "pubspec.yaml",
-      "build.yaml",
-    )
-    fix = "dart run build_runner build"
-  }
-  ["dart_format"] {
-    glob = List("**/*.dart")
-    check = "dart format --output=none --set-exit-if-changed {{files}}"
-    fix = "dart format {{files}}"
-    batch = true
-  }
-  ["dart_analyze"] {
-    glob = dart_globs
-    check = "dart analyze --fatal-infos"
-  }
-}
+skip_steps =
+  List(
+    "[fix] markdown license" // License text modified to to reference MIT license
+  )

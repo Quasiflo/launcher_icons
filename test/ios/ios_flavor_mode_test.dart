@@ -180,7 +180,7 @@ void main() {
       Directory.current = originalDir;
     });
 
-    Config xcconfig([Map<String, dynamic> extra = const {}]) => Config.fromJson(<String, dynamic>{
+    Config xcconfig([final Map<String, dynamic> extra = const {}]) => Config.fromJson(<String, dynamic>{
           'ios': {
             'generate': true,
             'image_path': 'icon.png',

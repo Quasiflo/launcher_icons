@@ -129,11 +129,11 @@ void main() {
           'AppIcon.appiconset',
         ),
       ).createSync(recursive: true);
-      final pbxproj = File(
+      File(
         path.join(sandboxDir, 'ios', 'Runner.xcodeproj', 'project.pbxproj'),
-      );
-      pbxproj.createSync(recursive: true);
-      pbxproj.writeAsStringSync('// !\$*UTF8*\$!\n{}\n');
+      )
+        ..createSync(recursive: true)
+        ..writeAsStringSync('// !\$*UTF8*\$!\n{}\n');
       Directory.current = sandboxDir;
     });
 
@@ -141,7 +141,7 @@ void main() {
       Directory.current = originalDir;
     });
 
-    Image readOutput(String fileName) => decodeImage(
+    Image readOutput(final String fileName) => decodeImage(
           File(
             path.join(
               'ios',

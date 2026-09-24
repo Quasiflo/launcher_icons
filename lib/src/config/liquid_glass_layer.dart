@@ -10,6 +10,25 @@ part 'liquid_glass_layer.g.dart';
   checked: true,
 )
 class LiquidGlassLayer {
+  /// Creates a liquid glass layer.
+  const LiquidGlassLayer({
+    required this.imagePath,
+    this.imagePathDark,
+    this.imagePathTinted,
+    this.scale = 1.0,
+    this.offsetX = 0.0,
+    this.offsetY = 0.0,
+    this.glass = true,
+    this.opacity,
+    this.blendMode,
+    this.fill,
+    this.fillDark,
+    this.fillTinted,
+  });
+
+  /// Creates [LiquidGlassLayer] from [json].
+  factory LiquidGlassLayer.fromJson(final Map<dynamic, dynamic> json) => _$LiquidGlassLayerFromJson(json);
+
   /// Artwork source for the layer (PNG or SVG, copied verbatim into the bundle's `Assets/` folder).
   @JsonKey(name: 'image_path')
   final String imagePath;
@@ -57,25 +76,6 @@ class LiquidGlassLayer {
   /// Tinted-appearance recolor tint (hex `#RRGGBB`). Falls back to `fill` when unset.
   @JsonKey(name: 'fill_tinted')
   final String? fillTinted;
-
-  /// Creates a liquid glass layer.
-  const LiquidGlassLayer({
-    required this.imagePath,
-    this.imagePathDark,
-    this.imagePathTinted,
-    this.scale = 1.0,
-    this.offsetX = 0.0,
-    this.offsetY = 0.0,
-    this.glass = true,
-    this.opacity,
-    this.blendMode,
-    this.fill,
-    this.fillDark,
-    this.fillTinted,
-  });
-
-  /// Creates [LiquidGlassLayer] from [json].
-  factory LiquidGlassLayer.fromJson(Map<dynamic, dynamic> json) => _$LiquidGlassLayerFromJson(json);
 
   /// Creates [Map] from [LiquidGlassLayer].
   Map<String, dynamic> toJson() => _$LiquidGlassLayerToJson(this);

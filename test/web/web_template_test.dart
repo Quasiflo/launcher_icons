@@ -13,7 +13,7 @@ void main() {
       icMonoMaskableTemplate = const WebIconTemplate(size: 512, maskable: true, monochrome: true);
     });
 
-    test('.iconFile should return valid file name', () async {
+    test('.iconFile should return valid file name', () {
       expect(icTemplate.iconFile, equals('Icon-512.png'));
       expect(icMaskableTemplate.iconFile, equals('Icon-maskable-512.png'));
       expect(icMonoMaskableTemplate.iconFile, equals('Icon-maskable-monochrome-512.png'));

@@ -68,9 +68,9 @@ void main() {
     }
   });
 
-  String resPath(List<String> parts) => path.join(prefixPath, 'android', 'app', 'src', 'main', 'res', path.joinAll(parts));
+  String resPath(final List<String> parts) => path.join(prefixPath, 'android', 'app', 'src', 'main', 'res', path.joinAll(parts));
 
-  Config pairConfig(Map<String, dynamic> extra) => Config.fromJson(<String, dynamic>{
+  Config pairConfig(final Map<String, dynamic> extra) => Config.fromJson(<String, dynamic>{
         'android': {
           'generate': true,
           'image_path': 'master-light-1024.png',
@@ -253,7 +253,7 @@ void main() {
       await AndroidIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       ).createIcons();

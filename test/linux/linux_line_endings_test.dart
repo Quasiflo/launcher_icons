@@ -56,13 +56,13 @@ flutter:
       return LinuxIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: tempDir.path,
         ),
       );
     }
 
-    Future<String> runWithCc(String content) async {
+    Future<String> runWithCc(final String content) async {
       final file = File('${tempDir.path}/linux/runner/my_application.cc');
       await file.writeAsString(content);
       await generator().createIcons();

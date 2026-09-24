@@ -10,17 +10,16 @@ import 'package:test/test.dart';
 
 /// Captures `info` output so warning routing can be asserted.
 class _RecordingLogger extends LILogger {
+  _RecordingLogger() : super(isVerbose: false);
   final List<String> messages = <String>[];
 
-  _RecordingLogger() : super(false);
-
   @override
-  void info(Object? message) {
+  void info(final Object? message) {
     messages.add(message.toString());
   }
 }
 
-const _corruptContentsJson = r'''
+const _corruptContentsJson = '''
 {
     "info": {
         "version": 1,
@@ -88,7 +87,7 @@ void main() {
       }
     });
 
-    void writeContents(String content) {
+    void writeContents(final String content) {
       final dir = Directory(
         path.join(
           prefixPath,
@@ -97,8 +96,7 @@ void main() {
           'Assets.xcassets',
           'AppIcon.appiconset',
         ),
-      );
-      dir.createSync(recursive: true);
+      )..createSync(recursive: true);
       File(path.join(dir.path, 'Contents.json')).writeAsStringSync(content);
     }
 
@@ -123,7 +121,7 @@ void main() {
       await gen.createIcons();
 
       expect(
-        logger.messages.any((m) => m.contains('WARNING')),
+        logger.messages.any((final m) => m.contains('WARNING')),
         isTrue,
       );
       final contents = jsonDecode(
@@ -141,7 +139,7 @@ void main() {
       final images = contents['images'] as List;
       expect(images, hasLength(10));
       expect(
-        images.every((e) => (e as Map)['idiom'] == 'mac'),
+        images.every((final e) => (e as Map)['idiom'] == 'mac'),
         isTrue,
       );
     });
@@ -154,7 +152,7 @@ void main() {
       await gen.createIcons();
 
       expect(
-        logger.messages.any((m) => m.contains('WARNING')),
+        logger.messages.any((final m) => m.contains('WARNING')),
         isTrue,
       );
       final contents = jsonDecode(

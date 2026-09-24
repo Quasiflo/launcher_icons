@@ -49,9 +49,9 @@ void main() {
       });
 
       Future<ProcessResult> compileIcon(
-        String bundleDir,
-        String iconName,
-        String outName,
+        final String bundleDir,
+        final String iconName,
+        final String outName,
       ) {
         final outDir = path.join(sandboxDir, outName);
         Directory(outDir).createSync();

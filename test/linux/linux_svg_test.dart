@@ -46,8 +46,8 @@ void main() {
 
     /// Minimal project with an SVG source; the pubspec bundles [pubspecAsset] (default: the derived runtime raster).
     Future<void> setUpSvgProject({
-      String pubspecAsset = 'assets/images/icon.linux.png',
-      String? applicationId,
+      final String pubspecAsset = 'assets/images/icon.linux.png',
+      final String? applicationId,
     }) async {
       await Directory('${tempDir.path}/linux/runner').create(
         recursive: true,
@@ -83,7 +83,7 @@ flutter:
 ''');
     }
 
-    LinuxIconGenerator generator({bool generateSnap = false}) {
+    LinuxIconGenerator generator({final bool generateSnap = false}) {
       final config = Config(
         imagePath: 'assets/images/icon.svg',
         linuxConfig: LinuxConfig(generate: true, generateSnap: generateSnap),
@@ -91,7 +91,7 @@ flutter:
       return LinuxIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: tempDir.path,
         ),
       );
@@ -186,7 +186,7 @@ if(DEFINED FLUTTER_APP_FLAVOR)
   endif()
 endif()
 ''');
-      LinuxIconGenerator flavorGenerator(String flavor) {
+      LinuxIconGenerator flavorGenerator(final String flavor) {
         const config = Config(
           imagePath: 'assets/images/icon.svg',
           linuxConfig: LinuxConfig(generate: true, generateSnap: true),
@@ -194,7 +194,7 @@ endif()
         return LinuxIconGenerator(
           IconGeneratorContext(
             config: config,
-            logger: LILogger(false),
+            logger: LILogger(isVerbose: false),
             prefixPath: tempDir.path,
             flavor: flavor,
           ),

@@ -1,5 +1,5 @@
 import 'package:launcher_icons/src/cli.dart' as launcher_icons;
 
-void main(List<String> arguments) {
-  launcher_icons.createIconsFromArguments(arguments);
+Future<void> main(final List<String> arguments) async {
+  await launcher_icons.createIconsFromArguments(arguments);
 }

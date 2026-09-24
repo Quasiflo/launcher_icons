@@ -36,13 +36,13 @@ const androidAdaptiveRoundIconName = 'ic_launcher_round';
 final androidManifestFile = path.join('android', 'app', 'src', 'main', 'AndroidManifest.xml');
 
 /// Relative path to android resource folder
-String androidResFolder(String? flavor) => path.join('android', 'app', 'src', flavor ?? 'main', 'res');
+String androidResFolder(final String? flavor) => path.join('android', 'app', 'src', flavor ?? 'main', 'res');
 
 /// Relative path to android colors.xml file
-String androidColorsFile(String? flavor) => path.join('android', 'app', 'src', flavor ?? 'main', 'res', 'values', 'colors.xml');
+String androidColorsFile(final String? flavor) => path.join('android', 'app', 'src', flavor ?? 'main', 'res', 'values', 'colors.xml');
 
 /// Relative path to the adaptive-icon xml folder
-String androidAdaptiveXmlFolder(String? flavor) => path.join(androidResFolder(flavor), 'mipmap-anydpi-v26');
+String androidAdaptiveXmlFolder(final String? flavor) => path.join(androidResFolder(flavor), 'mipmap-anydpi-v26');
 
 //* Apple Common
 /// Xcode project directory extension
@@ -70,7 +70,7 @@ const contentsJsonFileName = 'Contents.json';
 const iconJsonFileName = 'icon.json';
 
 /// Default app icon catalog name, flavor-aware (`AppIcon-<flavor>` for flavor runs)
-String appIconCatalogName(String? flavor) => flavor == null ? 'AppIcon' : 'AppIcon-$flavor';
+String appIconCatalogName(final String? flavor) => flavor == null ? 'AppIcon' : 'AppIcon-$flavor';
 
 /// Dark-appearance icon name suffix
 const appIconDarkSuffix = '-Dark';
@@ -95,13 +95,13 @@ final iosDefaultIconFolder = path.join(iosAssetFolder, '${appIconCatalogName(nul
 final iosConfigFile = path.join(iosDirPath, xcodeprojDirName, pbxprojFileName);
 
 /// Relative path to a liquid glass `.icon` bundle
-String iosLiquidGlassIconPath(String iconName) => path.join(iosRunnerFolder, '$iconName.icon');
+String iosLiquidGlassIconPath(final String iconName) => path.join(iosRunnerFolder, '$iconName.icon');
 
 /// Relative path to a liquid glass `.icon` assets folder
-String iosLiquidGlassAssetsPath(String iconName) => path.join(iosLiquidGlassIconPath(iconName), iconAssetsFolderName);
+String iosLiquidGlassAssetsPath(final String iconName) => path.join(iosLiquidGlassIconPath(iconName), iconAssetsFolderName);
 
 /// Relative path to a liquid glass `.icon` config file
-String iosLiquidGlassConfigPath(String iconName) => path.join(iosLiquidGlassIconPath(iconName), iconJsonFileName);
+String iosLiquidGlassConfigPath(final String iconName) => path.join(iosLiquidGlassIconPath(iconName), iconJsonFileName);
 
 //* MacOS
 /// Relative path to the macOS project folder
@@ -126,13 +126,13 @@ final macOSIconsDirPath = path.join(macOSAssetsDirPath, '${appIconCatalogName(nu
 final macOSContentsFilePath = path.join(macOSIconsDirPath, 'Contents.json');
 
 /// Relative path to a macOS liquid glass `.icon` bundle
-String macOSLiquidGlassIconPath(String iconName) => path.join(macOSRunnerFolder, '$iconName.icon');
+String macOSLiquidGlassIconPath(final String iconName) => path.join(macOSRunnerFolder, '$iconName.icon');
 
 /// Relative path to a macOS liquid glass `.icon` assets folder
-String macOSLiquidGlassAssetsPath(String iconName) => path.join(macOSLiquidGlassIconPath(iconName), iconAssetsFolderName);
+String macOSLiquidGlassAssetsPath(final String iconName) => path.join(macOSLiquidGlassIconPath(iconName), iconAssetsFolderName);
 
 /// Relative path to a macOS liquid glass `.icon` config file
-String macOSLiquidGlassConfigPath(String iconName) => path.join(macOSLiquidGlassIconPath(iconName), iconJsonFileName);
+String macOSLiquidGlassConfigPath(final String iconName) => path.join(macOSLiquidGlassIconPath(iconName), iconJsonFileName);
 
 //* Windows
 /// Relative path to windows directory
@@ -164,7 +164,7 @@ final linuxTopCMakeListsFile = path.join(linuxDirPath, 'CMakeLists.txt');
 const linuxDerivedIconSuffix = '.linux.png';
 
 /// Joins [sharePrefix] with the freedesktop `share/` tree. An empty or `.` prefix restores the legacy top-level `share/...` layout; the default `linux` prefix yields `linux/share/...`.
-String _withSharePrefix(String sharePrefix, List<String> tail) {
+String _withSharePrefix(final String sharePrefix, final List<String> tail) {
   final normalized = sharePrefix.trim();
   if (normalized.isEmpty || normalized == '.' || normalized == './') {
     return path.join('share', path.joinAll(tail));
@@ -173,19 +173,19 @@ String _withSharePrefix(String sharePrefix, List<String> tail) {
 }
 
 /// Project-relative root of the freedesktop `share/` tree for [sharePrefix].
-String linuxShareRoot([String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, []);
+String linuxShareRoot([final String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, []);
 
 /// Relative hicolor icon path for [appName] at [size]px under [sharePrefix]
-String linuxHicolorIconPath(String appName, int size, [String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, ['icons', 'hicolor', '${size}x$size', 'apps', '$appName.png']);
+String linuxHicolorIconPath(final String appName, final int size, [final String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, ['icons', 'hicolor', '${size}x$size', 'apps', '$appName.png']);
 
 /// Relative snap icon path for [appName]
-String linuxSnapIconPath(String appName) => path.join('snap', 'gui', '$appName.png');
+String linuxSnapIconPath(final String appName) => path.join('snap', 'gui', '$appName.png');
 
 /// Relative freedesktop desktop entry path for [appName] under [sharePrefix]
-String linuxDesktopFilePath(String appName, [String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, ['applications', '$appName.desktop']);
+String linuxDesktopFilePath(final String appName, [final String sharePrefix = 'linux']) => _withSharePrefix(sharePrefix, ['applications', '$appName.desktop']);
 
 /// Relative snap desktop entry path for [appName]
-String linuxSnapDesktopFilePath(String appName) => path.join('snap', 'gui', '$appName.desktop');
+String linuxSnapDesktopFilePath(final String appName) => path.join('snap', 'gui', '$appName.desktop');
 
 /// Relative snapcraft.yaml path
 final linuxSnapcraftFilePath = path.join('snap', 'snapcraft.yaml');
@@ -195,31 +195,31 @@ final linuxSnapcraftFilePath = path.join('snap', 'snapcraft.yaml');
 const webDirPath = 'web';
 
 /// Relative web icons directory path under [root]
-String webIconsDirPath([String root = webDirPath]) => path.join(root, 'icons');
+String webIconsDirPath([final String root = webDirPath]) => path.join(root, 'icons');
 
 /// Relative web manifest.json file path under [root]
-String webManifestFilePath([String root = webDirPath]) => path.join(root, 'manifest.json');
+String webManifestFilePath([final String root = webDirPath]) => path.join(root, 'manifest.json');
 
 /// Relative favicon.png path under [root]
-String webFaviconFilePath([String root = webDirPath]) => path.join(root, 'favicon.png');
+String webFaviconFilePath([final String root = webDirPath]) => path.join(root, 'favicon.png');
 
 /// Relative favicon.ico path (browsers request /favicon.ico by default) under [root]
-String webFaviconIcoFilePath([String root = webDirPath]) => path.join(root, 'favicon.ico');
+String webFaviconIcoFilePath([final String root = webDirPath]) => path.join(root, 'favicon.ico');
 
 /// Relative favicon.svg path (verbatim copy-through) under [root]
-String webFaviconSvgFilePath([String root = webDirPath]) => path.join(root, 'favicon.svg');
+String webFaviconSvgFilePath([final String root = webDirPath]) => path.join(root, 'favicon.svg');
 
 /// Relative Open Graph link-preview image path under [root]
-String webOpengraphFilePath([String root = webDirPath]) => path.join(root, 'opengraph.png');
+String webOpengraphFilePath([final String root = webDirPath]) => path.join(root, 'opengraph.png');
 
 /// Relative Twitter/X link-preview image path under [root]
-String webTwitterFilePath([String root = webDirPath]) => path.join(root, 'twitter.png');
+String webTwitterFilePath([final String root = webDirPath]) => path.join(root, 'twitter.png');
 
 /// Relative index.html file path under [root]
-String webIndexFilePath([String root = webDirPath]) => path.join(root, 'index.html');
+String webIndexFilePath([final String root = webDirPath]) => path.join(root, 'index.html');
 
 /// Apple touch icon file name
 const appleTouchIconFileName = 'apple-touch-icon.png';
 
 /// Relative apple-touch-icon.png path under [root]
-String webAppleTouchIconFilePath([String root = webDirPath]) => path.join(webIconsDirPath(root), appleTouchIconFileName);
+String webAppleTouchIconFilePath([final String root = webDirPath]) => path.join(webIconsDirPath(root), appleTouchIconFileName);

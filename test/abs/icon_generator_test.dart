@@ -8,7 +8,7 @@ void main() {
   group('IconGeneratorContext', () {
     test('holds config, logger, prefix and flavor', () {
       const config = Config(imagePath: 'icon.png');
-      final logger = LILogger(false);
+      final logger = LILogger(isVerbose: false);
       final context = IconGeneratorContext(
         config: config,
         logger: logger,
@@ -25,7 +25,7 @@ void main() {
     test('flavor defaults to null', () {
       final context = IconGeneratorContext(
         config: const Config(),
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
         prefixPath: '.',
       );
 

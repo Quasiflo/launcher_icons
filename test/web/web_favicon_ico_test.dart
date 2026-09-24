@@ -11,10 +11,11 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 import '../templates.dart' as templates;
 
 /// Frame widths from the ICONDIR header (`0` means 256 per the ICO spec).
-List<int> _icoFrameWidths(List<int> bytes) {
+List<int> _icoFrameWidths(final List<int> bytes) {
   final count = bytes[4] | bytes[5] << 8;
   return [
-    for (var i = 0; i < count; i++) bytes[6 + i * 16] == 0 ? 256 : bytes[6 + i * 16],
+    for (var i = 0; i < count; i++)
+      if (bytes[6 + i * 16] == 0) 256 else bytes[6 + i * 16],
   ];
 }
 
@@ -40,11 +41,11 @@ void main() {
       prefixPath = path.join(d.sandbox, 'fli_test');
     });
 
-    IconGenerator generatorFor(Map<String, dynamic> web) => WebIconGenerator(
+    IconGenerator generatorFor(final Map<String, dynamic> web) => WebIconGenerator(
           IconGeneratorContext(
             config: Config.fromJson(<String, dynamic>{'web': web}),
             prefixPath: prefixPath,
-            logger: LILogger(false),
+            logger: LILogger(isVerbose: false),
           ),
         );
 

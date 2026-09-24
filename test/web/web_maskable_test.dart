@@ -13,12 +13,11 @@ import '../templates.dart' as templates;
 
 /// Captures `info` output so warning routing can be asserted.
 class _RecordingLogger extends LILogger {
+  _RecordingLogger() : super(isVerbose: false);
   final List<String> messages = <String>[];
 
-  _RecordingLogger() : super(false);
-
   @override
-  void info(Object? message) {
+  void info(final Object? message) {
     messages.add(message.toString());
   }
 }
@@ -44,7 +43,7 @@ void main() {
       prefixPath = path.join(d.sandbox, 'fli_test');
 
       // Opaque solid-red dedicated maskable source.
-      final red = Image(width: 64, height: 64, numChannels: 3);
+      final red = Image(width: 64, height: 64);
       for (var y = 0; y < 64; y++) {
         for (var x = 0; x < 64; x++) {
           red.setPixelRgb(x, y, 255, 0, 0);
@@ -54,18 +53,18 @@ void main() {
     });
 
     IconGenerator generatorFor(
-      Map<String, dynamic> web, {
-      LILogger? logger,
+      final Map<String, dynamic> web, {
+      final LILogger? logger,
     }) =>
         WebIconGenerator(
           IconGeneratorContext(
             config: Config.fromJson(<String, dynamic>{'web': web}),
             prefixPath: prefixPath,
-            logger: logger ?? LILogger(false),
+            logger: logger ?? LILogger(isVerbose: false),
           ),
         );
 
-    Image readIcon(String fileName) => decodeImage(
+    Image readIcon(final String fileName) => decodeImage(
           File(path.join(prefixPath, 'web', 'icons', fileName)).readAsBytesSync(),
         )!;
 
@@ -120,7 +119,7 @@ void main() {
 
       expect(
         logger.messages.any(
-          (m) => m.contains('maskable') && m.contains('transparen'),
+          (final m) => m.contains('maskable') && m.contains('transparen'),
         ),
         isTrue,
       );

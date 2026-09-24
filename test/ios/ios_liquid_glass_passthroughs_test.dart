@@ -6,17 +6,17 @@ import 'package:test/test.dart';
 // Pass-throughs for Icon Composer engine features: group lighting, refractivity, and specular highlight placement, plus the top-level `features` declarations actool expects.
 void main() {
   group('generateIconConfig optical pass-throughs', () {
-    Map<String, dynamic> iconJsonFor(Map<String, dynamic> ios) {
+    Map<String, dynamic> iconJsonFor(final Map<String, dynamic> ios) {
       final config = Config.fromJson(<String, dynamic>{'ios': ios});
       return generateIconConfig(config);
     }
 
-    Map<String, dynamic> groupFor(Map<String, dynamic> ios) {
+    Map<String, dynamic> groupFor(final Map<String, dynamic> ios) {
       final groups = iconJsonFor(ios)['groups'] as List;
       return groups.first as Map<String, dynamic>;
     }
 
-    Map<String, dynamic> withLayer(Map<String, dynamic> extra) => <String, dynamic>{
+    Map<String, dynamic> withLayer(final Map<String, dynamic> extra) => <String, dynamic>{
           'generate': true,
           'liquid_glass_layers': [
             {'image_path': 'icon.png'},

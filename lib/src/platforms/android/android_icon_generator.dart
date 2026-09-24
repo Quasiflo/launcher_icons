@@ -1,6 +1,5 @@
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
-import 'package:launcher_icons/src/core/logger.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/android/android.dart' as android;
@@ -8,7 +7,7 @@ import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 /// An implementation of [IconGenerator] for Android.
 class AndroidIconGenerator extends IconGenerator {
   /// Creates an instance of [AndroidIconGenerator].
-  AndroidIconGenerator(IconGeneratorContext context) : super(context, 'Android');
+  AndroidIconGenerator(final IconGeneratorContext context) : super(context, 'Android');
 
   @override
   bool validateRequirements() {
@@ -40,7 +39,7 @@ class AndroidIconGenerator extends IconGenerator {
     final config = context.config;
     final flavor = context.flavor;
     final prefixPath = context.prefixPath;
-    final LILogger logger = context.logger;
+    final logger = context.logger;
 
     final concurrentIconCreation = <Future<void>>[];
     if (config.androidEnabled) {

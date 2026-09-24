@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:launcher_icons/src/config/liquid_glass_group.dart';
 import 'package:launcher_icons/src/config/liquid_glass_layer.dart';
+import 'package:launcher_icons/src/config/liquid_glass_options.dart';
 
 part 'macos_config.g.dart';
 
@@ -10,7 +11,37 @@ part 'macos_config.g.dart';
   checked: true,
   explicitToJson: true,
 )
-class MacOSConfig {
+class MacOSConfig extends LiquidGlassOptions {
+  /// Creates a instance of [MacOSConfig]
+  const MacOSConfig({
+    this.generate = false,
+    this.imagePath,
+    this.iconName,
+    this.xcodeprojPath,
+    this.iconOnly = false,
+    this.padding = 0,
+    this.roundedCorners = false,
+    this.liquidGlassLayers,
+    this.liquidGlassGroups,
+    super.removeLiquidGlass,
+    super.backgroundColor,
+    super.liquidGlassGradientFrom,
+    super.liquidGlassGradientTo,
+    super.liquidGlassTranslucency,
+    super.liquidGlassSpecular,
+    super.liquidGlassShadowKind,
+    super.liquidGlassShadowOpacity,
+    super.liquidGlassBlur,
+    super.liquidGlassLighting,
+    super.liquidGlassRefractivityEnabled,
+    super.liquidGlassRefractivityDepth,
+    super.liquidGlassRefractivityStrength,
+    super.liquidGlassSpecularHighlightPlacement,
+  });
+
+  /// Creates [MacOSConfig] from [json]
+  factory MacOSConfig.fromJson(final Map<dynamic, dynamic> json) => _$MacOSConfigFromJson(json);
+
   /// Specifies whether to generate icons for macos
   @JsonKey()
   final bool generate;
@@ -53,95 +84,9 @@ class MacOSConfig {
   @JsonKey(name: 'liquid_glass_groups')
   final List<LiquidGlassGroup>? liquidGlassGroups;
 
-  /// macOS remove_liquid_glass: flat icon without glass effects.
-  @JsonKey(name: 'remove_liquid_glass')
-  final bool removeLiquidGlass;
-
-  /// macOS background_color: canvas fill behind the glass (hex `#RRGGBB`).
-  @JsonKey(name: 'background_color')
-  final String backgroundColor;
-
-  /// First color of an explicit two-stop linear canvas gradient (hex `#RRGGBB`). Requires [liquidGlassGradientTo]; when both are set the `.icon` canvas renders a top-to-bottom gradient instead of the solid [backgroundColor] (verified against Icon Composer's document model and ictool rendering).
-  @JsonKey(name: 'liquid_glass_gradient_from')
-  final String? liquidGlassGradientFrom;
-
-  /// Second color of an explicit two-stop linear canvas gradient (hex `#RRGGBB`). Requires [liquidGlassGradientFrom].
-  @JsonKey(name: 'liquid_glass_gradient_to')
-  final String? liquidGlassGradientTo;
-
-  /// macOS liquid glass translucency
-  @JsonKey(name: 'liquid_glass_translucency')
-  final double? liquidGlassTranslucency;
-
-  /// macOS liquid glass specular
-  @JsonKey(name: 'liquid_glass_specular')
-  final bool liquidGlassSpecular;
-
-  /// macOS liquid glass shadow kind (`Neutral` or `Chromatic`)
-  @JsonKey(name: 'liquid_glass_shadow_kind')
-  final String liquidGlassShadowKind;
-
-  /// macOS liquid glass shadow opacity
-  @JsonKey(name: 'liquid_glass_shadow_opacity')
-  final double? liquidGlassShadowOpacity;
-
-  /// macOS liquid glass blur
-  @JsonKey(name: 'liquid_glass_blur')
-  final double? liquidGlassBlur;
-
-  /// Group lighting model: `individual` or `combined`. Unset by default (omitted from icon.json); only observable with 2+ layers.
-  @JsonKey(name: 'liquid_glass_lighting')
-  final String? liquidGlassLighting;
-
-  /// Enables group refractivity (`depth` + `strength` required).
-  @JsonKey(name: 'liquid_glass_refractivity_enabled')
-  final bool? liquidGlassRefractivityEnabled;
-
-  /// Refractivity depth (required when refractivity is enabled).
-  @JsonKey(name: 'liquid_glass_refractivity_depth')
-  final double? liquidGlassRefractivityDepth;
-
-  /// Refractivity strength (required when refractivity is enabled).
-  @JsonKey(name: 'liquid_glass_refractivity_strength')
-  final double? liquidGlassRefractivityStrength;
-
-  /// Specular highlight placement: `inside` or `outside`. Unset by default.
-  @JsonKey(name: 'liquid_glass_specular_highlight_placement')
-  final String? liquidGlassSpecularHighlightPlacement;
-
-  /// Creates a instance of [MacOSConfig]
-  const MacOSConfig({
-    this.generate = false,
-    this.imagePath,
-    this.iconName,
-    this.xcodeprojPath,
-    this.iconOnly = false,
-    this.padding = 0,
-    this.roundedCorners = false,
-    this.liquidGlassLayers,
-    this.liquidGlassGroups,
-    this.removeLiquidGlass = false,
-    this.backgroundColor = '#ffffff',
-    this.liquidGlassGradientFrom,
-    this.liquidGlassGradientTo,
-    this.liquidGlassTranslucency = 0.5,
-    this.liquidGlassSpecular = true,
-    this.liquidGlassShadowKind = 'Neutral',
-    this.liquidGlassShadowOpacity = 0.5,
-    this.liquidGlassBlur = 0.5,
-    this.liquidGlassLighting,
-    this.liquidGlassRefractivityEnabled,
-    this.liquidGlassRefractivityDepth,
-    this.liquidGlassRefractivityStrength,
-    this.liquidGlassSpecularHighlightPlacement,
-  });
-
-  /// Creates [MacOSConfig] from [json]
-  factory MacOSConfig.fromJson(Map<dynamic, dynamic> json) => _$MacOSConfigFromJson(json);
-
   /// Creates [Map] from [MacOSConfig]
   Map<String, dynamic> toJson() => _$MacOSConfigToJson(this);
 
   @override
-  String toString() => '$runtimeType: ${toJson()}';
+  String toString() => 'MacOSConfig: ${toJson()}';
 }

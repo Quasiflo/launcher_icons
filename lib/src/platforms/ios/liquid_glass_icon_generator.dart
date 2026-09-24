@@ -14,10 +14,10 @@ import 'package:path/path.dart' as path;
 
 /// Generate liquid glass .icon file for iOS
 Future<void> generateLiquidGlassIcon(
-  Config config,
-  String iconName, {
-  LILogger? logger,
-  String prefixPath = '.',
+  final Config config,
+  final String iconName, {
+  final LILogger? logger,
+  final String prefixPath = '.',
 }) async {
   // The bundle exists exactly when the iOS struct carries layers or groups.
   final layers = config.iosConfig?.liquidGlassLayers ?? const <LiquidGlassLayer>[];
@@ -33,7 +33,7 @@ Future<void> generateLiquidGlassIcon(
   final darkFallback = iosConfig.imagePathDarkTransparent;
   final tintedFallback = iosConfig.imagePathTintedGrayscale;
 
-  Set<String> layerSources(LiquidGlassLayer layer) => {
+  Set<String> layerSources(final LiquidGlassLayer layer) => {
         layer.imagePath,
         if ((layer.imagePathDark ?? darkFallback) != null) (layer.imagePathDark ?? darkFallback)!,
         if ((layer.imagePathTinted ?? tintedFallback) != null) (layer.imagePathTinted ?? tintedFallback)!,
@@ -57,10 +57,10 @@ Future<void> generateLiquidGlassIcon(
 
 /// Generate liquid glass .icon file for macOS (Tahoe 26+ renders live glass from it; the PNG catalog stays the fallback on older systems).
 Future<void> generateMacOSLiquidGlassIcon(
-  Config config,
-  String iconName, {
-  LILogger? logger,
-  String prefixPath = '.',
+  final Config config,
+  final String iconName, {
+  final LILogger? logger,
+  final String prefixPath = '.',
 }) async {
   // The bundle exists exactly when the macOS struct carries layers or groups.
   final layers = config.macOSConfig?.liquidGlassLayers ?? const <LiquidGlassLayer>[];
@@ -73,7 +73,7 @@ Future<void> generateMacOSLiquidGlassIcon(
 
   // macOS has no dark/tinted PNG catalog variants to fall back to: only explicitly configured layer sources become appearances.
 
-  Set<String> layerSources(LiquidGlassLayer layer) => {
+  Set<String> layerSources(final LiquidGlassLayer layer) => {
         layer.imagePath,
         if (layer.imagePathDark != null) layer.imagePathDark!,
         if (layer.imagePathTinted != null) layer.imagePathTinted!,
@@ -97,14 +97,14 @@ Future<void> generateMacOSLiquidGlassIcon(
 
 /// Copies layer [sources] into the `.icon` bundle folders, sweeps orphaned layers, and writes the `icon.json` document.
 Future<void> _writeLiquidGlassBundle({
-  required Set<String> sources,
-  required String iconFolderPath,
-  required String assetsFolderPath,
-  required String configFilePath,
-  required Map<String, dynamic> iconConfig,
-  required String iconFolderDisplayPath,
-  required LILogger? logger,
-  required String prefixPath,
+  required final Set<String> sources,
+  required final String iconFolderPath,
+  required final String assetsFolderPath,
+  required final String configFilePath,
+  required final Map<String, dynamic> iconConfig,
+  required final String iconFolderDisplayPath,
+  required final LILogger? logger,
+  required final String prefixPath,
 }) async {
   // Validate every source before creating any directories so error paths leave no empty `.icon`/`Assets` litter behind (e.g. unit tests asserting the missing-source throw at the repo root used to create `ios/Runner/AppIcon.icon/Assets` as a side effect).
   final wantedBasenames = <String>{};
@@ -145,7 +145,7 @@ Future<void> _writeLiquidGlassBundle({
 }
 
 /// Resolves a per-appearance layer basename: null when unset or identical to the base image (a present base key silently wins over the specializations array, so same-file variants must not be emitted).
-String? _variantName(String? source, String imageFileName) {
+String? _variantName(final String? source, final String imageFileName) {
   if (source == null || path.basename(source) == imageFileName) {
     return null;
   }
@@ -154,7 +154,7 @@ String? _variantName(String? source, String imageFileName) {
 
 /// Generate the icon.json configuration
 @visibleForTesting
-Map<String, dynamic> generateIconConfig(Config config) {
+Map<String, dynamic> generateIconConfig(final Config config) {
   // Fall back to defaults so direct callers don't need an ios block.
   final iosConfig = config.iosConfig ?? const IOSConfig();
   return buildLiquidGlassDocument(
@@ -184,7 +184,7 @@ Map<String, dynamic> generateIconConfig(Config config) {
 ///
 /// macOS shares Icon Composer's document format with iOS (one shared square design covers both); only the option source differs.
 @visibleForTesting
-Map<String, dynamic> generateMacOSIconConfig(Config config) {
+Map<String, dynamic> generateMacOSIconConfig(final Config config) {
   // Fall back to defaults so direct callers don't need a macos block.
   final macOSConfig = config.macOSConfig ?? const MacOSConfig();
   return buildLiquidGlassDocument(
@@ -223,7 +223,7 @@ const _blendModes = <String>{
 };
 
 /// Converts [hex] to display P3, labelling failures with the config [key].
-String _displayP3(String hex, String key) {
+String _displayP3(final String hex, final String key) {
   try {
     return convertHexToDisplayP3(hex);
   } on InvalidConfigException catch (e) {
@@ -236,25 +236,25 @@ String _displayP3(String hex, String key) {
 /// [platform] labels validation errors (`ios` or `macos`). [layers] stack bottom-to-top in list order inside one group sharing the group's glass pass. Pass [groups] instead to emit several groups (each with its own pass); setting both is an error. [gradientFrom]/[gradientTo] render a two-stop linear canvas gradient instead of the solid [backgroundColor] fill. Optical pass-throughs are opt-in so unset keys stay out of the document and historical output is byte-identical.
 @visibleForTesting
 Map<String, dynamic> buildLiquidGlassDocument({
-  required String platform,
-  required String backgroundColor,
-  String? gradientFrom,
-  String? gradientTo,
-  required List<LiquidGlassLayer> layers,
-  List<LiquidGlassGroup>? groups,
-  String? darkFallback,
-  String? tintedFallback,
-  required bool removeGlass,
-  required double? translucency,
-  required bool specular,
-  required String shadowKind,
-  required double? shadowOpacity,
-  required double? blur,
-  required String? lighting,
-  required bool? refractivityEnabled,
-  required double? refractivityDepth,
-  required double? refractivityStrength,
-  required String? specularPlacement,
+  required final String platform,
+  required final String backgroundColor,
+  required final List<LiquidGlassLayer> layers,
+  required final bool removeGlass,
+  required final double? translucency,
+  required final bool specular,
+  required final String shadowKind,
+  required final double? shadowOpacity,
+  required final double? blur,
+  required final String? lighting,
+  required final bool? refractivityEnabled,
+  required final double? refractivityDepth,
+  required final double? refractivityStrength,
+  required final String? specularPlacement,
+  final String? gradientFrom,
+  final String? gradientTo,
+  final List<LiquidGlassGroup>? groups,
+  final String? darkFallback,
+  final String? tintedFallback,
 }) {
   // Convert background color to display P3 format, labelling failures with the config key (the matte path validates separately).
   String displayP3Color;
@@ -348,12 +348,12 @@ Map<String, dynamic> buildLiquidGlassDocument({
   };
 }
 
-/// Resolves the canvas [fill] document: a two-stop top-to-bottom linear gradient when [gradientFrom]/[gradientTo] are both set, the solid [displayP3Color] otherwise. A half-set pair is an error.
+/// Resolves the canvas fill document: a two-stop top-to-bottom linear gradient when [gradientFrom]/[gradientTo] are both set, the solid [displayP3Color] otherwise. A half-set pair is an error.
 Map<String, dynamic> _resolveFill({
-  required String platform,
-  required String displayP3Color,
-  String? gradientFrom,
-  String? gradientTo,
+  required final String platform,
+  required final String displayP3Color,
+  final String? gradientFrom,
+  final String? gradientTo,
 }) {
   if (gradientFrom == null && gradientTo == null) {
     return {'solid': displayP3Color};
@@ -376,24 +376,24 @@ Map<String, dynamic> _resolveFill({
 ///
 /// [optionsLabel] prefixes option-key errors (`ios` for the legacy single group, `ios.liquid_glass_groups[0]` for explicit groups); [layersLabel] does the same for layer errors.
 Map<String, dynamic> _buildGroup({
-  required String platform,
-  required String optionsLabel,
-  String? name,
-  required List<LiquidGlassLayer> layers,
-  required String layersLabel,
-  String? darkFallback,
-  String? tintedFallback,
-  required bool removeGlass,
-  required double? translucency,
-  required bool specular,
-  required String shadowKind,
-  required double? shadowOpacity,
-  required double? blur,
-  required String? lighting,
-  required bool? refractivityEnabled,
-  required double? refractivityDepth,
-  required double? refractivityStrength,
-  required String? specularPlacement,
+  required final String platform,
+  required final String optionsLabel,
+  required final List<LiquidGlassLayer> layers,
+  required final String layersLabel,
+  required final bool removeGlass,
+  required final double? translucency,
+  required final bool specular,
+  required final String shadowKind,
+  required final double? shadowOpacity,
+  required final double? blur,
+  required final String? lighting,
+  required final bool? refractivityEnabled,
+  required final double? refractivityDepth,
+  required final double? refractivityStrength,
+  required final String? specularPlacement,
+  final String? name,
+  final String? darkFallback,
+  final String? tintedFallback,
 }) {
   // Unit-interval optical values. Unset keys fall back to 0.5 downstream, so
   // only validate explicitly set values here.
@@ -426,7 +426,7 @@ Map<String, dynamic> _buildGroup({
     );
   }
   Map<String, dynamic>? refractivity;
-  if (refractivityEnabled == true) {
+  if (refractivityEnabled ?? false) {
     if (refractivityDepth == null || refractivityStrength == null) {
       throw InvalidConfigException(
         '$optionsLabel.liquid_glass_refractivity_enabled requires '
@@ -482,11 +482,11 @@ Map<String, dynamic> _buildGroup({
 ///
 /// [label] is the config path of the layer (e.g. `ios.liquid_glass_layers[0]` or `ios.liquid_glass_groups[1].layers[0]`) used in error messages. Clear renditions (ClearLight/ClearDark) derive automatically from the default/dark artwork: neither classic asset catalogs nor Icon Composer documents offer a clear annotation slot (verified with actool/ictool against Xcode 27).
 Map<String, dynamic> _buildLayer(
-  String label,
-  LiquidGlassLayer layer, {
-  required String? darkFallback,
-  required String? tintedFallback,
-  required bool removeGlass,
+  final String label,
+  final LiquidGlassLayer layer, {
+  required final String? darkFallback,
+  required final String? tintedFallback,
+  required final bool removeGlass,
 }) {
   if (layer.scale <= 0.0) {
     throw InvalidConfigException(
@@ -580,7 +580,7 @@ Map<String, dynamic> _buildLayer(
 
 /// Convert hex color to Display P3 format (as used by Apple Icon Composer)
 @visibleForTesting
-String convertHexToDisplayP3(String hexColor) {
+String convertHexToDisplayP3(final String hexColor) {
   final (:r, :g, :b) = parseHexColor(hexColor);
 
   return 'display-p3:${(r / 255).toStringAsFixed(5)},'

@@ -11,7 +11,7 @@ import 'package:path/path.dart' as path;
 /// A Implementation of [WindowsIconGenerator] for Windows
 class WindowsIconGenerator extends IconGenerator {
   /// Creates a instance of [WindowsIconGenerator]
-  WindowsIconGenerator(IconGeneratorContext context) : super(context, 'Windows');
+  WindowsIconGenerator(final IconGeneratorContext context) : super(context, 'Windows');
 
   @override
   bool validateRequirements() {
@@ -64,7 +64,7 @@ class WindowsIconGenerator extends IconGenerator {
     );
 
     context.logger.verbose('Decoding and loading image file from $imgFilePath...');
-    final bool svgInput = utils.isSvgPath(imgFilePath);
+    final svgInput = utils.isSvgPath(imgFilePath);
     final imgFile = await utils.decodeImageFile(
       imgFilePath,
       cache: context.svgRasterCache,
@@ -78,7 +78,7 @@ class WindowsIconGenerator extends IconGenerator {
       );
     }
 
-    final utils.SizeImageLoader loadSize = (size) async => utils.createResizedImage(size, imgFile);
+    Future<Image> loadSize(final int size) => Future.value(utils.createResizedImage(size, imgFile));
 
     context.logger.verbose('Generating icon from $imgFilePath...');
     await _generateIcon(loadSize);
@@ -90,7 +90,7 @@ class WindowsIconGenerator extends IconGenerator {
     await _generateTileAssets(imagesDir);
   }
 
-  Future<void> _generateIcon(utils.SizeImageLoader loadSize) async {
+  Future<void> _generateIcon(final utils.SizeImageLoader loadSize) async {
     // Build a multi-frame ICO: one frame per target size.
     Image? multi;
     for (final sz in constants.windowsIcoSizes) {
@@ -119,9 +119,10 @@ class WindowsIconGenerator extends IconGenerator {
       path.join(context.prefixPath, paths.windowsImagesDirPath),
     );
 
-    Future<utils.SizeImageLoader> loaderFor(String? override, String label) async {
+    Future<utils.SizeImageLoader> loaderFor(final String? override, final String label) {
       if (override == null) {
-        return (int size) async => utils.createResizedImage(size, await _paddedMark(await _baseMaster(), size));
+        Future<Image> loadDerived(final int size) async => utils.createResizedImage(size, await _paddedMark(await _baseMaster(), size));
+        return Future.value(loadDerived);
       }
       final overridePath = path.join(context.prefixPath, override);
       context.logger.verbose('Decoding and loading $label image file from $overridePath...');
@@ -170,7 +171,7 @@ class WindowsIconGenerator extends IconGenerator {
   }
 
   /// Emits tile scale sets (`<Base>.scale-<N>.png`) for the `Square44x44Logo`, `Square150x150Logo`, and `Wide310x150Logo` manifest entries, plus the unqualified base file each entry points at. Pixel sizes follow `round(base * scale / 100)` per the MSIX app-icon construction table. The wide set renders from `image_path_wide` when set, otherwise from a center cover-crop of the base image. A manifest snippet for hand packaging is written alongside.
-  Future<void> _generateTileAssets(Directory imagesDir) async {
+  Future<void> _generateTileAssets(final Directory imagesDir) async {
     final windowsConfig = context.config.windowsConfig!;
     final loadBase = await _baseLoader();
 
@@ -219,35 +220,19 @@ class WindowsIconGenerator extends IconGenerator {
     await snippetFile.writeAsString(_manifestSnippet());
   }
 
-  /// Rectangular loader cover-cropping a master so any source fills a landscape canvas without stretching.
-  Future<Image> _coverCrop(Image source, int width, int height) async {
-    final scale = [width / source.width, height / source.height].reduce((a, b) => a > b ? a : b);
-    final scaled = copyResize(
-      source,
-      width: (source.width * scale).round(),
-      height: (source.height * scale).round(),
-      interpolation: Interpolation.average,
-    );
-    return copyCrop(
-      scaled,
-      x: ((scaled.width - width) / 2).round(),
-      y: ((scaled.height - height) / 2).round(),
-      width: width,
-      height: height,
-    );
-  }
-
   /// Wide-tile loader from the dedicated source when set, otherwise from the base master.
   Future<Future<Image> Function(int width, int height)> _wideLoader() async {
     final windowsConfig = context.config.windowsConfig!;
     if (windowsConfig.imagePathWide != null) {
-      final widePath = path.join(context.prefixPath, windowsConfig.imagePathWide!);
+      final widePath = path.join(context.prefixPath, windowsConfig.imagePathWide);
       context.logger.verbose('Decoding and loading wide image file from $widePath...');
       final master = await utils.decodeImageFile(widePath, cache: context.svgRasterCache);
-      return (int width, int height) => _coverCrop(master, width, height);
+      Future<Image> loadWide(final int width, final int height) => Future.value(utils.coverCropImage(master, width, height));
+      return loadWide;
     }
     final master = await _baseMaster();
-    return (int width, int height) => _coverCrop(master, width, height);
+    Future<Image> loadBase(final int width, final int height) => Future.value(utils.coverCropImage(master, width, height));
+    return loadBase;
   }
 
   Image? _baseMasterCache;
@@ -269,11 +254,12 @@ class WindowsIconGenerator extends IconGenerator {
   /// Square loader over the base master.
   Future<utils.SizeImageLoader> _baseLoader() async {
     final master = await _baseMaster();
-    return (int size) async => utils.createResizedImage(size, master);
+    Future<Image> load(final int size) => Future.value(utils.createResizedImage(size, master));
+    return load;
   }
 
-  /// Bare-mark derivation: artwork scaled to [windowsUnplatedArtworkScale] of the canvas and centered on transparency.
-  Future<Image> _paddedMark(Image master, int size) async {
+  /// Bare-mark derivation: artwork scaled to `windowsUnplatedArtworkScale` of the canvas and centered on transparency.
+  Future<Image> _paddedMark(final Image master, final int size) async {
     final artwork = utils.createResizedImage((size * constants.windowsUnplatedArtworkScale).round(), master);
     final canvas = Image(width: size, height: size, numChannels: 4);
     fill(canvas, color: ColorUint8.rgba(0, 0, 0, 0));

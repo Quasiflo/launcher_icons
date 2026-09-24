@@ -16,6 +16,8 @@ import 'package:path/path.dart' as path;
 
 /// A [IconGenerator] implementation for macos
 class MacOSIconGenerator extends IconGenerator {
+  /// Creates a instance of [MacOSIconGenerator]
+  MacOSIconGenerator(final IconGeneratorContext context) : super(context, 'MacOS');
   static const _iconSizeTemplates = <MacOSIconTemplate>[
     MacOSIconTemplate(16, 1),
     MacOSIconTemplate(16, 2),
@@ -29,9 +31,6 @@ class MacOSIconGenerator extends IconGenerator {
     MacOSIconTemplate(512, 2),
   ];
 
-  /// Creates a instance of [MacOSIconGenerator]
-  MacOSIconGenerator(IconGeneratorContext context) : super(context, 'MacOS');
-
   /// Catalog name for this run: a custom `icon_name` wins off-flavor (like iOS), otherwise `AppIcon-<flavor>` for flavor runs, else `AppIcon`.
   String _catalogName() {
     final iconName = context.config.macOSConfig?.iconName;
@@ -42,9 +41,7 @@ class MacOSIconGenerator extends IconGenerator {
   }
 
   /// Icons directory for [_catalogName]: `AppIcon-<flavor>.appiconset` for flavor runs so macOS honors flavors like iOS does.
-  String _iconsDirPath() {
-    return path.join(paths.macOSAssetsDirPath, '${_catalogName()}${paths.appIconSetExtension}');
-  }
+  String _iconsDirPath() => path.join(paths.macOSAssetsDirPath, '${_catalogName()}${paths.appIconSetExtension}');
 
   /// Contents.json path matching [_iconsDirPath].
   String _contentsFilePath() => path.join(_iconsDirPath(), paths.contentsJsonFileName);
@@ -52,8 +49,8 @@ class MacOSIconGenerator extends IconGenerator {
   @override
   Future<void> createIcons() async {
     final macOSConfig = context.config.macOSConfig!;
-    final bool iconOnly = macOSConfig.iconOnly;
-    final bool hasGlass = (macOSConfig.liquidGlassLayers?.isNotEmpty ?? false) || (macOSConfig.liquidGlassGroups?.isNotEmpty ?? false);
+    final iconOnly = macOSConfig.iconOnly;
+    final hasGlass = (macOSConfig.liquidGlassLayers?.isNotEmpty ?? false) || (macOSConfig.liquidGlassGroups?.isNotEmpty ?? false);
     if (iconOnly && !hasGlass) {
       throw const InvalidConfigException(
         '`macos.icon_only` requires `liquid_glass_layers` or `liquid_glass_groups`: there is nothing else to emit.',
@@ -86,7 +83,7 @@ class MacOSIconGenerator extends IconGenerator {
       _updateContentsFile();
     } else {
       context.logger.info(
-        'Skipping the PNG asset catalog (`macos.icon_only`): emitting ${_catalogName()}.icon only — set the target\'s App Icon to it in Xcode.',
+        "Skipping the PNG asset catalog (`macos.icon_only`): emitting ${_catalogName()}.icon only — set the target's App Icon to it in Xcode.",
       );
     }
 
@@ -151,7 +148,7 @@ class MacOSIconGenerator extends IconGenerator {
   }
 
   /// Adds the liquid glass `.icon` file reference to the macOS project.pbxproj (same reference edit the iOS generator performs). A missing project file only warns: the icons themselves are still valid.
-  Future<void> _addLiquidGlassIconToProject(String iconName) async {
+  Future<void> _addLiquidGlassIconToProject(final String iconName) async {
     final pbxprojPath = resolveMacOSPbxprojPath(
       context.config.macOSConfig?.xcodeprojPath,
       context.prefixPath,
@@ -180,7 +177,7 @@ class MacOSIconGenerator extends IconGenerator {
   }
 
   /// Removes the liquid glass `.icon` file reference for [iconName] from the macOS project.pbxproj (the inverse of [_addLiquidGlassIconToProject]). A missing project file is a no-op: the icons themselves are still valid.
-  Future<void> _removeLiquidGlassIconFromProject(String iconName) async {
+  Future<void> _removeLiquidGlassIconFromProject(final String iconName) async {
     final pbxprojPath = resolveMacOSPbxprojPath(
       context.config.macOSConfig?.xcodeprojPath,
       context.prefixPath,
@@ -205,8 +202,8 @@ class MacOSIconGenerator extends IconGenerator {
     context.logger.verbose('Checking $platformName config...');
     final macOSConfig = context.config.macOSConfig!;
 
-    final bool iconOnly = macOSConfig.iconOnly;
-    final bool hasGlass = (macOSConfig.liquidGlassLayers?.isNotEmpty ?? false) || (macOSConfig.liquidGlassGroups?.isNotEmpty ?? false);
+    final iconOnly = macOSConfig.iconOnly;
+    final hasGlass = (macOSConfig.liquidGlassLayers?.isNotEmpty ?? false) || (macOSConfig.liquidGlassGroups?.isNotEmpty ?? false);
     if (iconOnly && !hasGlass) {
       context.logger.error(
         '`macos.icon_only` requires `liquid_glass_layers` or `liquid_glass_groups`: there is nothing else to emit.',
@@ -226,7 +223,7 @@ class MacOSIconGenerator extends IconGenerator {
     }
 
     // Glass layer sources must exist (layers and groups alike): a missing file would otherwise surface deep inside bundle writing instead of up-front validation.
-    bool glassSourceOk(String label, LiquidGlassLayer layer) {
+    bool glassSourceOk(final String label, final LiquidGlassLayer layer) {
       for (final entry in {
         'image_path': layer.imagePath,
         'image_path_dark': layer.imagePathDark,
@@ -277,7 +274,7 @@ class MacOSIconGenerator extends IconGenerator {
   }
 
   Future<void> _generateIcons(
-    Future<Image> Function(int) loadArtwork,
+    final Future<Image> Function(int) loadArtwork,
   ) async {
     final iconsDir = await utils.createDirIfNotExist(
       path.join(context.prefixPath, _iconsDirPath()),
@@ -294,7 +291,7 @@ class MacOSIconGenerator extends IconGenerator {
       bySize.putIfAbsent(template.scaledSize, () => <MacOSIconTemplate>[]).add(template);
     }
     await Future.wait(
-      bySize.entries.map((entry) async {
+      bySize.entries.map((final entry) async {
         final resizedImg = await effects.buildMacOSIconImage(
           loadArtwork,
           entry.key,
@@ -358,7 +355,7 @@ class MacOSIconGenerator extends IconGenerator {
     }
     contentsConfig
       ..remove('images')
-      ..['images'] = _iconSizeTemplates.map<Map<String, dynamic>>((e) => e.iconContent).toList();
+      ..['images'] = _iconSizeTemplates.map<Map<String, dynamic>>((final e) => e.iconContent).toList();
 
     contentsFilePath.writeAsStringSync(utils.prettifyJsonEncode(contentsConfig));
   }
@@ -368,8 +365,8 @@ class MacOSIconGenerator extends IconGenerator {
 ///
 /// Prefers an explicit [xcodeprojPath] (`macos.xcodeproj_path`), then the standard `macos/Runner.xcodeproj` location, then the first `*.xcodeproj` found under `macos/` so renamed Runner projects keep working (the iOS generator's `resolveIosPbxprojPath` equivalent). Returns `null` when no project exists.
 String? resolveMacOSXcodeprojPath([
-  String? xcodeprojPath,
-  String prefixPath = '.',
+  final String? xcodeprojPath,
+  final String prefixPath = '.',
 ]) {
   if (xcodeprojPath != null) {
     return utils.withPrefix(prefixPath, xcodeprojPath);
@@ -380,7 +377,7 @@ String? resolveMacOSXcodeprojPath([
   }
   final macosDir = Directory(utils.withPrefix(prefixPath, paths.macOSDirPath));
   if (macosDir.existsSync()) {
-    final candidates = macosDir.listSync().whereType<Directory>().where((dir) => dir.path.endsWith(paths.xcodeprojExtension)).toList()..sort((a, b) => a.path.compareTo(b.path));
+    final candidates = macosDir.listSync().whereType<Directory>().where((final dir) => dir.path.endsWith(paths.xcodeprojExtension)).toList()..sort((final a, final b) => a.path.compareTo(b.path));
     for (final dir in candidates) {
       if (File(path.join(dir.path, paths.pbxprojFileName)).existsSync()) {
         return dir.path;
@@ -392,8 +389,8 @@ String? resolveMacOSXcodeprojPath([
 
 /// Resolves the macOS project.pbxproj file to edit (see [resolveMacOSXcodeprojPath]). Returns `null` when no project exists.
 String? resolveMacOSPbxprojPath([
-  String? xcodeprojPath,
-  String prefixPath = '.',
+  final String? xcodeprojPath,
+  final String prefixPath = '.',
 ]) {
   final dir = resolveMacOSXcodeprojPath(xcodeprojPath, prefixPath);
   return dir == null ? null : path.join(dir, paths.pbxprojFileName);
@@ -403,7 +400,7 @@ String? resolveMacOSPbxprojPath([
 /// project.pbxproj plus every `macos/Flutter/*.xcconfig` when present
 /// (macOS flavors are pbxproj-wired today; the xcconfig scan future-proofs a
 /// flavor_mode port and costs nothing when the directory is absent).
-Future<List<String>> macOSCatalogReferenceTexts({String prefixPath = '.'}) async {
+Future<List<String>> macOSCatalogReferenceTexts({final String prefixPath = '.'}) async {
   final references = <String>[];
   final pbxprojFile = File(path.join(prefixPath, paths.macOSConfigFile));
   if (pbxprojFile.existsSync()) {

@@ -8,6 +8,24 @@ part 'android_config.g.dart';
   checked: true,
 )
 class AndroidConfig {
+  /// Creates a instance of [AndroidConfig]
+  const AndroidConfig({
+    this.generate = false,
+    this.imagePath,
+    this.iconName,
+    this.adaptiveIconForeground,
+    this.adaptiveIconForegroundInset = 16,
+    this.adaptiveIconBackground,
+    this.adaptiveIconMonochrome,
+    this.adaptiveIconMonochromeInset = 16,
+    this.adaptiveIconRound,
+    this.notificationIcon,
+    this.notificationIconName = 'ic_notification',
+  });
+
+  /// Creates [AndroidConfig] from [json]
+  factory AndroidConfig.fromJson(final Map<dynamic, dynamic> json) => _$AndroidConfigFromJson(json);
+
   /// Specifies whether to generate icons for Android
   final bool generate;
 
@@ -54,24 +72,6 @@ class AndroidConfig {
   /// android notification icon resource name (defaults to `ic_notification`).
   @JsonKey(name: 'notification_icon_name')
   final String notificationIconName;
-
-  /// Creates a instance of [AndroidConfig]
-  const AndroidConfig({
-    this.generate = false,
-    this.imagePath,
-    this.iconName,
-    this.adaptiveIconForeground,
-    this.adaptiveIconForegroundInset = 16,
-    this.adaptiveIconBackground,
-    this.adaptiveIconMonochrome,
-    this.adaptiveIconMonochromeInset = 16,
-    this.adaptiveIconRound,
-    this.notificationIcon,
-    this.notificationIconName = 'ic_notification',
-  });
-
-  /// Creates [AndroidConfig] from [json]
-  factory AndroidConfig.fromJson(Map<dynamic, dynamic> json) => _$AndroidConfigFromJson(json);
 
   /// Creates [Map] from [AndroidConfig]
   Map<String, dynamic> toJson() => _$AndroidConfigToJson(this);

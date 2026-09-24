@@ -1,0 +1,3 @@
+import "package://github.com/jdx/hk/releases/download/v2.1.0/hk@2.1.0#/Builtins.pkl" as _builtins
+
+const Builtins = _builtins // Export for submodules to use and resolve same version

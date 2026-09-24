@@ -19,14 +19,14 @@ Thanks for helping out! This repo is intentionally easy to work in: plain Dart, 
    mise install
    ```
 
-   This configures mise to use the "toolchain" environment, which includes the extra dependencies from [.config/mise.toolchain.toml](.config/mise.toolchain.toml)
+   This configures mise to use the "toolchain" environment, which includes the extra dependencies from.
 3. Install the git hooks — recommended once per machine (Git 2.54+, silent no-op in repos without hk config):
 
    ```shell
    hk install --global
    ```
 
-   Or repo-only with `hk install`. Skip hooks for one command with `HK=0`. Optional global defaults (extra steps, `jobs`, …) live in `~/.config/hk/config.pkl`. More in the [hk docs](https://hk.jdx.dev/getting-started.html).
+   Or repo-only with `hk install`. Skip hooks for one command with `HK=0`. Optional global defaults (extra steps, `jobs`, …) live in `~/.config/hk/config.pkl`. More in the [hk docs](https://hk.jdx.dev/getting_started.html).
 4. Get dependencies and confirm green:
 
    ```shell

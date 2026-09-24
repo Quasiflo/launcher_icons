@@ -1,4 +1,4 @@
-const liConfigTemplate = r'''
+const liConfigTemplate = '''
 launcher_icons:
   image_path: "assets/images/icon-128x128.png"
   android:
@@ -31,7 +31,7 @@ launcher_icons:
 
 const flavorLIConfigTemplate = liConfigTemplate;
 
-const liWebConfig = r'''
+const liWebConfig = '''
 launcher_icons:
   web:
     generate: true
@@ -42,14 +42,14 @@ launcher_icons:
     apple_mobile_web_app_status_bar_style: "hex_color"
 ''';
 
-const liWindowsConfig = r'''
+const liWindowsConfig = '''
 launcher_icons:
   windows:
     generate: true
     image_path: "master-light-1024.png"
 ''';
 
-const invalidliConfigTemplate = r'''
+const invalidliConfigTemplate = '''
 # launcher_icons
 android: true
 ios: true
@@ -69,7 +69,7 @@ web:
   apple_mobile_web_app_status_bar_style: "hex_color"
 ''';
 
-const pubspecTemplate = r'''
+const pubspecTemplate = '''
 name: demo
 description: A new Flutter project.
 publish_to: 'none'
@@ -137,7 +137,7 @@ launcher_icons:
     image_path: "master-light-1024.png"
 ''';
 
-const invalidPubspecTemplate = r'''
+const invalidPubspecTemplate = '''
 name: demo
 description: A new Flutter project.
 publish_to: 'none'
@@ -197,7 +197,7 @@ launcher_icons:
     image_path: "master-light-1024.png"
 ''';
 
-const webManifestTemplate = r'''
+const webManifestTemplate = '''
 {
   "name": "demo",
   "short_name": "demo",
@@ -298,7 +298,7 @@ const webIndexTemplate = r'''
 ''';
 
 // macos
-const macOSContentsJsonFile = r'''
+const macOSContentsJsonFile = '''
 {
     "info": {
         "version": 1,

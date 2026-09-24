@@ -24,9 +24,12 @@ import '../templates.dart' as templates;
 import 'macos_icon_generator_test.mocks.dart';
 
 // Parses the `launcher_icons:` section of a config-file template string, mirroring what the removed file loaders extracted.
-Config parseTemplateSection(String template) => Config.fromJson(
-      loadYaml(template)['launcher_icons'] as Map<dynamic, dynamic>,
-    );
+Config parseTemplateSection(final String template) {
+  final yaml = loadYaml(template) as Map<dynamic, dynamic>;
+  return Config.fromJson(
+    yaml['launcher_icons'] as Map<dynamic, dynamic>,
+  );
+}
 
 void main() {
   group('MacOSIconGenerator', () {
@@ -57,8 +60,8 @@ void main() {
         generator = MacOSIconGenerator(context);
 
         // initilize mock defaults
-        when(mockLogger.error(argThat(anything))).thenReturn(anything);
-        when(mockLogger.verbose(argThat(anything))).thenReturn(anything);
+        when(mockLogger.error(argThat(anything))).thenAnswer((final _) {});
+        when(mockLogger.verbose(argThat(anything))).thenAnswer((final _) {});
         when(mockLogger.isVerbose).thenReturn(false);
         when(mockConfig.macOSConfig).thenReturn(mockMacOSConfig);
         when(mockMacOSConfig.generate).thenReturn(true);
@@ -66,7 +69,7 @@ void main() {
         when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
         // resolveImageFile is mocked: implement the real rule (platform path wins, top-level fallback, missing file throws) so the unit tests exercise the generators, not the mock default.
         when(mockConfig.resolveImageFile(argThat(anything), prefixPath)).thenAnswer(
-          (invocation) {
+          (final invocation) {
             final platformPath = invocation.positionalArguments.first as String?;
             final resolved = platformPath ?? mockConfig.imagePath;
             if (resolved == null || !File(path.join(prefixPath, resolved)).existsSync()) {
@@ -81,7 +84,7 @@ void main() {
         final realContext = IconGeneratorContext(
           config: const Config(imagePath: 'icon.png'),
           prefixPath: prefixPath,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
         );
 
         expect(realContext.config.macOSEnabled, isFalse);
@@ -91,10 +94,10 @@ void main() {
         final realContext = IconGeneratorContext(
           config: const Config(
             imagePath: 'icon.png',
-            macOSConfig: MacOSConfig(generate: false),
+            macOSConfig: MacOSConfig(),
           ),
           prefixPath: prefixPath,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
         );
 
         expect(realContext.config.macOSEnabled, isFalse);
@@ -181,7 +184,7 @@ void main() {
       context = IconGeneratorContext(
         config: config,
         prefixPath: prefixPath,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
       );
       generator = MacOSIconGenerator(context);
     });
@@ -231,7 +234,7 @@ void main() {
       final flavorContext = IconGeneratorContext(
         config: flavorConfig,
         prefixPath: flavorPrefix,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
         flavor: 'staging',
       );
       final flavorGenerator = MacOSIconGenerator(flavorContext);
@@ -276,7 +279,7 @@ void main() {
         IconGeneratorContext(
           config: freshConfig,
           prefixPath: freshPrefix,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           flavor: 'fresh',
         ),
       );
@@ -311,7 +314,7 @@ void main() {
       final roundedContext = IconGeneratorContext(
         config: roundedConfig,
         prefixPath: roundedPrefix,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
       );
       final roundedGenerator = MacOSIconGenerator(roundedContext);
 

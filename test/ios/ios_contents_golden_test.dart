@@ -12,7 +12,7 @@ void main() {
       expect(list, hasLength(21));
       final base = list.sublist(0, 20);
       expect(
-        base.every((e) => e['idiom'] == 'universal' && e['platform'] == 'ios'),
+        base.every((final e) => e['idiom'] == 'universal' && e['platform'] == 'ios'),
         isTrue,
       );
       final marketing = list.last;
@@ -26,10 +26,10 @@ void main() {
     test('universal 1024 and marketing share one PNG file', () {
       final list = ios.createImageList('Icon-App', null, null);
 
-      final hundreds = list.where((e) => e['size'] == '1024x1024').toList();
+      final hundreds = list.where((final e) => e['size'] == '1024x1024').toList();
       expect(hundreds, hasLength(2));
       expect(
-        hundreds.map((e) => e['filename']).toSet(),
+        hundreds.map((final e) => e['filename']).toSet(),
         equals({'Icon-App-1024x1024@1x.png'}),
       );
     });
@@ -43,31 +43,31 @@ void main() {
 
       expect(list, hasLength(21 + 20 + 20));
       final dark = list.where(
-        (e) =>
+        (final e) =>
             (e['appearances'] as List?)?.any(
-              (a) => a['value'] == 'dark',
+              (final a) => (a as Map)['value'] == 'dark',
             ) ??
             false,
       );
       expect(dark, hasLength(20));
       expect(
-        dark.every((e) => e['idiom'] == 'universal'),
+        dark.every((final e) => e['idiom'] == 'universal'),
         isTrue,
       );
       final tinted = list.where(
-        (e) =>
+        (final e) =>
             (e['appearances'] as List?)?.any(
-              (a) => a['value'] == 'tinted',
+              (final a) => (a as Map)['value'] == 'tinted',
             ) ??
             false,
       );
       expect(tinted, hasLength(20));
       expect(
-        tinted.every((e) => e['idiom'] == 'universal'),
+        tinted.every((final e) => e['idiom'] == 'universal'),
         isTrue,
       );
       // The marketing slot stays appearance-free.
-      final marketing = list.where((e) => e['idiom'] == 'ios-marketing').toList();
+      final marketing = list.where((final e) => e['idiom'] == 'ios-marketing').toList();
       expect(marketing, hasLength(1));
       expect(marketing.first.containsKey('appearances'), isFalse);
     });
@@ -105,7 +105,7 @@ void main() {
   group('Contents.json serialization', () {
     test('generateContentsFileAsString wraps the list with xcode info', () {
       final decoded = jsonDecode(
-        ios.generateContentsFileAsString('Icon-App', null, null, false),
+        ios.generateContentsFileAsString('Icon-App', null, null),
       ) as Map<String, dynamic>;
 
       expect(decoded['images'] as List, hasLength(21));

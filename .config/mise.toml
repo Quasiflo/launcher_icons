@@ -1,4 +1,69 @@
+#* Backend Priority Order: Core, Aqua, Github, Package Manager (cargo, npm, pipx)
+
+[env]
+ANDROID_BUILD_TOOLS = "36.0.0"                                  # Should match build tools version flutter uses
+ANDROID_SYSTEM_IMAGE = "android-36;google_apis_ps16k;arm64-v8a" # Image to use for android emulator
+GRADLE_OPTS = "--enable-native-access=ALL-UNNAMED"              # Don't warn about accessing native built binaries outside of JVM
+
 [tools]
-"aqua:jdx/hk" = "2.0.0"                       # Used for linting, formatting & git hooks
-"aqua:rvben/rumdl" = "0.2.73"                 # Used for linting & formatting markdown
-"github:zizmorcore/zizmor" = "v1.30.1"        # Used for statically analyzing github actions
+#* Main
+"core:java" = "25.0.2"                        # Used for Android builds
+"aqua:Kitware/CMake" = "4.4.3"                # Used for Linux builds
+"aqua:ninja-build/ninja" = "1.13.2"           # Used for Linux builds
+"gem:cocoapods" = "1.17.0"                    # Used for MacOS builds
+"cargo:templatry" = "0.2.0"                   # Used for generating config files
+"vfox:mise-plugins/vfox-android-sdk" = "23.0" # Used for acquiring android sdk tools, which install the sdk using the mise postinstall script
+#* Linting
+"aqua:jdx/hk" = "2.1.0"                # Used for running linting, formatting & git hooks
+"aqua:astral-sh/uv" = "0.12.13"        # Used for python (pipx) linting tools
+"aqua:mikefarah/yq" = "4.53.6"         # Used for validating & formatting JSON & toml parsing
+"aqua:tombi-toml/tombi" = "1.5.5"      # Used for validating & formatting TOML
+"aqua:rvben/rumdl" = "0.2.73"          # Used for linting & formatting markdown
+"aqua:lycheeverse/lychee" = "0.24.2"   # Used for checking for dead links
+"aqua:loeffel-io/ls-lint" = "2.3.1"    # Used for enforcing folder & file naming conventions
+"aqua:google/yamlfmt" = "0.21.0"       # Used for formatting YAML
+"github:mongodb/kingfisher" = "v2.4.0" # Used for checking for leaked credentials & secrets
+"github:kucherenko/jscpd" = "v5.2.1"   # Used for detecting code duplication
+"github:zizmorcore/zizmor" = "v1.30.1" # Used for statically analyzing github actions
+"pipx:yamllint" = "1.38.0"             # Used for linting YAML
+
+[tools."http:flutter"]
+version = "3.47.2"
+version_expr = 'fromJSON(body).releases | filter({ #.channel == "stable" }) | map({ replace(#.version, "-stable", "") }) | sortVersions()'
+checksum_expr = '"sha256:" + filter(fromJSON(body).releases, { #.archive endsWith filename })[0].sha256'
+version_list_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json"
+
+[tools."http:flutter".platforms]
+macos-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_{{ version }}-stable.zip", checksum_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_macos.json" }
+macos-arm64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_arm64_{{ version }}-stable.zip", checksum_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_macos.json" }
+windows-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_{{ version }}-stable.zip", checksum_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_windows.json" }
+linux-x64 = { url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_{{ version }}-stable.tar.xz", checksum_url = "https://storage.googleapis.com/flutter_infra_release/releases/releases_linux.json" }
+
+[hooks]
+postinstall = """
+#!/usr/bin/env bash
+#* Installs required Android SDK components. Uses various envs set earlier in this file
+set -e
+
+echo "--> Installing Android SDK components inside mise tool directory..."
+android sdk install \
+  "build-tools;${ANDROID_BUILD_TOOLS}" \
+  "platform-tools" \
+  "emulator" \
+  "system-images;${ANDROID_SYSTEM_IMAGE}" \
+  "tools"
+
+# build-tools gets auto-installed by flutter but must be installed first to discover the emulated device. Ensure version matches what flutter expects to avoid downloading two versions!
+# "platforms;android-${ANDROID_COMPILE_SDK}" isn't needed as Flutter downloads the correct SDK
+# "ndk;${ANDROID_NDK_VERSION}" isn't needed as Flutter downloads the correct NDK
+
+echo "--> Creating Android Emulator..."
+avdmanager create avd \
+  -n Android_Phone_16k \
+  -k "system-images;${ANDROID_SYSTEM_IMAGE}" \
+  -d "pixel_6" \
+  --force
+"""
+
+[settings]
+lockfile = true

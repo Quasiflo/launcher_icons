@@ -8,6 +8,17 @@ part 'linux_config.g.dart';
   checked: true,
 )
 class LinuxConfig {
+  /// Creates a instance of [LinuxConfig]
+  const LinuxConfig({
+    this.generate = false,
+    this.imagePath,
+    this.sharePrefix = 'linux',
+    this.generateSnap = false,
+  });
+
+  /// Creates [LinuxConfig] from [json]
+  factory LinuxConfig.fromJson(final Map<dynamic, dynamic> json) => _$LinuxConfigFromJson(json);
+
   /// Specifies whether to generate icons for Linux
   final bool generate;
 
@@ -22,17 +33,6 @@ class LinuxConfig {
   /// Whether to emit snap packaging (`snap/gui/` + `snap/snapcraft.yaml`, default false).
   @JsonKey(name: 'generate_snap')
   final bool generateSnap;
-
-  /// Creates a instance of [LinuxConfig]
-  const LinuxConfig({
-    this.generate = false,
-    this.imagePath,
-    this.sharePrefix = 'linux',
-    this.generateSnap = false,
-  });
-
-  /// Creates [LinuxConfig] from [json]
-  factory LinuxConfig.fromJson(Map<dynamic, dynamic> json) => _$LinuxConfigFromJson(json);
 
   /// Creates [Map] from [LinuxConfig]
   Map<String, dynamic> toJson() => _$LinuxConfigToJson(this);

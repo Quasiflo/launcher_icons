@@ -53,18 +53,18 @@ launcher_icons-production:
       Directory.current = originalDir;
     });
 
-    Future<List<String>> runCli(List<String> args) async {
+    Future<List<String>> runCli(final List<String> args) async {
       final printed = <String>[];
       await runZoned(
         () => main_dart.createIconsFromArguments(args),
         zoneSpecification: ZoneSpecification(
-          print: (self, parent, zone, line) => printed.add(line),
+          print: (final self, final parent, final zone, final line) => printed.add(line),
         ),
       );
       return printed;
     }
 
-    bool icoExists(String name) => File(
+    bool icoExists(final String name) => File(
           path.join(
             sandboxDir,
             'windows',
@@ -77,12 +77,12 @@ launcher_icons-production:
     test('loops over suffixed sections without -c', () async {
       final printed = await runCli([]);
 
-      expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: staging')), isTrue);
       expect(
-        printed.any((line) => line.contains('Flavor: production')),
+        printed.any((final line) => line.contains('Flavor: production')),
         isTrue,
       );
-      expect(printed.any((line) => line.contains('for flavors')), isTrue);
+      expect(printed.any((final line) => line.contains('for flavors')), isTrue);
       expect(icoExists('key_staging.ico'), isTrue);
       expect(icoExists('key_production.ico'), isTrue);
     });
@@ -93,9 +93,9 @@ launcher_icons-production:
 
       final printed = await runCli([]);
 
-      expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: staging')), isTrue);
       expect(
-        printed.any((line) => line.contains('Flavor: production')),
+        printed.any((final line) => line.contains('Flavor: production')),
         isTrue,
       );
       expect(icoExists('key_staging.ico'), isTrue);
@@ -104,14 +104,14 @@ launcher_icons-production:
     test('--flavor runs a single section', () async {
       final printed = await runCli(['--flavor', 'staging']);
 
-      expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: staging')), isTrue);
       expect(
-        printed.any((line) => line.contains('Flavor: production')),
+        printed.any((final line) => line.contains('Flavor: production')),
         isFalse,
       );
       expect(
         printed.any(
-          (line) => line.contains('Successfully generated launcher icons') && !line.contains('flavors'),
+          (final line) => line.contains('Successfully generated launcher icons') && !line.contains('flavors'),
         ),
         isTrue,
       );
@@ -162,7 +162,7 @@ launcher_icons-myflav:
 
       final printed = await runCli(['-c', 'sub', '-f', 'myflav']);
 
-      expect(printed.any((line) => line.contains('Flavor: myflav')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: myflav')), isTrue);
       // The section ran from sub/launcher_icons-myflav.yaml ...
       expect(icoExists('app_myflav.ico'), isTrue);
       // ...not from the root launcher_icons.yaml sections.

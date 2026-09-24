@@ -1,3 +1,4 @@
+---
 # Codegen only applies to the package itself: the checked-in example app is a standalone Flutter project with its own language version and must not be scanned by builders (json_serializable chokes on its newer syntax, and no generated outputs live there).
 targets:
   $default:

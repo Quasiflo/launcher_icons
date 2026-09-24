@@ -62,8 +62,8 @@ flutter:
     }
 
     LinuxIconGenerator generator({
-      String sharePrefix = 'linux',
-      bool generateSnap = false,
+      final String sharePrefix = 'linux',
+      final bool generateSnap = false,
     }) {
       final config = Config(
         imagePath: 'assets/images/icon.png',
@@ -76,7 +76,7 @@ flutter:
       return LinuxIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: tempDir.path,
         ),
       );

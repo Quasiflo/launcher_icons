@@ -65,7 +65,7 @@ void main() {
     });
 
     test('matte of identical renders strips alpha as fully opaque', () {
-      final white = Image(width: 4, height: 4, numChannels: 3);
+      final white = Image(width: 4, height: 4);
       fill(white, color: ColorRgb8(10, 20, 30));
 
       final matted = utils.matteWhiteBlack(white, white);
@@ -179,7 +179,7 @@ void main() {
         IconGeneratorContext(
           config: config,
           prefixPath: prefix,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
         ),
       );
 
@@ -194,7 +194,7 @@ void main() {
       );
     }
 
-    int icoFrameCount(String icoPath) {
+    int icoFrameCount(final String icoPath) {
       final bytes = File(icoPath).readAsBytesSync();
       expect(bytes.length, greaterThan(6));
       return bytes[4] | bytes[5] << 8;

@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 // Malformed-input coverage for the line-oriented parsers: XML comments, duplicate keys, CRLF, and missing trailing newlines.
 void main() {
   group('manifest icon rewriting', () {
-    Future<String> rewrite(String input, String iconName) async {
+    Future<String> rewrite(final String input, final String iconName) async {
       final dir = await Directory.systemTemp.createTemp('manifest_fuzz');
       try {
         final file = File('${dir.path}/AndroidManifest.xml');
@@ -85,7 +85,7 @@ void main() {
   });
 
   group('colors.xml updating', () {
-    Future<String> update(String input, String color) async {
+    Future<String> update(final String input, final String color) async {
       final dir = await Directory.systemTemp.createTemp('colors_fuzz');
       try {
         final file = File('${dir.path}/colors.xml');
@@ -98,7 +98,8 @@ void main() {
     }
 
     test('ignores commented background entries', () async {
-      const input = '''<?xml version="1.0" encoding="utf-8"?>
+      const input = '''
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- <color name="ic_launcher_background">#000000</color> -->
 </resources>
@@ -119,7 +120,8 @@ void main() {
     });
 
     test('first duplicate entry wins', () async {
-      const input = '''<?xml version="1.0" encoding="utf-8"?>
+      const input = '''
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#111111</color>
     <color name="ic_launcher_background">#222222</color>

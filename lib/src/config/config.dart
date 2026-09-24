@@ -29,6 +29,9 @@ class Config {
     this.linuxConfig,
   });
 
+  /// Creates [Config] icons from [json]
+  factory Config.fromJson(final Map<dynamic, dynamic> json) => _$ConfigFromJson(json);
+
   /// Generic image_path
   @JsonKey(name: 'image_path')
   final String? imagePath;
@@ -76,22 +79,15 @@ class Config {
   bool get linuxEnabled => linuxConfig?.generate ?? false;
 
   /// Checks if at least one platform section has `generate: true`
-  bool get hasEnabledPlatform {
-    return androidEnabled || iosEnabled || webEnabled || windowsEnabled || macOSEnabled || linuxEnabled;
-  }
+  bool get hasEnabledPlatform => androidEnabled || iosEnabled || webEnabled || windowsEnabled || macOSEnabled || linuxEnabled;
 
   /// Resolves the platform `image_path` (falling back to the top-level `image_path`) to an existing file, returning its project-relative path. Throws [InvalidConfigException] when unset or when the file does not exist.
-  String resolveImageFile(String? platformImagePath, String prefixPath) {
+  String resolveImageFile(final String? platformImagePath, final String prefixPath) {
     final resolved = platformImagePath ?? imagePath;
     if (resolved == null || !File(path.join(prefixPath, resolved)).existsSync()) {
       throw InvalidConfigException('Missing "image_path" within configuration, or the referenced image file does not exist${resolved == null ? '' : ': "$resolved"'}');
     }
     return resolved;
-  }
-
-  /// Creates [Config] icons from [json]
-  factory Config.fromJson(Map<dynamic, dynamic> json) {
-    return _$ConfigFromJson(json);
   }
 
   /// Converts config to [Map]

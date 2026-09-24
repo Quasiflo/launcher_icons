@@ -12,10 +12,10 @@ import 'package:yaml/yaml.dart';
 /// An implementation of [LinuxIconGenerator] for Linux
 class LinuxIconGenerator extends IconGenerator {
   /// Creates an instance of [LinuxIconGenerator]
-  LinuxIconGenerator(IconGeneratorContext context) : super(context, 'Linux');
+  LinuxIconGenerator(final IconGeneratorContext context) : super(context, 'Linux');
 
   /// Runtime icon path: SVG sources derive a sibling raster (see constants.linuxRuntimeSize) because the runner can only load rasters; raster sources pass through untouched.
-  static String runtimeIconPath(String iconPath) => utils.isSvgPath(iconPath)
+  static String runtimeIconPath(final String iconPath) => utils.isSvgPath(iconPath)
       ? path.join(
           path.dirname(iconPath),
           '${path.basenameWithoutExtension(iconPath)}${paths.linuxDerivedIconSuffix}',
@@ -44,8 +44,8 @@ class LinuxIconGenerator extends IconGenerator {
 
   /// Rasterizes the SVG at [sourcePath] to the [iconPath] runtime raster.
   Future<void> _writeDerivedRuntimeIcon(
-    String sourcePath,
-    String iconPath,
+    final String sourcePath,
+    final String iconPath,
   ) async {
     final image = await utils.cachedSvgRaster(
       context.svgRasterCache,
@@ -63,7 +63,7 @@ class LinuxIconGenerator extends IconGenerator {
   /// Generates the real launcher deliverables: the hicolor PNG tree and the freedesktop `.desktop` entry under `sharePrefix`, plus (when `generate_snap` is true) the snap icon, the snap `.desktop` entry and `snap/snapcraft.yaml` — all keyed off the pubspec name/version. Also ensures `linux/CMakeLists.txt` installs the `share/` tree.
   ///
   /// Every file is strictly only-if-absent: pre-existing files are left untouched (with a warning) so user edits are never clobbered. The CMake block is canonical and updated in place when the prefix changes.
-  Future<void> _generatePackagingFiles(String iconPath) async {
+  Future<void> _generatePackagingFiles(final String iconPath) async {
     final linuxConfig = context.config.linuxConfig!;
     final sharePrefix = linuxConfig.sharePrefix;
     final generateSnap = linuxConfig.generateSnap;
@@ -107,8 +107,8 @@ class LinuxIconGenerator extends IconGenerator {
     await _ensureCmakeInstallRules(sharePrefix);
   }
 
-  /// Writes [bytes] to [relativePath] (under [prefixPath]) unless the file already exists, in which case it warns and leaves it untouched.
-  Future<void> _writeBytesIfAbsent(String relativePath, List<int> bytes) async {
+  /// Writes [bytes] to [relativePath] (under the prefix path) unless the file already exists, in which case it warns and leaves it untouched.
+  Future<void> _writeBytesIfAbsent(final String relativePath, final List<int> bytes) async {
     final file = File(path.join(context.prefixPath, relativePath));
     if (file.existsSync()) {
       context.logger.verbose('$relativePath already exists, skipping.');
@@ -121,8 +121,8 @@ class LinuxIconGenerator extends IconGenerator {
 
   /// String variant of [_writeBytesIfAbsent].
   Future<void> _writeStringIfAbsent(
-    String relativePath,
-    String content,
+    final String relativePath,
+    final String content,
   ) async {
     final file = File(path.join(context.prefixPath, relativePath));
     if (file.existsSync()) {
@@ -140,7 +140,7 @@ class LinuxIconGenerator extends IconGenerator {
   /// Ensures `linux/CMakeLists.txt` installs the freedesktop `share/` tree (icons + desktop entry) into the bundle/system `share/`.
   ///
   /// The source directory is derived from [sharePrefix] relative to `linux/` (default `linux` -> `${CMAKE_CURRENT_SOURCE_DIR}/share/...`), so custom prefixes keep working. Idempotent: the canonical 2-line block is added once and rewritten in place when the prefix changes; user edits outside the block are preserved.
-  Future<void> _ensureCmakeInstallRules(String sharePrefix) async {
+  Future<void> _ensureCmakeInstallRules(final String sharePrefix) async {
     final file = File(path.join(context.prefixPath, paths.linuxTopCMakeListsFile));
     if (!file.existsSync()) {
       context.logger.verbose('${paths.linuxTopCMakeListsFile} not found, skipping CMake install rules.');
@@ -176,7 +176,7 @@ class LinuxIconGenerator extends IconGenerator {
     final eol = content.contains('\r\n') ? '\r\n' : '\n';
     final normalizedEol = content.replaceAll('\r\n', '\n');
     final withTrailing = normalizedEol.endsWith('\n') ? normalizedEol : '$normalizedEol\n';
-    final updated = (withTrailing + '\n$block\n').replaceAll('\n', eol);
+    final updated = '$withTrailing\n$block\n'.replaceAll('\n', eol);
     await file.writeAsString(updated);
     context.logger.verbose('Added CMake install rules for $shareRoot.');
   }
@@ -209,16 +209,16 @@ class LinuxIconGenerator extends IconGenerator {
     }
     try {
       return loadYaml(pubspecFile.readAsStringSync()) as Map<dynamic, dynamic>?;
-    } catch (_) {
+    } on Object catch (_) {
       return null;
     }
   }
 
   /// freedesktop desktop entry with the given `Icon=` line. [applicationId] becomes `StartupWMClass=` so docks/taskbars group the window under this entry; it is omitted when unknown (a wrong value is worse than none — it would override the signals that already work).
   String _desktopFile(
-    String appName,
-    String iconLine,
-    String? applicationId,
+    final String appName,
+    final String iconLine,
+    final String? applicationId,
   ) {
     final buffer = StringBuffer('''
 [Desktop Entry]
@@ -259,13 +259,13 @@ Categories=Utility;
         }
       }
       return matches.first.group(1);
-    } catch (_) {
+    } on Object catch (_) {
       return null;
     }
   }
 
   /// Minimal snap packaging template off the pubspec name/version.
-  String _snapcraftFile(String appName, String appVersion) => '''
+  String _snapcraftFile(final String appName, final String appVersion) => '''
 name: $appName
 version: $appVersion
 summary: $appName
@@ -337,7 +337,7 @@ parts:
   }
 
   /// Returns `true` when [iconPath] (or its directory) is declared in the `assets:` list under `flutter:` in `pubspec.yaml`. [sourcePath] names the SVG the runtime raster derives from, so the error can explain which file to declare.
-  bool _hasPubspecAsset(String iconPath, {String? sourcePath}) {
+  bool _hasPubspecAsset(final String iconPath, {final String? sourcePath}) {
     final pubspecFile = File(path.join(context.prefixPath, 'pubspec.yaml'));
 
     if (!pubspecFile.existsSync()) {
@@ -350,7 +350,7 @@ parts:
     final Map<dynamic, dynamic>? yamlDoc;
     try {
       yamlDoc = loadYaml(pubspecFile.readAsStringSync()) as Map<dynamic, dynamic>?;
-    } catch (_) {
+    } on Object catch (_) {
       context.logger.error('Could not parse pubspec.yaml');
       return false;
     }
@@ -400,11 +400,11 @@ parts:
 
   /// Matches the helper definition/call, but not a longer identifier that merely ends with the helper name (e.g. `my_get_flutter_asset_path(`).
   static final _helperRefRegex = RegExp(
-    '(^|[^A-Za-z0-9_])' + _assetHelperName + r'\s*\(',
+    '(^|[^A-Za-z0-9_])$_assetHelperName\\s*\\(',
     multiLine: true,
   );
 
-  static const _assetHelperTemplate = r'''
+  static const _assetHelperTemplate = '''
 static gchar* get_flutter_asset_path(const gchar* asset_path) {
   g_autofree gchar* executable = g_file_read_link("/proc/self/exe", NULL);
   if (executable == NULL) {
@@ -416,14 +416,12 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
 ''';
 
   /// Builds the canonical 2-line call block for [iconPath] with [indent].
-  static List<String> _canonicalBlock(String iconPath, String indent) {
-    return [
-      '${indent}g_autofree gchar* $_iconVarName = $_assetHelperName("$iconPath");',
-      '${indent}gtk_window_set_icon_from_file(window, $_iconVarName, NULL);',
-    ];
-  }
+  static List<String> _canonicalBlock(final String iconPath, final String indent) => [
+        '${indent}g_autofree gchar* $_iconVarName = $_assetHelperName("$iconPath");',
+        '${indent}gtk_window_set_icon_from_file(window, $_iconVarName, NULL);',
+      ];
 
-  Future<void> _updateMyApplicationFile(String iconPath) async {
+  Future<void> _updateMyApplicationFile(final String iconPath) async {
     final myAppFile = File(path.join(context.prefixPath, paths.linuxMyApplicationFile));
 
     if (!myAppFile.existsSync()) {
@@ -438,7 +436,6 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     // Canonical block already present -> check path, update or no-op.
     if (_helperRefRegex.hasMatch(content)) {
       final canonicalPathRegex = RegExp(
-        // ignore: prefer_single_quotes
         RegExp.escape(_assetHelperName) + r'\s*\(\s*"([^"]+)"\s*\)',
       );
       final canonicalMatch = canonicalPathRegex.firstMatch(content);
@@ -483,7 +480,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
       final existingIconStatement = existingIconMatch.group(0)!;
       // Skip if this is already the canonical second line (uses variable).
       if (!existingIconStatement.contains(_iconVarName)) {
-        final iconPathRegex = RegExp(r'"([^"]+)"');
+        final iconPathRegex = RegExp('"([^"]+)"');
         final iconPathMatch = iconPathRegex.firstMatch(existingIconStatement);
         final currentIconPath = iconPathMatch?.group(1);
         context.logger.verbose(
@@ -513,13 +510,13 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
     final lines = content.split('\n');
     var modified = false;
 
-    void insertAt(int index, String indent) {
+    void insertAt(final int index, final String indent) {
       final block = _canonicalBlock(iconPath, indent);
       lines.insertAll(index, block);
     }
 
     // Strategy 1: Find gtk_window_set_default_size and insert before it
-    for (int i = 0; i < lines.length; i++) {
+    for (var i = 0; i < lines.length; i++) {
       if (lines[i].contains('gtk_window_set_default_size')) {
         final currentLine = lines[i];
         final leadingWhitespace = RegExp(r'^(\s*)').firstMatch(currentLine)?.group(1) ?? '  ';
@@ -531,16 +528,16 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
 
     // Strategy 2: Find window variable declaration and insert after it
     if (!modified) {
-      for (int i = 0; i < lines.length; i++) {
+      for (var i = 0; i < lines.length; i++) {
         if (lines[i].contains('GtkWindow* window =') || lines[i].contains('GtkWindow *window =')) {
           // Find the end of the window declaration (look for semicolon)
-          int declarationEndIndex = i;
+          var declarationEndIndex = i;
           while (declarationEndIndex < lines.length && !lines[declarationEndIndex].contains(';')) {
             declarationEndIndex++;
           }
 
           // Insert after the window declaration
-          final int insertIndex = declarationEndIndex + 1;
+          final insertIndex = declarationEndIndex + 1;
 
           // Find proper indentation
           final currentLine = lines[i];
@@ -555,7 +552,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
 
     // Strategy 3: Find gtk_window_show and insert before it
     if (!modified) {
-      for (int i = 0; i < lines.length; i++) {
+      for (var i = 0; i < lines.length; i++) {
         if (lines[i].contains('gtk_window_show') || lines[i].contains('gtk_widget_show')) {
           // Find proper indentation
           final currentLine = lines[i];
@@ -570,7 +567,7 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
 
     // Strategy 4: Find any gtk_window function call and insert nearby
     if (!modified) {
-      for (int i = 0; i < lines.length; i++) {
+      for (var i = 0; i < lines.length; i++) {
         if (lines[i].contains('gtk_window_') && !lines[i].contains('gtk_window_set_icon_from_file')) {
           // Find proper indentation
           final currentLine = lines[i];
@@ -604,11 +601,11 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
   }
 
   /// Ensures `#include <gio/gio.h>` and the asset-path helper are present.
-  String _ensureHelperAndInclude(String content) {
+  String _ensureHelperAndInclude(final String content) {
     var updated = content;
     if (!updated.contains(_gioInclude)) {
       final lines = updated.split('\n');
-      final lastInclude = lines.lastIndexWhere((l) => l.trimLeft().startsWith('#include'));
+      final lastInclude = lines.lastIndexWhere((final l) => l.trimLeft().startsWith('#include'));
       if (lastInclude != -1) {
         lines.insert(lastInclude + 1, _gioInclude);
       } else {
@@ -634,9 +631,9 @@ static gchar* get_flutter_asset_path(const gchar* asset_path) {
 
   /// Replaces a legacy `gtk_window_set_icon_from_file(...)` statement with the canonical 2-line exe-relative block, preserving indentation.
   String _replaceLegacyCall(
-    String content,
-    RegExp legacyRegex,
-    String iconPath,
+    final String content,
+    final RegExp legacyRegex,
+    final String iconPath,
   ) {
     final match = legacyRegex.firstMatch(content);
     if (match == null) {

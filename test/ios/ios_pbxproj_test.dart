@@ -56,9 +56,9 @@ final RegExp _buildFileRegExp = RegExp(
 );
 final RegExp _xcodeIdRegExp = RegExp(r'^[0-9A-F]{24}$');
 
-String _fileRefId(String content) => _fileRefRegExp.firstMatch(content)!.group(1)!;
+String _fileRefId(final String content) => _fileRefRegExp.firstMatch(content)!.group(1)!;
 
-String _buildFileId(String content) => _buildFileRegExp.firstMatch(content)!.group(1)!;
+String _buildFileId(final String content) => _buildFileRegExp.firstMatch(content)!.group(1)!;
 
 // Unit tests for the liquid glass project.pbxproj manipulation
 void main() {

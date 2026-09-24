@@ -47,10 +47,10 @@ void main() {
       }
     });
 
-    IconGenerator generatorFor(Config config) => IosIconGenerator(
+    IconGenerator generatorFor(final Config config) => IosIconGenerator(
           IconGeneratorContext(
             config: config,
-            logger: LILogger(false),
+            logger: LILogger(isVerbose: false),
             prefixPath: prefixPath,
           ),
         );

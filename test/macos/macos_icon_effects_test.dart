@@ -4,14 +4,14 @@ import 'package:launcher_icons/src/core/utils.dart' as utils;
 import 'package:launcher_icons/src/platforms/macos/macos_icon_effects.dart';
 import 'package:test/test.dart';
 
-Image _solidRed([int size = 64]) {
-  final image = Image(width: size, height: size, numChannels: 3);
+Image _solidRed([final int size = 64]) {
+  final image = Image(width: size, height: size);
   fill(image, color: ColorRgb8(255, 0, 0));
   return image;
 }
 
 void main() {
-  Future<Image> Function(int) loaderFor(Image source) => (size) async => utils.createResizedImage(size, source);
+  Future<Image> Function(int) loaderFor(final Image source) => (final size) async => utils.createResizedImage(size, source);
 
   group('buildMacOSIconImage', () {
     test('defaults resize straight through (historical behavior)', () async {

@@ -2,8 +2,7 @@
 
 [![pub package](https://img.shields.io/pub/v/launcher_icons.svg)](https://pub.dev/packages/launcher_icons)
 [![pub points](https://img.shields.io/pub/points/launcher_icons?label=pub%20points)](https://pub.dev/packages/launcher_icons/score)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Quasiflo/launcher_icons/blob/main/LICENSE)
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Quasiflo/dependency_sorter?utm_source=oss&utm_medium=github&utm_campaign=Quasiflo%2Fdependency_sorter&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+[![License](https://img.shields.io/badge/license-APACHE%202.0-blue.svg)](https://github.com/Quasiflo/launcher_icons/blob/main/LICENSE)
 
 > **A maintained fork of [fluttercommunity/flutter_launcher_icons](https://github.com/fluttercommunity/flutter_launcher_icons).** Thank you to [@MarkOSullivan94](https://github.com/MarkOSullivan94) and all the original contributors for building the tool this continues. Bug reports, ideas, and pull requests are welcome here — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -147,3 +146,15 @@ Anything else: [open an issue](https://github.com/Quasiflo/launcher_icons/issues
 ## Credits
 
 Icon resizing via Brendan Duncan's [image package](https://pub.dev/packages/image). Full history and attributions in [CHANGELOG.md](CHANGELOG.md) and the [upstream repository](https://github.com/fluttercommunity/flutter_launcher_icons).
+
+## License
+
+This repository is licensed under the Apache License 2.0. Contributions made prior to 2026-09-14 (commit 1b763c0) remain licensed under MIT, see [LICENSE-MIT](LICENSE-MIT) for the full text.
+
+- **Copyright (c) 2026 Quasiflo**
+- **Permission Granted:** You are free to use, copy, modify, distribute, and sublicense this software, including for commercial purposes, subject to the terms of the license.
+- **Conditions:** You must include the original copyright notice and a copy of the license in any distribution, clearly state any significant changes made to the original files, and retain any attribution notices from a NOTICE file (if present).
+- **Patent Grant:** Contributors grant a patent license covering their contributions. This patent license terminates if you institute patent litigation alleging that the Work (or a Contribution) infringes a patent.
+- **No Warranty:** This software is provided "as is," without warranties or conditions of any kind, express or implied.
+
+See the [LICENSE](LICENSE) file for the full legal text.

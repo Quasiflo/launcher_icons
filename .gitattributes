@@ -1,0 +1,291 @@
+#! Macros
+# By default, set as binary. Can be overridden in template for lfs support
+[attr]lfs_maybe     binary
+
+#! General Rules
+# Auto detect text files and perform LF normalization unless set below
+*                   text=auto
+
+#! Exclude files from exporting
+.gitattributes      export-ignore
+.gitignore          export-ignore
+.gitkeep            export-ignore
+
+#! General Formats
+#* Git
+.gitattributes      text
+.gitignore          text
+#* Documents
+*.md                text diff=markdown
+*.mdx               text diff=markdown
+*.rtf               text diff=astextplain
+*.pdf               lfs_maybe
+*.epub              text diff=astextplain
+*.bib               text diff=bibtex
+*.tex               text diff=tex
+*.adoc              text
+*.csv               text
+*.tsv               text
+*.txt               text
+*.ipynb             text eol=lf
+#* Configs
+*.ini               text
+*.cnf               text
+*.conf              text
+*.config            text
+*.env               text
+#* Serialization
+*.json              text
+*.jsonc             text
+*.json5             text
+*.toml              text
+*.xml               text
+*.yaml              text
+*.yml               text
+# Fixes syntax highlighting on GitHub to allow comments
+.vscode/*.json      linguist-language=JSON-with-Comments
+#* Scripts
+*.sh                text eol=lf
+*.bash              text eol=lf
+*.fish              text eol=lf
+*.ksh               text eol=lf
+*.zsh               text eol=lf
+*.sql               text linguist-detectable linguist-language=sql
+#* Windows Specific (must use crlf!)
+*.bat               text eol=crlf
+*.cmd               text eol=crlf
+*.ps1               text eol=crlf
+*.rc                text eol=crlf
+*.props             text eol=crlf
+*.props.tmpl        text eol=crlf
+*.vcxproj           text eol=crlf
+*.vcxproj.filters   text eol=crlf
+*.vcxproj.tmpl      text eol=crlf
+#* Fonts
+*.ttf               lfs_maybe
+*.otf               lfs_maybe
+*.woff              lfs_maybe
+*.woff2             lfs_maybe
+#* Graphics
+*.jpg               lfs_maybe
+*.jpeg              lfs_maybe
+*.jp2               lfs_maybe
+*.jpx               lfs_maybe
+*.jxr               lfs_maybe
+*.heic              lfs_maybe
+*.heif              lfs_maybe
+*.webp              lfs_maybe
+*.png               lfs_maybe
+*.tga               lfs_maybe
+*.bmp               lfs_maybe
+*.tif               lfs_maybe
+*.tiff              lfs_maybe
+*.exr               lfs_maybe
+*.hdr               lfs_maybe
+*.ico               lfs_maybe
+*.eps               lfs_maybe
+*.svgz              lfs_maybe
+*.svg               text
+#* Video
+*.gif               lfs_maybe
+*.gifv              lfs_maybe
+*.mpeg              lfs_maybe
+*.mpg               lfs_maybe
+*.mp4               lfs_maybe
+*.m4v               lfs_maybe
+*.mov               lfs_maybe
+*.avi               lfs_maybe
+*.avif              lfs_maybe
+*.webm              lfs_maybe
+*.ogv               lfs_maybe
+*.wmv               lfs_maybe
+*.asf               lfs_maybe
+#* Audio
+*.mp3               lfs_maybe
+*.m4a               lfs_maybe
+*.ogg               lfs_maybe
+*.flac              lfs_maybe
+*.opus              lfs_maybe
+*.aif               lfs_maybe
+*.aiff              lfs_maybe
+*.wav               lfs_maybe
+*.midi              lfs_maybe
+#* 3D models
+*.dxf               lfs_maybe
+*.collada           lfs_maybe
+*.dae               lfs_maybe
+*.fbx               lfs_maybe
+*.obj               lfs_maybe
+*.stl               lfs_maybe
+*.3ds               lfs_maybe
+*.blend             lfs_maybe
+*.blend1            lfs_maybe
+*.ply               lfs_maybe
+#* Archives
+*.7z                lfs_maybe
+*.bz                lfs_maybe
+*.bz2               lfs_maybe
+*.bzip2             lfs_maybe
+*.gz                lfs_maybe
+*.lz                lfs_maybe
+*.lzma              lfs_maybe
+*.rar               lfs_maybe
+*.tar               lfs_maybe
+*.taz               lfs_maybe
+*.tbz               lfs_maybe
+*.tbz2              lfs_maybe
+*.tgz               lfs_maybe
+*.tlz               lfs_maybe
+*.txz               lfs_maybe
+*.xz                lfs_maybe
+*.z                 lfs_maybe
+*.zip               lfs_maybe
+*.zst               lfs_maybe
+#* Executables
+*.exe               lfs_maybe
+*.app               lfs_maybe
+*.apk               lfs_maybe
+*.out               lfs_maybe
+#* Compiled Dynamic libraries
+*.so                lfs_maybe
+*.dylib             lfs_maybe
+*.dll               lfs_maybe
+*.pdb               lfs_maybe
+#* Compiled Static libraries
+*.lib               lfs_maybe
+*.lai               lfs_maybe
+*.la                lfs_maybe
+*.a                 lfs_maybe
+#* Text files where line endings should be preserved
+*.patch             -text
+*.diff              -text
+
+#! Database
+*.db                lfs_maybe
+
+#! Web
+*.html              text diff=html
+*.css               text diff=css
+*.scss              text diff=css
+*.sass              text
+*.map               text -diff
+*.ejs               text
+*.mustache          text
+*.handlebars        text
+*.hbs               text
+
+#! Package Managers
+package.json        text
+*.lock              text -diff
+aube-lock.json      text eol=lf -diff
+aube-lock.yaml      text eol=lf -diff
+package-lock.json   text eol=lf -diff
+
+#! Build Systems
+Makefile            text
+makefile            text
+
+#! Javascript & Typescript
+*.js                text
+*.mjs               text
+*.cjs               text
+*.jsx               text
+*.ts                text
+*.tsx               text
+
+#! C++
+*.c                 text diff=cpp
+*.cc                text diff=cpp
+*.cxx               text diff=cpp
+*.cpp               text diff=cpp
+*.cpi               text diff=cpp
+*.c++               text diff=cpp
+*.hpp               text diff=cpp
+*.h                 text diff=cpp
+*.h++               text diff=cpp
+*.hh                text diff=cpp
+*.lo                lfs_maybe
+*.o                 lfs_maybe
+*.gch               lfs_maybe
+*.pch               lfs_maybe
+
+#! Lua
+*.lua               text
+
+#! Python
+*.py                text diff=python
+*.py3               text diff=python
+*.pxd               text diff=python
+*.pyw               text diff=python
+*.pyx               text diff=python
+*.pyz               text diff=python
+*.pyi               text diff=python
+*.p                 lfs_maybe
+*.pickle            lfs_maybe
+*.pyc               lfs_maybe
+*.pyo               lfs_maybe
+*.pyd               lfs_maybe
+
+#! Rust
+*.rs                text diff=rust
+Cargo.lock          text
+
+#! Flutter
+*.dart              text
+
+#! Swift
+*.pbxproj           text merge=union
+*.swift             text
+
+#! Objective C
+*.m                 text diff=objc
+
+#! Ruby
+*.rb                text diff=ruby
+
+#! PKL
+*.pkl               text
+
+#! C#
+*.cs                text diff=csharp
+*.cshtml            text diff=html
+*.csx               text diff=csharp
+*.sln               text eol=crlf
+*.slnx              text eol=crlf
+*.sln.tmpl          text eol=crlf
+*.csproj            text eol=crlf
+
+#! PHP
+*.php               text eol=lf diff=php
+*.phpt              text eol=lf diff=php
+*.phtml             text eol=lf diff=html
+*.phar              lfs_maybe
+phpcs.xml           text eol=lf
+phpunit.xml         text eol=lf
+phpstan.neon        text eol=lf
+psalm.xml           text eol=lf
+
+#! Java
+*.java              text diff=java
+*.groovy            text diff=java
+*.scala             text diff=java
+*.gradle            text diff=java
+*.kt                text diff=kotlin
+*.kts               text diff=kotlin
+*.jsp               text
+*.jspf              text
+*.jspx              text
+*.properties        text
+*.tld               text
+*.tag               text
+*.tagx              text
+*.class             lfs_maybe
+*.ear               lfs_maybe
+*.jar               lfs_maybe
+*.war               lfs_maybe
+*.jks               lfs_maybe
+mvnw                text eol=lf
+gradlew             text eol=lf
+
+#! Docker
+Dockerfile          text

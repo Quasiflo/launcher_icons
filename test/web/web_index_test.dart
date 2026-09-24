@@ -33,11 +33,11 @@ void main() {
       prefixPath = path.join(d.sandbox, 'fli_test');
     });
 
-    IconGenerator generatorFor(Map<String, dynamic> web) => WebIconGenerator(
+    IconGenerator generatorFor(final Map<String, dynamic> web) => WebIconGenerator(
           IconGeneratorContext(
             config: Config.fromJson(<String, dynamic>{'web': web}),
             prefixPath: prefixPath,
-            logger: LILogger(false),
+            logger: LILogger(isVerbose: false),
           ),
         );
 
@@ -81,7 +81,7 @@ void main() {
       );
       // No deprecated tags introduced by the tool's own block.
       final block = RegExp(
-        r'<!--LI-->.*?<!--LIEND-->',
+        '<!--LI-->.*?<!--LIEND-->',
         dotAll: true,
       ).firstMatch(index)![0]!;
       expect(block, isNot(contains('apple-mobile-web-app-capable')));

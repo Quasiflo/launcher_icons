@@ -6,12 +6,15 @@ import 'package:launcher_icons/src/platforms/android/android.dart' as android;
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
 
-import './templates.dart' as templates;
+import 'templates.dart' as templates;
 
 /// Parses the `launcher_icons:` section of a config-file template string, mirroring what the file loaders extracted before their removal.
-Config parseTemplateSection(String template) => Config.fromJson(
-      loadYaml(template)['launcher_icons'] as Map<dynamic, dynamic>,
-    );
+Config parseTemplateSection(final String template) {
+  final yaml = loadYaml(template) as Map<dynamic, dynamic>;
+  return Config.fromJson(
+    yaml['launcher_icons'] as Map<dynamic, dynamic>,
+  );
+}
 
 void main() {
   group('Config', () {
@@ -168,11 +171,11 @@ void main() {
     });
     group('#loadConfigFromTestPubSpec', () {
       test('should return valid configs', () {
-        const String pubspecPath = 'test/config/test_pubspec.yaml';
+        const pubspecPath = 'test/config/test_pubspec.yaml';
         final configs = parseTemplateSection(
           File(pubspecPath).readAsStringSync(),
         );
-        const String imagePath = 'assets/images/icon-710x599.png';
+        const imagePath = 'assets/images/icon-710x599.png';
         expect(configs.imagePath, equals(imagePath));
         // android configs
         expect(configs.androidEnabled, isTrue);
@@ -488,7 +491,7 @@ void main() {
           () => config.resolveImageFile('missing.png', dir.path),
           throwsA(
             isA<InvalidConfigException>().having(
-              (e) => e.message,
+              (final e) => e.message,
               'message',
               contains('missing.png'),
             ),

@@ -106,7 +106,7 @@ void main() {
   group('IconGeneratorContext svgRasterCache', () {
     IconGeneratorContext context() => IconGeneratorContext(
           config: const Config(),
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: '.',
         );
 

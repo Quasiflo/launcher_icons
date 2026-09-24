@@ -97,7 +97,7 @@ void main() {
     late String originalDir;
     late String sandboxDir;
 
-    setUp(() async {
+    setUp(() {
       originalDir = Directory.current.path;
       sandboxDir = path.join(
         '.dart_tool',
@@ -117,7 +117,7 @@ void main() {
       Directory.current = originalDir;
     });
 
-    Future<void> writePbxproj(String projectDir) async {
+    Future<void> writePbxproj(final String projectDir) async {
       final file = File(path.join('ios', projectDir, 'project.pbxproj'));
       await file.parent.create(recursive: true);
       await file.writeAsString('// !\$*UTF8*\$!\n{}\n');
@@ -142,11 +142,11 @@ void main() {
       );
     });
 
-    test('returns null when no project exists', () async {
+    test('returns null when no project exists', () {
       expect(ios.resolveIosPbxprojPath(), isNull);
     });
 
-    test('honors an explicit path without touching the disk', () async {
+    test('honors an explicit path without touching the disk', () {
       expect(
         ios.resolveIosPbxprojPath('ios/Custom.xcodeproj'),
         equals('ios/Custom.xcodeproj/project.pbxproj'),

@@ -20,7 +20,7 @@ import 'windows_icon_generator_test.mocks.dart';
 
 /// Parses the ICONDIR of a `.ico` file, returning one entry per embedded image. Width/height of `0` means 256 (per the ICO spec).
 List<({int width, int height, int offset, int size, int planes, int bitCount})> _parseIcoDirectory(
-  List<int> bytes,
+  final List<int> bytes,
 ) {
   if (bytes.length < 6) {
     fail('ico is smaller than the 6 byte ICONDIR header');
@@ -44,12 +44,11 @@ List<({int width, int height, int offset, int size, int planes, int bitCount})> 
 
 /// Captures `info` output so warning routing can be asserted.
 class _RecordingLogger extends LILogger {
+  _RecordingLogger() : super(isVerbose: false);
   final List<String> messages = <String>[];
 
-  _RecordingLogger() : super(false);
-
   @override
-  void info(Object? message) {
+  void info(final Object? message) {
     messages.add(message.toString());
   }
 }
@@ -72,7 +71,7 @@ void main() {
         testImageFile = File(path.join(assetPath, 'master-light-1024.png'));
         expect(testImageFile.existsSync(), isTrue);
       });
-      setUp(() async {
+      setUp(() {
         prefixPath = path.join(d.sandbox, 'fli_test');
         mockConfig = MockConfig();
         mockWindowsConfig = MockWindowsConfig();
@@ -84,9 +83,9 @@ void main() {
         );
         generator = WindowsIconGenerator(context);
         // initilize mock defaults
-        when(mockLogger.error(argThat(anything))).thenReturn(anything);
-        when(mockLogger.info(argThat(anything))).thenReturn(anything);
-        when(mockLogger.verbose(argThat(anything))).thenReturn(anything);
+        when(mockLogger.error(argThat(anything))).thenAnswer((final _) {});
+        when(mockLogger.info(argThat(anything))).thenAnswer((final _) {});
+        when(mockLogger.verbose(argThat(anything))).thenAnswer((final _) {});
         when(mockLogger.isVerbose).thenReturn(false);
         when(mockConfig.windowsConfig).thenReturn(mockWindowsConfig);
         when(mockWindowsConfig.generate).thenReturn(true);
@@ -97,7 +96,7 @@ void main() {
         when(mockConfig.imagePath).thenReturn(path.join(prefixPath, 'master-light-1024.png'));
         // resolveImageFile is mocked: implement the real rule (platform path wins, top-level fallback, missing file throws) so the unit tests exercise the generators, not the mock default.
         when(mockConfig.resolveImageFile(argThat(anything), prefixPath)).thenAnswer(
-          (invocation) {
+          (final invocation) {
             final platformPath = invocation.positionalArguments.first as String?;
             final resolved = platformPath ?? mockConfig.imagePath;
             if (resolved == null || !File(path.join(prefixPath, resolved)).existsSync()) {
@@ -112,7 +111,7 @@ void main() {
         final realContext = IconGeneratorContext(
           config: const Config(imagePath: 'icon.png'),
           prefixPath: prefixPath,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
         );
 
         expect(realContext.config.windowsEnabled, isFalse);
@@ -122,10 +121,10 @@ void main() {
         final realContext = IconGeneratorContext(
           config: const Config(
             imagePath: 'icon.png',
-            windowsConfig: WindowsConfig(generate: false),
+            windowsConfig: WindowsConfig(),
           ),
           prefixPath: prefixPath,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
         );
 
         expect(realContext.config.windowsEnabled, isFalse);
@@ -183,15 +182,16 @@ void main() {
         d.file('master-light-1024.png', imageFile.readAsBytesSync()),
       ]).create();
       prefixPath = path.join(d.sandbox, 'fli_test');
+      final windowsYaml = loadYaml(
+        templates.liWindowsConfig,
+      ) as Map<dynamic, dynamic>;
       config = Config.fromJson(
-        loadYaml(
-          templates.liWindowsConfig,
-        )['launcher_icons'] as Map<dynamic, dynamic>,
+        windowsYaml['launcher_icons'] as Map<dynamic, dynamic>,
       );
       context = IconGeneratorContext(
         config: config,
         prefixPath: prefixPath,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
       );
       generator = WindowsIconGenerator(context);
     });
@@ -224,13 +224,13 @@ void main() {
       expect(icoBytes.length, greaterThan(6));
 
       final entries = _parseIcoDirectory(icoBytes);
-      int toPixels(int byte) => byte == 0 ? 256 : byte;
+      int toPixels(final int byte) => byte == 0 ? 256 : byte;
       expect(
-        entries.map((e) => toPixels(e.width)).toList(),
+        entries.map((final e) => toPixels(e.width)).toList(),
         constants.windowsIcoSizes,
       );
       expect(
-        entries.map((e) => toPixels(e.height)).toList(),
+        entries.map((final e) => toPixels(e.height)).toList(),
         constants.windowsIcoSizes,
       );
 
@@ -264,7 +264,7 @@ void main() {
         IconGeneratorContext(
           config: config,
           prefixPath: prefixPath,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
         ),
       );
 
@@ -286,7 +286,7 @@ void main() {
     });
 
     test('warns when the source is smaller than 256px', () async {
-      final small = Image(width: 64, height: 64, numChannels: 3);
+      final small = Image(width: 64, height: 64);
       await File(path.join(prefixPath, 'small.png')).writeAsBytes(encodePng(small));
       final config = Config.fromJson(<String, dynamic>{
         'windows': {
@@ -306,7 +306,7 @@ void main() {
       await smallGenerator.createIcons();
 
       expect(
-        logger.messages.any((m) => m.contains('256')),
+        logger.messages.any((final m) => m.contains('256')),
         isTrue,
       );
     });

@@ -1,3 +1,4 @@
+---
 name: launcher_icons
 description: Thorough, predictable flutter app launcher icon generation & integration across all platforms!
 version: 0.15.0
@@ -23,7 +24,9 @@ environment:
 
 dev_dependencies:
   build_runner: ^2.4.12
+  dependency_sorter: ^0.2.0
   json_serializable: ^6.8.0
   mockito: ^5.4.4
+  quasiflo_lints: 0.1.1
   test: ^1.25.8
   test_descriptor: ^2.0.1

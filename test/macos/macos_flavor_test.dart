@@ -96,7 +96,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
           flavor: 'staging',
         ),

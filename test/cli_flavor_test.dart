@@ -22,7 +22,7 @@ launcher_icons:
     generate: true
 ''';
 
-    String flavorYaml(String flavor) => '''
+    String flavorYaml(final String flavor) => '''
 launcher_icons-$flavor:
   image_path: "icon.png"
   windows:
@@ -57,12 +57,12 @@ launcher_icons-$flavor:
       Directory.current = originalDir;
     });
 
-    Future<List<String>> runCli(List<String> args) async {
+    Future<List<String>> runCli(final List<String> args) async {
       final printed = <String>[];
       await runZoned(
         () => main_dart.createIconsFromArguments(args),
         zoneSpecification: ZoneSpecification(
-          print: (self, parent, zone, line) => printed.add(line),
+          print: (final self, final parent, final zone, final line) => printed.add(line),
         ),
       );
       return printed;
@@ -70,22 +70,22 @@ launcher_icons-$flavor:
 
     test('loops over all flavors without -c', () async {
       final printed = await runCli([]);
-      expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: staging')), isTrue);
       expect(
-        printed.any((line) => line.contains('Flavor: production')),
+        printed.any((final line) => line.contains('Flavor: production')),
         isTrue,
       );
       expect(
-        printed.any((line) => line.contains('for flavors')),
+        printed.any((final line) => line.contains('for flavors')),
         isTrue,
       );
     });
 
     test('explicit --flavor runs only that flavor', () async {
       final printed = await runCli(['--flavor', 'staging']);
-      expect(printed.any((line) => line.contains('Flavor: staging')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: staging')), isTrue);
       expect(
-        printed.any((line) => line.contains('Flavor: production')),
+        printed.any((final line) => line.contains('Flavor: production')),
         isFalse,
       );
     });
@@ -99,12 +99,12 @@ launcher_icons-$flavor:
 
       final printed = await runCli(['-c', 'customdir']);
       expect(
-        printed.any((line) => line.contains('Flavor:')),
+        printed.any((final line) => line.contains('Flavor:')),
         isFalse,
       );
       expect(
         printed.any(
-          (line) => line.contains('Successfully generated launcher icons') && !line.contains('flavors'),
+          (final line) => line.contains('Successfully generated launcher icons') && !line.contains('flavors'),
         ),
         isTrue,
       );
@@ -120,9 +120,9 @@ launcher_icons-$flavor:
 
       final printed = await runCli(['-c', 'sub']);
 
-      expect(printed.any((line) => line.contains('Flavor: qa')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: qa')), isTrue);
       expect(
-        printed.any((line) => line.contains('Flavor: staging')),
+        printed.any((final line) => line.contains('Flavor: staging')),
         isFalse,
       );
     });
@@ -141,8 +141,8 @@ launcher_icons-$flavor:
 
       final printed = await runCli(['-c', 'sub']);
 
-      expect(printed.any((line) => line.contains('Flavor: qa')), isTrue);
-      expect(printed.any((line) => line.contains('Flavor: deep')), isFalse);
+      expect(printed.any((final line) => line.contains('Flavor: qa')), isTrue);
+      expect(printed.any((final line) => line.contains('Flavor: deep')), isFalse);
     });
 
     test('explicit -c folder loads the default config inside it', () async {
@@ -155,12 +155,12 @@ launcher_icons-$flavor:
       final printed = await runCli(['-c', 'plain']);
 
       expect(
-        printed.any((line) => line.contains('Flavor:')),
+        printed.any((final line) => line.contains('Flavor:')),
         isFalse,
       );
       expect(
         printed.any(
-          (line) => line.contains('Successfully generated launcher icons') && !line.contains('flavors'),
+          (final line) => line.contains('Successfully generated launcher icons') && !line.contains('flavors'),
         ),
         isTrue,
       );

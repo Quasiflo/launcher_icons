@@ -10,12 +10,11 @@ import 'package:test/test.dart';
 
 /// Captures `info` output so logger routing can be asserted.
 class _RecordingLogger extends LILogger {
+  _RecordingLogger() : super(isVerbose: false);
   final List<String> messages = <String>[];
 
-  _RecordingLogger() : super(false);
-
   @override
-  void info(Object? message) {
+  void info(final Object? message) {
     messages.add(message.toString());
   }
 }
@@ -61,19 +60,19 @@ void main() {
         Directory.current = originalDir;
       }
       expect(
-        logger.messages.any((m) => m.contains('Creating adaptive icons Android')),
+        logger.messages.any((final m) => m.contains('Creating adaptive icons Android')),
         isTrue,
       );
       expect(
-        logger.messages.any((m) => m.contains('colors.xml')),
+        logger.messages.any((final m) => m.contains('colors.xml')),
         isTrue,
       );
     });
   });
 
   test('Adaptive icon mipmap path is correct', () {
-    const String path1 = 'android/app/src/main/res/';
-    const String path2 = 'mipmap-anydpi-v26/';
+    const path1 = 'android/app/src/main/res/';
+    const path2 = 'mipmap-anydpi-v26/';
     expect(android.isCorrectMipmapDirectoryForAdaptiveIcon(path1), false);
     expect(android.isCorrectMipmapDirectoryForAdaptiveIcon(path2), false);
     expect(
@@ -155,7 +154,7 @@ void main() {
       Directory.current = originalDir;
     });
 
-    String backgroundPngPath(android.AndroidIconTemplate template) => path.join(
+    String backgroundPngPath(final android.AndroidIconTemplate template) => path.join(
           'android',
           'app',
           'src',
@@ -191,11 +190,10 @@ void main() {
 
       await android.createMipmapXmlFile(config, null);
       final mipmapXml = File(
-        path.join(
-              paths.androidAdaptiveXmlFolder(null),
-              androidDefaultIconName,
-            ) +
-            '.xml',
+        '${path.join(
+          paths.androidAdaptiveXmlFolder(null),
+          androidDefaultIconName,
+        )}.xml',
       ).readAsStringSync();
       expect(mipmapXml, contains('@drawable/ic_launcher_background'));
     });
@@ -242,11 +240,10 @@ void main() {
 
       await android.createMipmapXmlFile(config, null);
       final mipmapXml = File(
-        path.join(
-              paths.androidAdaptiveXmlFolder(null),
-              androidDefaultIconName,
-            ) +
-            '.xml',
+        '${path.join(
+          paths.androidAdaptiveXmlFolder(null),
+          androidDefaultIconName,
+        )}.xml',
       ).readAsStringSync();
       expect(mipmapXml, contains('@color/ic_launcher_background'));
     });
@@ -286,11 +283,10 @@ void main() {
 
       await android.createMipmapXmlFile(config, null);
       final mipmapXml = File(
-        path.join(
-              paths.androidAdaptiveXmlFolder(null),
-              androidDefaultIconName,
-            ) +
-            '.xml',
+        '${path.join(
+          paths.androidAdaptiveXmlFolder(null),
+          androidDefaultIconName,
+        )}.xml',
       ).readAsStringSync();
       expect(
         mipmapXml,
@@ -303,11 +299,10 @@ void main() {
 
     test('removes stale adaptive artifacts without adaptive config', () async {
       final staleXml = File(
-        path.join(
-              paths.androidAdaptiveXmlFolder(null),
-              androidDefaultIconName,
-            ) +
-            '.xml',
+        '${path.join(
+          paths.androidAdaptiveXmlFolder(null),
+          androidDefaultIconName,
+        )}.xml',
       );
       await staleXml.create(recursive: true);
       await staleXml.writeAsString('<stale/>');
@@ -361,14 +356,12 @@ void main() {
       Directory.current = originalDir;
     });
 
-    String mipmapXmlPath() =>
-        path.join(
+    String mipmapXmlPath() => '${path.join(
           paths.androidAdaptiveXmlFolder(null),
           androidDefaultIconName,
-        ) +
-        '.xml';
+        )}.xml';
 
-    Future<String> mipmapXmlFor(Map<String, dynamic> androidSection) async {
+    Future<String> mipmapXmlFor(final Map<String, dynamic> androidSection) async {
       final config = Config.fromJson(<String, dynamic>{
         'android': androidSection,
       });
@@ -423,7 +416,7 @@ void main() {
   });
 
   test('Config contains string for generating new launcher icons', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': true},
       'ios': {'generate': true},
@@ -433,7 +426,7 @@ void main() {
       isFalse,
     );
 
-    final Map<String, dynamic> flutterIconsNewIconConfig = <String, dynamic>{
+    final flutterIconsNewIconConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': true, 'icon_name': 'New Icon'},
       'ios': {'generate': true},
@@ -445,10 +438,10 @@ void main() {
   });
 
   test('Transforming manifest without icon must add icon', () async {
-    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
-    final String expectedManifest = getAndroidManifestExample('android:icon="@mipmap/ic_other_icon_name"');
+    final inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
+    final expectedManifest = getAndroidManifestExample('android:icon="@mipmap/ic_other_icon_name"');
 
-    await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
+    await withTempFile('AndroidManifest.xml', (final androidManifestFile) async {
       androidManifestFile.writeAsStringSync(inputManifest);
       await android.overwriteAndroidManifestWithNewLauncherIcon(
         'ic_other_icon_name',
@@ -459,10 +452,10 @@ void main() {
   });
 
   test('Transforming manifest with icon already in place should leave it unchanged', () async {
-    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
-    final String expectedManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
+    final inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
+    final expectedManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"');
 
-    await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
+    await withTempFile('AndroidManifest.xml', (final androidManifestFile) async {
       androidManifestFile.writeAsStringSync(inputManifest);
       await android.overwriteAndroidManifestWithNewLauncherIcon(
         'ic_launcher',
@@ -473,10 +466,10 @@ void main() {
   });
 
   test('Transforming manifest with trailing newline should keep newline untouched', () async {
-    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"') + '\n';
-    final String expectedManifest = inputManifest;
+    final inputManifest = '${getAndroidManifestExample('android:icon="@mipmap/ic_launcher"')}\n';
+    final expectedManifest = inputManifest;
 
-    await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
+    await withTempFile('AndroidManifest.xml', (final androidManifestFile) async {
       androidManifestFile.writeAsStringSync(inputManifest);
       await android.overwriteAndroidManifestWithNewLauncherIcon(
         'ic_launcher',
@@ -487,10 +480,10 @@ void main() {
   });
 
   test('Transforming manifest with 3 trailing newlines should keep newlines untouched', () async {
-    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"') + '\n\n\n';
-    final String expectedManifest = inputManifest;
+    final inputManifest = '${getAndroidManifestExample('android:icon="@mipmap/ic_launcher"')}\n\n\n';
+    final expectedManifest = inputManifest;
 
-    await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
+    await withTempFile('AndroidManifest.xml', (final androidManifestFile) async {
       androidManifestFile.writeAsStringSync(inputManifest);
       await android.overwriteAndroidManifestWithNewLauncherIcon(
         'ic_launcher',
@@ -501,10 +494,10 @@ void main() {
   });
 
   test('Transforming manifest with special newline characters should leave special newline characters untouched', () async {
-    final String inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"').replaceAll('\n', '\r\n');
-    final String expectedManifest = inputManifest;
+    final inputManifest = getAndroidManifestExample('android:icon="@mipmap/ic_launcher"').replaceAll('\n', '\r\n');
+    final expectedManifest = inputManifest;
 
-    await withTempFile('AndroidManifest.xml', (File androidManifestFile) async {
+    await withTempFile('AndroidManifest.xml', (final androidManifestFile) async {
       androidManifestFile.writeAsStringSync(inputManifest);
       await android.overwriteAndroidManifestWithNewLauncherIcon(
         'ic_launcher',
@@ -515,9 +508,9 @@ void main() {
   });
 }
 
-Future<void> withTempFile(String fileName, Function block) async {
-  final Directory tempDir = Directory.systemTemp.createTempSync();
-  final File file = File('${tempDir.path}/$fileName')..createSync();
+Future<void> withTempFile(final String fileName, final Future<void> Function(File) block) async {
+  final tempDir = Directory.systemTemp.createTempSync();
+  final file = File('${tempDir.path}/$fileName')..createSync();
   if (!file.existsSync()) {
     fail('Could not create temp test file ${file.path}');
   }
@@ -528,8 +521,7 @@ Future<void> withTempFile(String fileName, Function block) async {
   }
 }
 
-String getAndroidManifestExample(String iconLine) {
-  return '''
+String getAndroidManifestExample(final String iconLine) => '''
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.myapplication">
@@ -555,5 +547,4 @@ String getAndroidManifestExample(String iconLine) {
 
 </manifest>
   '''
-      .trim();
-}
+    .trim();

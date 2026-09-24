@@ -18,12 +18,11 @@ const _manifest = '''
 
 /// Captures `info` output so warning routing can be asserted.
 class _RecordingLogger extends LILogger {
+  _RecordingLogger() : super(isVerbose: false);
   final List<String> messages = <String>[];
 
-  _RecordingLogger() : super(false);
-
   @override
-  void info(Object? message) {
+  void info(final Object? message) {
     messages.add(message.toString());
   }
 }
@@ -265,7 +264,7 @@ void main() {
       );
 
       expect(
-        logger.messages.any((m) => m.contains('roundIcon')),
+        logger.messages.any((final m) => m.contains('roundIcon')),
         isTrue,
       );
     });

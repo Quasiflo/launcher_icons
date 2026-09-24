@@ -7,6 +7,29 @@ part 'web_config.g.dart';
 /// The launcher_icons configuration set for Web
 @JsonSerializable(anyMap: true, checked: true)
 class WebConfig {
+  /// Creates an instance of [WebConfig]
+  const WebConfig({
+    this.generate = false,
+    this.imagePath,
+    this.imagePathPwa,
+    this.imagePathMaskable,
+    this.imagePathMonochrome,
+    this.imagePathMonochromeMaskable,
+    this.imagePathFaviconSvg,
+    this.imagePathOpengraph,
+    this.imagePathTwitter,
+    this.shortcutIcons,
+    this.faviconSize = constants.faviconDefaultSize,
+    this.faviconIco = true,
+    this.outputPath = 'web',
+    this.backgroundColor,
+    this.themeColorLight,
+    this.themeColorDark,
+  });
+
+  /// Creates [WebConfig] from [json]
+  factory WebConfig.fromJson(final Map<dynamic, dynamic> json) => _$WebConfigFromJson(json);
+
   /// Specifies weather to generate icons for web
   final bool generate;
 
@@ -69,29 +92,6 @@ class WebConfig {
   /// Dark-scheme theme color, emitted as `<meta name="theme-color" media="(prefers-color-scheme: dark)">`. When only one of light/dark is set, it is emitted without a media query.
   @JsonKey(name: 'theme_color_dark')
   final String? themeColorDark;
-
-  /// Creates an instance of [WebConfig]
-  const WebConfig({
-    this.generate = false,
-    this.imagePath,
-    this.imagePathPwa,
-    this.imagePathMaskable,
-    this.imagePathMonochrome,
-    this.imagePathMonochromeMaskable,
-    this.imagePathFaviconSvg,
-    this.imagePathOpengraph,
-    this.imagePathTwitter,
-    this.shortcutIcons,
-    this.faviconSize = constants.faviconDefaultSize,
-    this.faviconIco = true,
-    this.outputPath = 'web',
-    this.backgroundColor,
-    this.themeColorLight,
-    this.themeColorDark,
-  });
-
-  /// Creates [WebConfig] from [json]
-  factory WebConfig.fromJson(Map<dynamic, dynamic> json) => _$WebConfigFromJson(json);
 
   /// Creates [Map] from [WebConfig]
   Map<String, dynamic> toJson() => _$WebConfigToJson(this);

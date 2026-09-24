@@ -16,7 +16,7 @@ void main() {
 
   test('generateContentsFileAsString honors single-size', () {
     final decoded = jsonDecode(
-      ios.generateContentsFileAsString('AppIcon', 'AppIcon-Dark', null, true),
+      ios.generateContentsFileAsString('AppIcon', 'AppIcon-Dark', null, singleSize: true),
     ) as Map<String, dynamic>;
     expect((decoded['images'] as List).length, equals(1));
   });
@@ -28,14 +28,14 @@ void main() {
   test('iOS icon list includes 1x switcher sizes', () {
     for (final name in ['-20x20@1x', '-29x29@1x', '-40x40@1x', '-76x76@1x']) {
       expect(
-        ios.iosIcons.map((template) => template.name),
+        ios.iosIcons.map((final template) => template.name),
         contains(name),
       );
     }
     // Both the base and the dark-appearance entries must exist in Contents.
     final contents = ios.createImageList('AppIcon', 'AppIcon-Dark', null);
     for (final size in ['20x20', '29x29', '40x40', '76x76']) {
-      final matches = contents.where((entry) => entry['size'] == size && entry['scale'] == '1x').toList();
+      final matches = contents.where((final entry) => entry['size'] == size && entry['scale'] == '1x').toList();
       expect(matches.length, equals(2), reason: size);
     }
   });
@@ -69,7 +69,7 @@ void main() {
     ); // 20 normal, 20 dark, 20 tinted icons + 1 marketing icon
   });
   test('At least one platform is in config file', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': true},
       'ios': {'generate': true},
@@ -79,7 +79,7 @@ void main() {
   });
 
   test('No platform specified in config', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
     };
     final config = Config.fromJson(flutterIconsConfig);
@@ -87,7 +87,7 @@ void main() {
   });
 
   test('At least one platform enabled in config file', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': false},
       'ios': {'generate': true},
@@ -97,7 +97,7 @@ void main() {
   });
 
   test('No platform enabled when all generate flags are false', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': false},
       'ios': {'generate': false},
@@ -112,7 +112,7 @@ void main() {
   });
 
   test('No platform enabled when no sections exist', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
     };
     final config = Config.fromJson(flutterIconsConfig);
@@ -120,7 +120,7 @@ void main() {
   });
 
   test('androidEnabled is false when android.generate is false', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': false},
       'ios': {'generate': true},
@@ -130,7 +130,7 @@ void main() {
   });
 
   test('androidEnabled is false with no android section', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'ios': {'generate': true},
     };
@@ -139,7 +139,7 @@ void main() {
   });
 
   test('iosEnabled is false when ios.generate is false', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': true},
       'ios': {'generate': false},
@@ -149,7 +149,7 @@ void main() {
   });
 
   test('iosEnabled is false with no ios section', () {
-    final Map<String, dynamic> flutterIconsConfig = <String, dynamic>{
+    final flutterIconsConfig = <String, dynamic>{
       'image_path': 'assets/images/icon-710x599.png',
       'android': {'generate': true},
     };

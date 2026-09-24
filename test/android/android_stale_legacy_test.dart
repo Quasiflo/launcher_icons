@@ -48,7 +48,7 @@ void main() {
       }
     });
 
-    void writeManifest(String iconName) {
+    void writeManifest(final String iconName) {
       File(
         path.join(
           prefixPath,
@@ -61,9 +61,9 @@ void main() {
       ).writeAsStringSync(_manifest.replaceAll('ICON', iconName));
     }
 
-    void writeLegacyPngs(String iconName) {
+    void writeLegacyPngs(final String iconName) {
       for (final template in android.androidIcons) {
-        final file = File(
+        File(
           path.join(
             prefixPath,
             'android',
@@ -74,13 +74,13 @@ void main() {
             template.directoryName,
             '$iconName.png',
           ),
-        );
-        file.createSync(recursive: true);
-        file.writeAsBytesSync([0]);
+        )
+          ..createSync(recursive: true)
+          ..writeAsBytesSync([0]);
       }
     }
 
-    bool legacyPngExists(String iconName, String density) => File(
+    bool legacyPngExists(final String iconName, final String density) => File(
           path.join(
             prefixPath,
             'android',
@@ -93,7 +93,7 @@ void main() {
           ),
         ).existsSync();
 
-    Config customConfig(String iconName) => Config.fromJson(<String, dynamic>{
+    Config customConfig(final String iconName) => Config.fromJson(<String, dynamic>{
           'android': {
             'generate': true,
             'image_path': 'master-light-1024.png',

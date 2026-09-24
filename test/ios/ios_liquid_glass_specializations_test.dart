@@ -9,10 +9,12 @@ import 'package:test/test.dart';
 // Per-appearance layer specializations: dark/tinted glass sources become `image-name-specializations` entries (light is the unmarked entry, and no base `image-name` is emitted alongside the array).
 void main() {
   group('generateIconConfig specializations', () {
-    Map<String, dynamic> layerFor(Map<String, dynamic> ios) {
+    Map<String, dynamic> layerFor(final Map<String, dynamic> ios) {
       final config = Config.fromJson(<String, dynamic>{'ios': ios});
-      final groups = generateIconConfig(config)['groups'] as List;
-      return (groups.first as Map<String, dynamic>)['layers'].first as Map<String, dynamic>;
+      final iconJson = generateIconConfig(config);
+      final groups = iconJson['groups'] as List;
+      final layers = (groups.first as Map<String, dynamic>)['layers'] as List;
+      return layers.first as Map<String, dynamic>;
     }
 
     test('emits image-name-specializations for dark and tinted sources', () {
@@ -141,7 +143,8 @@ void main() {
       );
       final iconJson = generateIconConfig(config);
       final groups = iconJson['groups'] as List;
-      final layer = (groups.first as Map)['layers'].first as Map;
+      final layers = (groups.first as Map)['layers'] as List;
+      final layer = layers.first as Map;
       expect(layer['image-name'], equals('icon.svg'));
     });
   });

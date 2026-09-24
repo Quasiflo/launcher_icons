@@ -7,14 +7,13 @@ import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart';
 import 'package:launcher_icons/src/core/paths.dart' as paths;
 import 'package:launcher_icons/src/core/utils.dart' as utils;
+import 'package:launcher_icons/src/platforms/web/web_template.dart';
 import 'package:path/path.dart' as path;
-
-import 'web_template.dart';
 
 /// Generates Web icons for flutter
 class WebIconGenerator extends IconGenerator {
   /// Creates an instance of [WebIconGenerator].
-  WebIconGenerator(IconGeneratorContext context) : super(context, 'Web');
+  WebIconGenerator(final IconGeneratorContext context) : super(context, 'Web');
 
   /// Web root directory honoring `output_path` (default `web`), so flavors can target separate web roots.
   String get _webRoot => context.config.webConfig?.outputPath ?? paths.webDirPath;
@@ -121,9 +120,9 @@ class WebIconGenerator extends IconGenerator {
     );
 
     // resolve the PWA source: a dedicated override when provided, else base.
-    utils.SizeImageLoader loadPwa = loadBase;
+    var loadPwa = loadBase;
     if (webConfig.imagePathPwa != null) {
-      final pwaImgFilePath = path.join(context.prefixPath, webConfig.imagePathPwa!);
+      final pwaImgFilePath = path.join(context.prefixPath, webConfig.imagePathPwa);
       context.logger.verbose('Decoding and loading PWA image file at $pwaImgFilePath...');
       loadPwa = await utils.sizeImageLoaderFor(
         pwaImgFilePath,
@@ -162,7 +161,7 @@ class WebIconGenerator extends IconGenerator {
     // resolve the monochrome source: only emitted when explicitly provided.
     utils.SizeImageLoader? loadMonochrome;
     if (webConfig.imagePathMonochrome != null) {
-      final monoImgFilePath = path.join(context.prefixPath, webConfig.imagePathMonochrome!);
+      final monoImgFilePath = path.join(context.prefixPath, webConfig.imagePathMonochrome);
       context.logger.verbose(
         'Decoding and loading monochrome image file at $monoImgFilePath...',
       );
@@ -252,7 +251,7 @@ class WebIconGenerator extends IconGenerator {
     );
   }
 
-  Future<void> _generateFavicon(utils.SizeImageLoader loadBase) async {
+  Future<void> _generateFavicon(final utils.SizeImageLoader loadBase) async {
     final size = context.config.webConfig?.faviconSize ?? constants.faviconDefaultSize;
     final favIcon = await loadBase(
       size > 0 ? size : constants.faviconDefaultSize,
@@ -290,14 +289,14 @@ class WebIconGenerator extends IconGenerator {
   }
 
   Future<List<WebIconTemplate>> _generateIcons(
-    utils.SizeImageLoader loadPwa,
-    utils.SizeImageLoader? loadMaskable,
-    Image? deriveLogo,
-    bool deriveMaskable,
-    utils.SizeImageLoader? loadMonochrome,
-    utils.SizeImageLoader? loadMonochromeMaskable,
-    Image? deriveMonoLogo,
-    bool deriveMonoMaskable,
+    final utils.SizeImageLoader loadPwa,
+    final utils.SizeImageLoader? loadMaskable,
+    final Image? deriveLogo,
+    final bool deriveMaskable,
+    final utils.SizeImageLoader? loadMonochrome,
+    final utils.SizeImageLoader? loadMonochromeMaskable,
+    final Image? deriveMonoLogo,
+    final bool deriveMonoMaskable,
   ) async {
     final iconsDir = await utils.createDirIfNotExist(
       path.join(context.prefixPath, paths.webIconsDirPath(_webRoot)),
@@ -337,13 +336,13 @@ class WebIconGenerator extends IconGenerator {
   }
 
   /// Derives a safe-zone-compliant maskable icon: the logo scaled to ~80% and centered on the opaque `background_color` (white fallback) so the outer edge survives maskable cropping.
-  Image _buildPaddedMaskable(Image source, int size) {
+  Image _buildPaddedMaskable(final Image source, final int size) {
     var bg = (r: 255, g: 255, b: 255);
     final bgRaw = context.config.webConfig?.backgroundColor;
     if (bgRaw != null) {
       try {
         bg = utils.parseHexColor(bgRaw);
-      } catch (_) {
+      } on Object catch (_) {
         context.logger.verbose(
           'Ignoring non-hex background_color "$bgRaw" for maskable icons; using white.',
         );
@@ -358,11 +357,11 @@ class WebIconGenerator extends IconGenerator {
 
   /// Renders an opt-in social link-preview image with a cover-crop so any square icon source fills the 1200px landscape canvas without stretching. Returns true when an image was generated.
   Future<bool> _generateSocialImage({
-    required String? overridePath,
-    required String fileName,
-    required int width,
-    required int height,
-    required String label,
+    required final String? overridePath,
+    required final String fileName,
+    required final int width,
+    required final int height,
+    required final String label,
   }) async {
     if (overridePath == null) {
       return false;
@@ -370,29 +369,12 @@ class WebIconGenerator extends IconGenerator {
     final sourcePath = path.join(context.prefixPath, overridePath);
     context.logger.verbose('Generating $label image from $sourcePath...');
     final source = await utils.decodeImageFile(sourcePath, cache: context.svgRasterCache);
-    final cover = _coverCrop(source, width, height);
+    final cover = utils.coverCropImage(source, width, height);
     final outFile = await utils.createFileIfNotExist(
       path.join(context.prefixPath, _webRoot, fileName),
     );
     await outFile.writeAsBytes(encodePng(cover));
     return true;
-  }
-
-  Image _coverCrop(Image source, int width, int height) {
-    final scale = [width / source.width, height / source.height].reduce((a, b) => a > b ? a : b);
-    final scaled = copyResize(
-      source,
-      width: (source.width * scale).round(),
-      height: (source.height * scale).round(),
-      interpolation: Interpolation.average,
-    );
-    return copyCrop(
-      scaled,
-      x: ((scaled.width - width) / 2).round(),
-      y: ((scaled.height - height) / 2).round(),
-      width: width,
-      height: height,
-    );
   }
 
   /// Renders each `shortcut_icons` entry at 96px and returns the manifest `shortcuts[]` payloads. Returns an empty list when none are configured.
@@ -437,8 +419,8 @@ class WebIconGenerator extends IconGenerator {
   }
 
   Future<void> _updateManifestFile(
-    List<WebIconTemplate> templates,
-    List<Map<String, dynamic>> shortcutManifests,
+    final List<WebIconTemplate> templates,
+    final List<Map<String, dynamic>> shortcutManifests,
   ) async {
     final manifestFile = await utils.createFileIfNotExist(
       path.join(context.prefixPath, paths.webManifestFilePath(_webRoot)),
@@ -449,15 +431,14 @@ class WebIconGenerator extends IconGenerator {
     if (context.config.webConfig?.backgroundColor != null) {
       manifestConfig['background_color'] = context.config.webConfig?.backgroundColor;
     }
-    manifestConfig.remove('theme_color');
 
-    // replace existing icons to eliminate conflicts
+    // replace existing icons to eliminate conflicts, and drop stale entries
+    // (theme_color is html-only; shortcuts are re-added below when configured)
     manifestConfig
+      ..remove('theme_color')
       ..remove('icons')
-      ..['icons'] = templates.map<Map<String, dynamic>>((e) => e.iconManifest).toList();
-
-    // replace shortcuts when configured, otherwise drop stale entries
-    manifestConfig.remove('shortcuts');
+      ..['icons'] = templates.map<Map<String, dynamic>>((final e) => e.iconManifest).toList()
+      ..remove('shortcuts');
     if (shortcutManifests.isNotEmpty) {
       manifestConfig['shortcuts'] = shortcutManifests;
     }
@@ -467,7 +448,7 @@ class WebIconGenerator extends IconGenerator {
 
   /// Generates an opaque 180x180 `apple-touch-icon.png` by flattening the source onto `background_color` (white fallback).
   Future<void> _generateAppleTouchIcon(
-    utils.SizeImageLoader loadBase,
+    final utils.SizeImageLoader loadBase,
   ) async {
     const size = 180;
     final resized = await loadBase(size);
@@ -478,14 +459,14 @@ class WebIconGenerator extends IconGenerator {
     if (bgRaw != null) {
       try {
         bg = utils.parseHexColor(bgRaw);
-      } catch (_) {
+      } on Object catch (_) {
         context.logger.verbose(
           'Ignoring non-hex background_color "$bgRaw" for apple-touch-icon; using white.',
         );
       }
     }
 
-    final flat = Image(width: size, height: size, numChannels: 3);
+    final flat = Image(width: size, height: size);
     for (var y = 0; y < size; y++) {
       for (var x = 0; x < size; x++) {
         final pixel = rgba.getPixel(x, y);
@@ -509,9 +490,9 @@ class WebIconGenerator extends IconGenerator {
 
   /// Manages an idempotent `<!--LI-->…<!--LIEND-->` block in index.html wiring up the favicon, apple-touch-icon, manifest, background/theme colors, and social preview images. An existing block is replaced in place; otherwise the block is inserted before `</head>`.
   Future<void> _updateIndexFile({
-    required bool hasFaviconSvg,
-    required bool hasOpengraph,
-    required bool hasTwitter,
+    required final bool hasFaviconSvg,
+    required final bool hasOpengraph,
+    required final bool hasTwitter,
   }) async {
     final indexFile = File(path.join(context.prefixPath, paths.webIndexFilePath(_webRoot)));
     var content = await indexFile.readAsString();
@@ -535,7 +516,7 @@ class WebIconGenerator extends IconGenerator {
   <link rel="manifest" href="manifest.json"/>${colorLines.isNotEmpty ? '\n${colorLines.join('\n')}' : ''}${hasOpengraph ? '\n  <meta property="og:image" content="opengraph.png"/>' : ''}${hasTwitter ? '\n  <meta name="twitter:card" content="summary_large_image"/>\n  <meta name="twitter:image" content="twitter.png"/>' : ''}
   <!--LIEND-->''';
 
-    final pattern = RegExp(r'<!--LI-->.*?<!--LIEND-->', dotAll: true);
+    final pattern = RegExp('<!--LI-->.*?<!--LIEND-->', dotAll: true);
     if (pattern.hasMatch(content)) {
       content = content.replaceAll(pattern, block);
     } else if (content.contains('</head>')) {

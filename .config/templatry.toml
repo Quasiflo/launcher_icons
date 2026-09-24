@@ -1,0 +1,4 @@
+[source]
+github = "Quasiflo/configs"
+ref = "v0.2.2"
+enable_labels = ["dart", "github", "license", "toml", "yaml"]

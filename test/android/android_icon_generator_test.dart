@@ -43,19 +43,19 @@ void main() {
       }
     });
 
-    IconGenerator generatorFor(Config config) => AndroidIconGenerator(
+    IconGenerator generatorFor(final Config config) => AndroidIconGenerator(
           IconGeneratorContext(
             config: config,
-            logger: LILogger(false),
+            logger: LILogger(isVerbose: false),
             prefixPath: prefixPath,
           ),
         );
 
-    Config configFor(Map<String, dynamic> root) => Config.fromJson(<String, dynamic>{
+    Config configFor(final Map<String, dynamic> root) => Config.fromJson(<String, dynamic>{
           'android': {'generate': true, ...root},
         });
 
-    void writeImage([String name = 'icon.png']) {
+    void writeImage([final String name = 'icon.png']) {
       File(
         path.join(
           Directory.current.path,

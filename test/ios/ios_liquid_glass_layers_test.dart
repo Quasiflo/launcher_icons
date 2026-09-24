@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 // Multi-layer composition: layers stack bottom-to-top in list order, each with its own artwork variants, position, and composition keys.
 void main() {
   group('generateIconConfig layers', () {
-    List<dynamic> layersFor(Map<String, dynamic> ios) {
+    List<dynamic> layersFor(final Map<String, dynamic> ios) {
       final config = Config.fromJson(<String, dynamic>{'ios': ios});
       final groups = generateIconConfig(config)['groups'] as List;
       return (groups.first as Map<String, dynamic>)['layers'] as List;
@@ -178,7 +178,7 @@ void main() {
         }),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_layers[1].opacity'),
           ),
@@ -196,7 +196,7 @@ void main() {
         }),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_layers[0].blend_mode'),
           ),
@@ -214,7 +214,7 @@ void main() {
         }),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_layers[0].fill'),
           ),

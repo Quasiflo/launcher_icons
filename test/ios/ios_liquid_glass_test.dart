@@ -266,7 +266,7 @@ void main() {
     });
 
     test('rejects out-of-range optical values with labelled errors', () {
-      Map<String, dynamic> iconJsonFor(Map<String, dynamic> extra) {
+      Map<String, dynamic> iconJsonFor(final Map<String, dynamic> extra) {
         final config = Config.fromJson(<String, dynamic>{
           'ios': {
             'generate': true,
@@ -288,7 +288,7 @@ void main() {
           () => iconJsonFor({entry.key: entry.value}),
           throwsA(
             isA<InvalidConfigException>().having(
-              (e) => e.message,
+              (final e) => e.message,
               'message',
               contains('ios.${entry.key}'),
             ),
@@ -311,7 +311,7 @@ void main() {
         () => generateIconConfig(config),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.background_color'),
           ),
@@ -332,7 +332,7 @@ void main() {
         () => generateIconConfig(config),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_layers[0].scale'),
           ),
@@ -376,7 +376,7 @@ void main() {
         () => generateIconConfig(config),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_gradient_from'),
           ),
@@ -437,7 +437,7 @@ void main() {
         () => generateIconConfig(config),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_groups'),
           ),
@@ -458,7 +458,7 @@ void main() {
         () => generateIconConfig(config),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_groups[0].layers'),
           ),
@@ -484,7 +484,7 @@ void main() {
         () => generateIconConfig(config),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('ios.liquid_glass_groups[0].liquid_glass_blur'),
           ),

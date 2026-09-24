@@ -23,7 +23,7 @@ void main() {
 
       context = IconGeneratorContext(
         config: config,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
         prefixPath: tempDir.path,
       );
 
@@ -36,8 +36,8 @@ void main() {
 
     /// Creates a minimal valid project layout (linux runner, icon file and a pubspec.yaml bundling the icon) inside [tempDir].
     Future<File> setUpValidProject({
-      String iconPath = 'assets/images/icon.png',
-      String? pubspecAssetsEntry,
+      final String iconPath = 'assets/images/icon.png',
+      final String? pubspecAssetsEntry,
     }) async {
       final linuxDir = Directory('${tempDir.path}/linux');
       await linuxDir.create();
@@ -77,12 +77,12 @@ flutter:
       test('returns false when linux.generate is false', () {
         const config = Config(
           imagePath: 'assets/images/icon.png',
-          linuxConfig: LinuxConfig(generate: false),
+          linuxConfig: LinuxConfig(),
         );
 
         final testContext = IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: tempDir.path,
         );
 
@@ -94,7 +94,7 @@ flutter:
 
         final testContext = IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: tempDir.path,
         );
 
@@ -109,7 +109,7 @@ flutter:
 
       final testContext = IconGeneratorContext(
         config: config,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
         prefixPath: tempDir.path,
       );
 
@@ -142,7 +142,7 @@ flutter:
       );
       final testContext = IconGeneratorContext(
         config: config,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
         prefixPath: tempDir.path,
       );
 
@@ -229,7 +229,7 @@ flutter:
       const exeResolution = 'g_file_read_link("/proc/self/exe"';
       const gioInclude = '#include <gio/gio.h>';
 
-      void expectCanonicalBlock(String content, [String? iconPath]) {
+      void expectCanonicalBlock(final String content, [final String? iconPath]) {
         final path = iconPath ?? 'assets/images/icon.png';
         expect(
           content,
@@ -248,7 +248,7 @@ flutter:
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
   GtkWindow* window = GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
-  
+
   gtk_window_set_default_size(window, 1280, 720);
   gtk_widget_show(GTK_WIDGET(window));
 }
@@ -262,10 +262,10 @@ static void my_application_activate(GApplication* application) {
         // Block is inserted before gtk_window_set_default_size.
         final lines = modifiedContent.split('\n');
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
         final defaultSizeLineIndex = lines.indexWhere(
-          (line) => line.contains('gtk_window_set_default_size'),
+          (final line) => line.contains('gtk_window_set_default_size'),
         );
         expect(iconLineIndex, lessThan(defaultSizeLineIndex));
         // No naive relative path: the call must use the resolved variable.
@@ -293,7 +293,7 @@ static void my_application_activate(GApplication* application) {
 
         final modifiedContent = await myAppFile.readAsString();
         expectCanonicalBlock(modifiedContent);
-        final includeCount = modifiedContent.split('\n').where((line) => line.trim() == gioInclude).length;
+        final includeCount = modifiedContent.split('\n').where((final line) => line.trim() == gioInclude).length;
         expect(includeCount, equals(1));
       });
 
@@ -339,9 +339,9 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the window declaration line
         final lines = modifiedContent.split('\n');
-        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow* window ='));
+        final windowLineIndex = lines.indexWhere((final line) => line.contains('GtkWindow* window ='));
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
         expect(iconLineIndex, greaterThan(windowLineIndex));
       });
@@ -366,9 +366,9 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the multiline window declaration
         final lines = modifiedContent.split('\n');
-        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow* window ='));
+        final windowLineIndex = lines.indexWhere((final line) => line.contains('GtkWindow* window ='));
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
         expect(iconLineIndex, greaterThan(windowLineIndex));
       });
@@ -384,7 +384,7 @@ static void my_application_activate(GApplication* application) {
 
         final testContext = IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: tempDir.path,
         );
 
@@ -616,9 +616,9 @@ static void my_application_activate(GApplication* application) {
         // Should be inserted before gtk_window_show
         final lines = modifiedContent.split('\n');
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
-        final showLineIndex = lines.indexWhere((line) => line.contains('gtk_window_show'));
+        final showLineIndex = lines.indexWhere((final line) => line.contains('gtk_window_show'));
         expect(iconLineIndex, lessThan(showLineIndex));
       });
 
@@ -641,9 +641,9 @@ static void my_application_activate(GApplication* application) {
         // Should be inserted before gtk_widget_show
         final lines = modifiedContent.split('\n');
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
-        final showLineIndex = lines.indexWhere((line) => line.contains('gtk_widget_show'));
+        final showLineIndex = lines.indexWhere((final line) => line.contains('gtk_widget_show'));
         expect(iconLineIndex, lessThan(showLineIndex));
       });
 
@@ -666,9 +666,9 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after gtk_window_set_title
         final lines = modifiedContent.split('\n');
-        final titleLineIndex = lines.indexWhere((line) => line.contains('gtk_window_set_title'));
+        final titleLineIndex = lines.indexWhere((final line) => line.contains('gtk_window_set_title'));
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
         expect(iconLineIndex, greaterThan(titleLineIndex));
       });
@@ -722,9 +722,9 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the window declaration
         final lines = modifiedContent.split('\n');
-        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow *window ='));
+        final windowLineIndex = lines.indexWhere((final line) => line.contains('GtkWindow *window ='));
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
         expect(iconLineIndex, greaterThan(windowLineIndex));
       });
@@ -750,23 +750,23 @@ static void my_application_activate(GApplication* application) {
         expectCanonicalBlock(modifiedContent);
         // Should be inserted after the complete window declaration
         final lines = modifiedContent.split('\n');
-        final windowLineIndex = lines.indexWhere((line) => line.contains('GtkWindow* window ='));
+        final windowLineIndex = lines.indexWhere((final line) => line.contains('GtkWindow* window ='));
         final iconLineIndex = lines.indexWhere(
-          (line) => line.contains('get_flutter_asset_path("'),
+          (final line) => line.contains('get_flutter_asset_path("'),
         );
         expect(iconLineIndex, greaterThan(windowLineIndex));
         // Should be before the show call
-        final showLineIndex = lines.indexWhere((line) => line.contains('gtk_widget_show'));
+        final showLineIndex = lines.indexWhere((final line) => line.contains('gtk_widget_show'));
         expect(iconLineIndex, lessThan(showLineIndex));
       });
 
       test('provides helpful error message when no insertion point found', () async {
-        const originalContent = '''
+        const originalContent = r'''
 #include "my_application.h"
 
 static void my_application_activate(GApplication* application) {
   // Some other content without the expected patterns
-  g_print("Hello World\\n");
+  g_print("Hello World\n");
 }
 ''';
 
@@ -775,7 +775,7 @@ static void my_application_activate(GApplication* application) {
         try {
           await generator.createIcons();
           fail('Expected an exception to be thrown');
-        } catch (e) {
+        } on Object catch (e) {
           expect(e.toString(), contains('Failed to update my_application.cc'));
           // The error message should contain the manual instructions
           expect(
@@ -804,7 +804,7 @@ static void my_application_activate(GApplication* application) {
 static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
   GtkWindow* window = GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
-  
+
   if (some_condition) {
     gtk_window_set_icon_from_file(
         window,
@@ -812,7 +812,7 @@ static void my_application_activate(GApplication* application) {
         NULL
     );
   }
-  
+
   gtk_window_set_default_size(window, 1280, 720);
   gtk_widget_show(GTK_WIDGET(window));
 }

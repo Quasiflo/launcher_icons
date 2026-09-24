@@ -1,5 +1,8 @@
 /// A Icon Template for Web
 class WebIconTemplate {
+  /// Creates an instance of [WebIconTemplate].
+  const WebIconTemplate({required this.size, this.maskable = false, this.monochrome = false});
+
   /// Size of the web icon
   final int size;
 
@@ -10,9 +13,6 @@ class WebIconTemplate {
 
   /// Monochrome icon for themed PWA icons (`purpose: monochrome`). Combines with [maskable] as `purpose: "maskable monochrome"`.
   final bool monochrome;
-
-  /// Creates an instance of [WebIconTemplate].
-  const WebIconTemplate({required this.size, this.maskable = false, this.monochrome = false});
 
   /// Icon file name
   String get iconFile {

@@ -17,7 +17,7 @@ void main() {
       ]).create();
     });
 
-    test('should return null when entites exists', () async {
+    test('should return null when entites exists', () {
       expect(
         utils.areFSEntiesExist([
           path.join(prefixPath, 'file1.txt'),
@@ -130,7 +130,7 @@ void main() {
 
   group('#prettifyJsonEncode', () {
     test('should return prettiffed json string 4 indents', () {
-      const expectedValue = r'''
+      const expectedValue = '''
 {
     "key1": "value1",
     "key2": "value2"

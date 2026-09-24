@@ -14,12 +14,11 @@ import '../templates.dart' as templates;
 
 /// Captures `info` output so warning routing can be asserted.
 class _RecordingLogger extends LILogger {
+  _RecordingLogger() : super(isVerbose: false);
   final List<String> messages = <String>[];
 
-  _RecordingLogger() : super(false);
-
   @override
-  void info(Object? message) {
+  void info(final Object? message) {
     messages.add(message.toString());
   }
 }
@@ -33,7 +32,7 @@ void main() {
       final imageFile = File(path.join(assetPath, 'master-light-1024.png'));
       expect(imageFile.existsSync(), isTrue);
       // Solid-red theme overrides so tests can distinguish sources by pixel.
-      final red = Image(width: 64, height: 64, numChannels: 3);
+      final red = Image(width: 64, height: 64);
       for (var y = 0; y < 64; y++) {
         for (var x = 0; x < 64; x++) {
           red.setPixelRgb(x, y, 255, 0, 0);
@@ -51,15 +50,15 @@ void main() {
       prefixPath = path.join(d.sandbox, 'fli_test');
     });
 
-    IconGenerator generatorFor(Map<String, dynamic> windows, {LILogger? logger}) => WindowsIconGenerator(
+    IconGenerator generatorFor(final Map<String, dynamic> windows, {final LILogger? logger}) => WindowsIconGenerator(
           IconGeneratorContext(
             config: Config.fromJson(<String, dynamic>{'windows': windows}),
             prefixPath: prefixPath,
-            logger: logger ?? LILogger(false),
+            logger: logger ?? LILogger(isVerbose: false),
           ),
         );
 
-    Image readAsset(String fileName) => decodeImage(
+    Image readAsset(final String fileName) => decodeImage(
           File(path.join(prefixPath, 'windows', 'images', fileName)).readAsBytesSync(),
         )!;
 
@@ -127,7 +126,7 @@ void main() {
       final corner = unplated.getPixel(0, 0);
       expect(corner.a.toInt(), equals(0));
       expect(
-        logger.messages.any((m) => m.contains('unplated')),
+        logger.messages.any((final m) => m.contains('unplated')),
         isTrue,
       );
     });

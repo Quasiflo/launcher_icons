@@ -8,6 +8,19 @@ part 'windows_config.g.dart';
   checked: true,
 )
 class WindowsConfig {
+  /// Creates a instance of [WindowsConfig]
+  const WindowsConfig({
+    this.generate = false,
+    this.imagePath,
+    this.iconFilename = 'app_icon.ico',
+    this.imagePathUnplated,
+    this.imagePathLightUnplated,
+    this.imagePathWide,
+  });
+
+  /// Creates [WindowsConfig] from [json]
+  factory WindowsConfig.fromJson(final Map<dynamic, dynamic> json) => _$WindowsConfigFromJson(json);
+
   /// Specifies whether to generate icons for Windows
   final bool generate;
 
@@ -32,19 +45,6 @@ class WindowsConfig {
   /// Wide-tile source for `Wide310x150Logo.scale-<N>.png` (310x150 base). Falls back to [imagePath] with a center cover-crop and a warning.
   @JsonKey(name: 'image_path_wide')
   final String? imagePathWide;
-
-  /// Creates a instance of [WindowsConfig]
-  const WindowsConfig({
-    this.generate = false,
-    this.imagePath,
-    this.iconFilename = 'app_icon.ico',
-    this.imagePathUnplated,
-    this.imagePathLightUnplated,
-    this.imagePathWide,
-  });
-
-  /// Creates [WindowsConfig] from [json]
-  factory WindowsConfig.fromJson(Map<dynamic, dynamic> json) => _$WindowsConfigFromJson(json);
 
   /// Creates [Map] from [WindowsConfig]
   Map<String, dynamic> toJson() => _$WindowsConfigToJson(this);

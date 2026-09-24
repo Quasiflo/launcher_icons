@@ -52,10 +52,11 @@ void main() {
     });
 
     test('parses to a valid enabled config', () {
+      final yaml = loadYaml(
+        generate.configFileTemplate,
+      ) as Map<dynamic, dynamic>;
       final config = Config.fromJson(
-        loadYaml(
-          generate.configFileTemplate,
-        )['launcher_icons'] as Map<dynamic, dynamic>,
+        yaml['launcher_icons'] as Map<dynamic, dynamic>,
       );
       expect(config.hasEnabledPlatform, isTrue);
     });

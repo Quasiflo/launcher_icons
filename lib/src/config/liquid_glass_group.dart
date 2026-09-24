@@ -16,6 +16,26 @@ part 'liquid_glass_group.g.dart';
   explicitToJson: true,
 )
 class LiquidGlassGroup {
+  /// Creates a liquid glass group.
+  const LiquidGlassGroup({
+    this.name,
+    this.layers,
+    this.translucency,
+    this.specular,
+    this.shadowKind,
+    this.shadowOpacity,
+    this.blur,
+    this.lighting,
+    this.refractivityEnabled,
+    this.refractivityDepth,
+    this.refractivityStrength,
+    this.specularHighlightPlacement,
+    this.removeLiquidGlass,
+  });
+
+  /// Creates [LiquidGlassGroup] from [json].
+  factory LiquidGlassGroup.fromJson(final Map<dynamic, dynamic> json) => _$LiquidGlassGroupFromJson(json);
+
   /// Group display name shown in Icon Composer (optional, cosmetic).
   @JsonKey(name: 'name')
   final String? name;
@@ -67,26 +87,6 @@ class LiquidGlassGroup {
   /// Group glass-effect override (forces this group's layers flat).
   @JsonKey(name: 'remove_liquid_glass')
   final bool? removeLiquidGlass;
-
-  /// Creates a liquid glass group.
-  const LiquidGlassGroup({
-    this.name,
-    this.layers,
-    this.translucency,
-    this.specular,
-    this.shadowKind,
-    this.shadowOpacity,
-    this.blur,
-    this.lighting,
-    this.refractivityEnabled,
-    this.refractivityDepth,
-    this.refractivityStrength,
-    this.specularHighlightPlacement,
-    this.removeLiquidGlass,
-  });
-
-  /// Creates [LiquidGlassGroup] from [json].
-  factory LiquidGlassGroup.fromJson(Map<dynamic, dynamic> json) => _$LiquidGlassGroupFromJson(json);
 
   /// Creates [Map] from [LiquidGlassGroup].
   Map<String, dynamic> toJson() => _$LiquidGlassGroupToJson(this);

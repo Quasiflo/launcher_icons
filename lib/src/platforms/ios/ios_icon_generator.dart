@@ -9,7 +9,7 @@ import 'package:launcher_icons/src/platforms/ios/ios.dart' as ios;
 /// An implementation of [IconGenerator] for iOS.
 class IosIconGenerator extends IconGenerator {
   /// Creates an instance of [IosIconGenerator].
-  IosIconGenerator(IconGeneratorContext context) : super(context, 'iOS');
+  IosIconGenerator(final IconGeneratorContext context) : super(context, 'iOS');
 
   @override
   bool validateRequirements() {
@@ -17,8 +17,8 @@ class IosIconGenerator extends IconGenerator {
     context.logger.verbose('Validating iOS config...');
     final config = context.config;
 
-    final bool iconOnly = config.iosConfig?.iconOnly ?? false;
-    final bool hasGlass = (config.iosConfig?.liquidGlassLayers?.isNotEmpty ?? false) || (config.iosConfig?.liquidGlassGroups?.isNotEmpty ?? false);
+    final iconOnly = config.iosConfig?.iconOnly ?? false;
+    final hasGlass = (config.iosConfig?.liquidGlassLayers?.isNotEmpty ?? false) || (config.iosConfig?.liquidGlassGroups?.isNotEmpty ?? false);
     if (iconOnly && !hasGlass) {
       context.logger.error(
         '`ios.icon_only` requires `liquid_glass_layers` or `liquid_glass_groups`: there is nothing else to emit.',

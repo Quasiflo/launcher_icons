@@ -82,7 +82,7 @@ void main() {
       // Flavor run for a new flavor: nothing references AppIcon-retired.
       await ios.createIcons(config, 'production');
 
-      String catalog(String name) => path.join(
+      String catalog(final String name) => path.join(
             'ios',
             'Runner',
             'Assets.xcassets',

@@ -38,45 +38,45 @@ List<AndroidIconTemplate> get notificationIcons => [
     ];
 
 /// Whether [config] requests the adaptive pair: enabled with both background and foreground layers. Only Android reads these keys, so the rule lives here rather than on Config.
-bool hasAndroidAdaptiveConfig(Config config) {
+bool hasAndroidAdaptiveConfig(final Config config) {
   final androidConfig = config.androidConfig;
   return config.androidEnabled && androidConfig?.adaptiveIconForeground != null && androidConfig?.adaptiveIconBackground != null;
 }
 
 /// Whether [config] requests Android 13+ monochrome icons: enabled with a monochrome layer.
-bool hasAndroidAdaptiveMonochromeConfig(Config config) {
+bool hasAndroidAdaptiveMonochromeConfig(final Config config) {
   final androidConfig = config.androidConfig;
   return config.androidEnabled && androidConfig?.adaptiveIconMonochrome != null;
 }
 
 /// Whether [config] requests the opt-in round icon: enabled with a round layer (which itself requires the adaptive pair).
-bool hasAndroidAdaptiveRoundConfig(Config config) {
+bool hasAndroidAdaptiveRoundConfig(final Config config) {
   final androidConfig = config.androidConfig;
   return config.androidEnabled && androidConfig?.adaptiveIconRound != null;
 }
 
 /// Whether [config] requests the notification (status-bar) icon: enabled with a notification layer.
-bool hasAndroidNotificationConfig(Config config) {
+bool hasAndroidNotificationConfig(final Config config) {
   final androidConfig = config.androidConfig;
   return config.androidEnabled && androidConfig?.notificationIcon != null;
 }
 
 /// Whether a custom Android `icon_name` was specified. When set, a new launcher icon is generated without removing the old default existing Flutter launcher icon.
-bool isCustomAndroidFile(Config config) => config.androidConfig?.iconName != null;
+bool isCustomAndroidFile(final Config config) => config.androidConfig?.iconName != null;
 
 /// Whether [sourcePath] is an Android vector drawable source (`.xml`), copied verbatim into `drawable/` instead of rasterized into density PNGs.
-bool isVectorDrawableSource(String sourcePath) => sourcePath.toLowerCase().endsWith('.xml');
+bool isVectorDrawableSource(final String sourcePath) => sourcePath.toLowerCase().endsWith('.xml');
 
 /// Vector drawable file name for a raster layer file (e.g. `ic_launcher_foreground.png` -> `ic_launcher_foreground.xml`).
-String vectorDrawableFileName(String rasterFileName) => '${path.basenameWithoutExtension(rasterFileName)}.xml';
+String vectorDrawableFileName(final String rasterFileName) => '${path.basenameWithoutExtension(rasterFileName)}.xml';
 
 /// Copies a user-supplied vector drawable [sourcePath] verbatim to `drawable/[fileName]` (density-independent, flavor-aware res). The file must be a valid Android drawable XML; build-time `aapt` errors point at the source when it is not. PNG fallbacks are skipped for vector layers: the vector itself scales, while legacy mipmaps from `image_path` keep covering pre-26 devices.
 Future<void> writeVectorDrawable(
-  String sourcePath,
-  String fileName,
-  String? flavor, {
-  String prefixPath = '.',
-  LILogger? logger,
+  final String sourcePath,
+  final String fileName,
+  final String? flavor, {
+  final String prefixPath = '.',
+  final LILogger? logger,
 }) async {
   final source = File(utils.withPrefix(prefixPath, sourcePath));
   if (!source.existsSync()) {
@@ -94,9 +94,9 @@ Future<void> writeVectorDrawable(
 
 /// Deletes [relativePath] (under [prefixPath]) when present, e.g. a superseded vector/PNG twin that would otherwise collide as a duplicate resource.
 Future<void> _deleteIfExists(
-  String relativePath, {
-  String prefixPath = '.',
-  LILogger? logger,
+  final String relativePath, {
+  final String prefixPath = '.',
+  final LILogger? logger,
 }) async {
   final file = File(utils.withPrefix(prefixPath, relativePath));
   // Using the sync method here due to `avoid_slow_async_io` lint suggestion.
@@ -108,30 +108,30 @@ Future<void> _deleteIfExists(
 
 /// Creates the legacy mipmap icons (overwriting defaults, or adding a new icon when `android.icon_name` is set) and wires the manifest.
 Future<void> createDefaultIcons(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
-  utils.SvgRasterCache? cache,
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
+  final utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating default icons Android', logger);
-  final String filePath = config.resolveImageFile(config.androidConfig?.imagePath, prefixPath);
+  final filePath = config.resolveImageFile(config.androidConfig?.imagePath, prefixPath);
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
     logger: logger,
     cache: cache,
   );
-  final File androidManifestFile = File(utils.withPrefix(prefixPath, paths.androidManifestFile));
+  final androidManifestFile = File(utils.withPrefix(prefixPath, paths.androidManifestFile));
   final concurrentIconUpdates = <Future<void>>[];
   if (isCustomAndroidFile(config)) {
     utils.printStatus('Adding a new Android launcher icon', logger);
-    final String iconName = config.androidConfig!.iconName!;
+    final iconName = config.androidConfig!.iconName!;
     isAndroidIconNameCorrectFormat(iconName);
-    final String iconPath = '$iconName.png';
-    for (AndroidIconTemplate template in androidIcons) {
+    final iconPath = '$iconName.png';
+    for (final template in androidIcons) {
       concurrentIconUpdates.add(
         loadSize(template.size).then(
-          (image) => writeResizedPng(
+          (final image) => writeResizedPng(
             template,
             image,
             iconPath,
@@ -159,10 +159,10 @@ Future<void> createDefaultIcons(
       'Overwriting the default Android launcher icon with a new icon',
       logger,
     );
-    for (AndroidIconTemplate template in androidIcons) {
+    for (final template in androidIcons) {
       concurrentIconUpdates.add(
         loadSize(template.size).then(
-          (image) => writeResizedPng(
+          (final image) => writeResizedPng(
             template,
             image,
             paths.androidFileName,
@@ -193,17 +193,17 @@ Future<void> createDefaultIcons(
 ///
 /// The manifest's previous icon name proves tool ownership: only the tool writes custom names there. `ic_launcher` (possibly Flutter's originals) and the incoming name are never touched.
 Future<void> removeStaleLegacyIconsForSwitch(
-  File androidManifestFile,
-  String newIconName,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
+  final File androidManifestFile,
+  final String newIconName,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
 }) async {
   if (!androidManifestFile.existsSync()) {
     return;
   }
   final content = await androidManifestFile.readAsString();
-  final match = RegExp(r'android:icon="@mipmap/([^"]+)"').firstMatch(content);
+  final match = RegExp('android:icon="@mipmap/([^"]+)"').firstMatch(content);
   final oldIconName = match?.group(1);
   if (oldIconName == null || oldIconName == newIconName || oldIconName == constants.androidDefaultIconName) {
     return;
@@ -226,7 +226,7 @@ Future<void> removeStaleLegacyIconsForSwitch(
 }
 
 /// Ensures that the Android icon name is in the correct format
-bool isAndroidIconNameCorrectFormat(String iconName) {
+bool isAndroidIconNameCorrectFormat(final String iconName) {
   // assure the icon only consists of lowercase letters, numbers and underscore
   if (!RegExp(r'^[a-z0-9_]+$').hasMatch(iconName)) {
     throw const InvalidAndroidIconNameException(
@@ -238,18 +238,18 @@ bool isAndroidIconNameCorrectFormat(String iconName) {
 
 /// Creates the adaptive foreground/background icons and `colors.xml` entries.
 Future<void> createAdaptiveIcons(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
-  utils.SvgRasterCache? cache,
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
+  final utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating adaptive icons Android', logger);
 
   // Retrieve the necessary Flutter Launcher Icons configuration from the pubspec.yaml file
   final androidConfig = config.androidConfig!;
-  final String? backgroundConfig = androidConfig.adaptiveIconBackground;
-  final String? foregroundImagePath = androidConfig.adaptiveIconForeground;
+  final backgroundConfig = androidConfig.adaptiveIconBackground;
+  final foregroundImagePath = androidConfig.adaptiveIconForeground;
   if (backgroundConfig == null || foregroundImagePath == null) {
     throw const InvalidConfigException('Missing "adaptive_icon_background" and "adaptive_icon_foreground" within android configuration.');
   }
@@ -279,10 +279,10 @@ Future<void> createAdaptiveIcons(
       logger: logger,
       cache: cache,
     );
-    for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
+    for (final androidIcon in adaptiveForegroundIcons) {
       concurrentImageUpdates.add(
         loadForegroundSize(androidIcon.size).then(
-          (foregroundImage) => writeResizedPng(
+          (final foregroundImage) => writeResizedPng(
             androidIcon,
             foregroundImage,
             paths.androidAdaptiveForegroundFileName,
@@ -325,22 +325,23 @@ Future<void> createAdaptiveIcons(
       );
     }
   } else if (isAdaptiveIconConfigImageFile(backgroundConfig)) {
-    concurrentImageUpdates.add(
-      _createAdaptiveBackgrounds(
-        config,
-        backgroundConfig,
-        flavor,
-        prefixPath: prefixPath,
-        cache: cache,
-      ),
-    );
-    concurrentImageUpdates.add(
-      _deleteIfExists(
-        path.join(paths.androidResFolder(flavor), 'drawable', vectorDrawableFileName(paths.androidAdaptiveBackgroundFileName)),
-        prefixPath: prefixPath,
-        logger: logger,
-      ),
-    );
+    concurrentImageUpdates
+      ..add(
+        _createAdaptiveBackgrounds(
+          config,
+          backgroundConfig,
+          flavor,
+          prefixPath: prefixPath,
+          cache: cache,
+        ),
+      )
+      ..add(
+        _deleteIfExists(
+          path.join(paths.androidResFolder(flavor), 'drawable', vectorDrawableFileName(paths.androidAdaptiveBackgroundFileName)),
+          prefixPath: prefixPath,
+          logger: logger,
+        ),
+      );
   } else {
     // colors.xml has a single writer (this branch) and is awaited before the foreground/background fan-out below, so no locking is needed despite the concurrent PNG writes.
     await updateColorsXmlFile(
@@ -355,16 +356,16 @@ Future<void> createAdaptiveIcons(
 
 /// Creates the adaptive monochrome icons.
 Future<void> createAdaptiveMonochromeIcons(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
-  utils.SvgRasterCache? cache,
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
+  final utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating adaptive monochrome icons Android', logger);
 
   // Retrieve the necessary Flutter Launcher Icons configuration from the pubspec.yaml file
-  final String? monochromeImagePath = config.androidConfig!.adaptiveIconMonochrome;
+  final monochromeImagePath = config.androidConfig!.adaptiveIconMonochrome;
   if (monochromeImagePath == null) {
     throw const InvalidConfigException('Missing "adaptive_icon_monochrome" within android configuration.');
   }
@@ -397,10 +398,10 @@ Future<void> createAdaptiveMonochromeIcons(
       cache: cache,
     );
     // Create adaptive icon monochrome images
-    for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
+    for (final androidIcon in adaptiveForegroundIcons) {
       concurrentIconUpdates.add(
         loadMonochromeSize(androidIcon.size).then(
-          (monochromeImage) => writeResizedPng(
+          (final monochromeImage) => writeResizedPng(
             androidIcon,
             monochromeImage,
             paths.androidAdaptiveMonochromeFileName,
@@ -422,28 +423,28 @@ Future<void> createAdaptiveMonochromeIcons(
 }
 
 /// Round-icon drawable file name: `<custom>_round.png` for custom icons, `ic_launcher_round.png` otherwise.
-String androidAdaptiveRoundFileName(Config config) {
+String androidAdaptiveRoundFileName(final Config config) {
   final customName = config.androidConfig?.iconName;
   return customName != null ? '${customName}_round.png' : paths.androidAdaptiveRoundFileName;
 }
 
 /// Round-icon resource name: `<custom>_round` for custom icons, `ic_launcher_round` otherwise.
-String androidAdaptiveRoundXmlName(Config config) {
+String androidAdaptiveRoundXmlName(final Config config) {
   final customName = config.androidConfig?.iconName;
   return customName != null ? '${customName}_round' : paths.androidAdaptiveRoundIconName;
 }
 
 /// Creates the opt-in adaptive round icons.
 Future<void> createAdaptiveRoundIcons(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
-  utils.SvgRasterCache? cache,
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
+  final utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating adaptive round icons Android', logger);
 
-  final String? roundImagePath = config.androidConfig?.adaptiveIconRound;
+  final roundImagePath = config.androidConfig?.adaptiveIconRound;
   if (roundImagePath == null) {
     throw const InvalidConfigException('Missing "adaptive_icon_round" within android configuration.');
   }
@@ -477,10 +478,10 @@ Future<void> createAdaptiveRoundIcons(
       cache: cache,
     );
     // Create adaptive icon round images
-    for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
+    for (final androidIcon in adaptiveForegroundIcons) {
       concurrentIconUpdates.add(
         loadRoundSize(androidIcon.size).then(
-          (roundImage) => writeResizedPng(
+          (final roundImage) => writeResizedPng(
             androidIcon,
             roundImage,
             roundFileName,
@@ -506,16 +507,16 @@ const String fcmNotificationIconMetaDataName = 'com.google.firebase.messaging.de
 
 /// Creates the notification (status-bar) small icons and wires the FCM `default_notification_icon` meta-data in the manifest.
 Future<void> createNotificationIcons(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
-  utils.SvgRasterCache? cache,
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
+  final utils.SvgRasterCache? cache,
 }) async {
   utils.printStatus('Creating notification icons Android', logger);
 
   final androidConfig = config.androidConfig!;
-  final String? sourcePath = androidConfig.notificationIcon;
+  final sourcePath = androidConfig.notificationIcon;
   if (sourcePath == null) {
     throw const InvalidConfigException('Missing "notification_icon" within android configuration.');
   }
@@ -544,10 +545,10 @@ Future<void> createNotificationIcons(
       cache: cache,
     );
     final concurrentIconUpdates = <Future<void>>[];
-    for (AndroidIconTemplate template in notificationIcons) {
+    for (final template in notificationIcons) {
       concurrentIconUpdates.add(
         loadSize(template.size).then(
-          (image) => writeResizedPng(
+          (final image) => writeResizedPng(
             template,
             image,
             '$resourceName.png',
@@ -575,9 +576,9 @@ Future<void> createNotificationIcons(
 
 /// Ensures `<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/<resourceName>" />` inside `<application>`: inserted before `</application>` when absent, updated in place when present with a different value. Missing manifests are skipped with a warning.
 Future<void> ensureFcmNotificationIconMetaData(
-  String resourceName, {
-  LILogger? logger,
-  String prefixPath = '.',
+  final String resourceName, {
+  final LILogger? logger,
+  final String prefixPath = '.',
 }) async {
   final manifestFile = File(utils.withPrefix(prefixPath, paths.androidManifestFile));
   if (!manifestFile.existsSync()) {
@@ -590,11 +591,11 @@ Future<void> ensureFcmNotificationIconMetaData(
   for (var i = 0; i < lines.length; i++) {
     if (lines[i].contains(fcmNotificationIconMetaDataName)) {
       found = true;
-      lines[i] = lines[i].replaceAll(RegExp(r'@drawable/[^"]*'), reference);
+      lines[i] = lines[i].replaceAll(RegExp('@drawable/[^"]*'), reference);
     }
   }
   if (!found) {
-    final closeIndex = lines.indexWhere((line) => line.contains('</application>'));
+    final closeIndex = lines.indexWhere((final line) => line.contains('</application>'));
     if (closeIndex == -1) {
       utils.printStatus('WARNING: no <application> block in AndroidManifest.xml, skipping FCM notification icon meta-data.', logger);
       return;
@@ -608,10 +609,10 @@ Future<void> ensureFcmNotificationIconMetaData(
 
 /// Creates the `mipmap-anydpi-v26` adaptive-icon xml (plus the round variant when configured), clearing stale adaptive artifacts otherwise.
 Future<void> createMipmapXmlFile(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
 }) async {
   // Note: adaptive icons are only used when the adaptive pair (`adaptive_icon_background` + `adaptive_icon_foreground`) is specified. Monochrome and round layers require the pair (`image_path` is never taken as a layer).
   if (!hasAndroidAdaptiveConfig(config) && !hasAndroidAdaptiveMonochromeConfig(config) && !hasAndroidAdaptiveRoundConfig(config)) {
@@ -633,7 +634,7 @@ Future<void> createMipmapXmlFile(
 
   utils.printStatus('Creating mipmap xml file Android', logger);
 
-  String xmlContent = '';
+  var xmlContent = '';
   final androidConfig = config.androidConfig!;
 
   if (hasAndroidAdaptiveConfig(config)) {
@@ -646,7 +647,7 @@ Future<void> createMipmapXmlFile(
       xmlContent += '  <background android:drawable="@color/ic_launcher_background"/>\n';
     }
 
-    final int foregroundInset = androidConfig.adaptiveIconForegroundInset;
+    final foregroundInset = androidConfig.adaptiveIconForegroundInset;
     if (foregroundInset == 0) {
       // Canonical form per developer.android.com: a direct drawable attribute with no <inset> wrapper.
       xmlContent += '  <foreground android:drawable="@drawable/ic_launcher_foreground" />\n';
@@ -662,7 +663,7 @@ Future<void> createMipmapXmlFile(
   }
 
   if (hasAndroidAdaptiveMonochromeConfig(config)) {
-    final int monochromeInset = androidConfig.adaptiveIconMonochromeInset;
+    final monochromeInset = androidConfig.adaptiveIconMonochromeInset;
     if (monochromeInset == 0) {
       // Canonical form per developer.android.com: a direct drawable attribute with no <inset> wrapper.
       xmlContent += '  <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n';
@@ -716,10 +717,10 @@ Future<void> createMipmapXmlFile(
 ///
 /// Only tool-owned file names are removed (`colors.xml` is shared and left untouched). Both the default and the custom icon xml names are covered so switching in either direction is cleaned up.
 Future<void> _removeStaleAdaptiveIcons(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
 }) async {
   final xmlNames = <String>{constants.androidDefaultIconName};
   final customName = config.androidConfig?.iconName;
@@ -778,12 +779,12 @@ Future<void> _removeStaleAdaptiveIcons(
 ///
 /// If not, the colors.xml file is created and a color item for the adaptive icon background is included in the new colors.xml file.
 Future<void> updateColorsXmlFile(
-  String backgroundConfig,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
+  final String backgroundConfig,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
 }) async {
-  final File colorsXml = File(utils.withPrefix(prefixPath, paths.androidColorsFile(flavor)));
+  final colorsXml = File(utils.withPrefix(prefixPath, paths.androidColorsFile(flavor)));
   // Using the sync method here due to `avoid_slow_async_io` lint suggestion.
   if (colorsXml.existsSync()) {
     utils.printStatus(
@@ -810,13 +811,13 @@ Future<void> updateColorsXmlFile(
 
 /// creates adaptive background using png image
 Future<void> _createAdaptiveBackgrounds(
-  Config config,
-  String adaptiveIconBackgroundImagePath,
-  String? flavor, {
-  String prefixPath = '.',
-  utils.SvgRasterCache? cache,
+  final Config config,
+  final String adaptiveIconBackgroundImagePath,
+  final String? flavor, {
+  final String prefixPath = '.',
+  final utils.SvgRasterCache? cache,
 }) async {
-  final String filePath = adaptiveIconBackgroundImagePath;
+  final filePath = adaptiveIconBackgroundImagePath;
   final loadSize = await utils.sizeImageLoaderFor(
     utils.withPrefix(prefixPath, filePath),
     cache: cache,
@@ -824,10 +825,10 @@ Future<void> _createAdaptiveBackgrounds(
 
   final concurrentImageUpdates = <Future<void>>[];
   // creates a png image (ic_adaptive_background.png) for the adaptive icon background in each of the locations it is required
-  for (AndroidIconTemplate androidIcon in adaptiveForegroundIcons) {
+  for (final androidIcon in adaptiveForegroundIcons) {
     concurrentImageUpdates.add(
       loadSize(androidIcon.size).then(
-        (image) => writeResizedPng(
+        (final image) => writeResizedPng(
           androidIcon,
           image,
           paths.androidAdaptiveBackgroundFileName,
@@ -842,9 +843,9 @@ Future<void> _createAdaptiveBackgrounds(
 
 /// Creates a colors.xml file if it was missing from android/app/src/main/res/values/colors.xml
 Future<void> createNewColorsFile(
-  String backgroundColor,
-  String? flavor, {
-  String prefixPath = '.',
+  final String backgroundColor,
+  final String? flavor, {
+  final String prefixPath = '.',
 }) async {
   final colorsFile = await utils.createFileIfNotExist(
     utils.withPrefix(prefixPath, paths.androidColorsFile(flavor)),
@@ -854,16 +855,17 @@ Future<void> createNewColorsFile(
 }
 
 /// Updates the colors.xml with the new adaptive launcher icon color
-Future<void> updateColorsFile(File colorsFile, String backgroundColor) async {
+Future<void> updateColorsFile(final File colorsFile, final String backgroundColor) async {
   // Normalize bare hex colors (`ffffff` -> `#ffffff`, #673). Image paths never reach this function (see createAdaptiveIcons), so a plain 6/8-digit hex string here is always meant to be a color.
-  if (RegExp(r'^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$').hasMatch(backgroundColor)) {
-    backgroundColor = '#$backgroundColor';
+  var normalizedColor = backgroundColor;
+  if (RegExp(r'^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$').hasMatch(normalizedColor)) {
+    normalizedColor = '#$normalizedColor';
   }
   // Write foreground color
-  final List<String> lines = await colorsFile.readAsLines();
-  bool foundExisting = false;
-  for (int x = 0; x < lines.length; x++) {
-    String line = lines[x];
+  final lines = await colorsFile.readAsLines();
+  var foundExisting = false;
+  for (var x = 0; x < lines.length; x++) {
+    var line = lines[x];
     // Never touch XML comments: a commented-out entry is documentation, not configuration.
     if (line.trimLeft().startsWith('<!--')) {
       continue;
@@ -871,7 +873,7 @@ Future<void> updateColorsFile(File colorsFile, String backgroundColor) async {
     if (line.contains('name="ic_launcher_background"')) {
       foundExisting = true;
       // replace anything between tags which does not contain another tag
-      line = line.replaceAll(RegExp(r'>([^><]*)<'), '>$backgroundColor<');
+      line = line.replaceAll(RegExp('>([^><]*)<'), '>$normalizedColor<');
       lines[x] = line;
       break;
     }
@@ -881,22 +883,22 @@ Future<void> updateColorsFile(File colorsFile, String backgroundColor) async {
   if (!foundExisting) {
     lines.insert(
       lines.length - 1,
-      '\t<color name="ic_launcher_background">$backgroundColor</color>',
+      '\t<color name="ic_launcher_background">$normalizedColor</color>',
     );
   }
 
   await colorsFile.writeAsString(lines.join('\n'));
 }
 
-/// Writes [image] resized to [template.size] as a PNG file named [filename] inside [template.directoryName] (see [utils.createResizedImage] for the interpolation policy).
+/// Writes `image` resized to the template size as a PNG file named `filename` inside the template directory (see `createResizedImage` for the interpolation policy).
 Future<void> writeResizedPng(
-  AndroidIconTemplate template,
-  Image image,
-  String filename,
-  String? flavor, {
-  String prefixPath = '.',
+  final AndroidIconTemplate template,
+  final Image image,
+  final String filename,
+  final String? flavor, {
+  final String prefixPath = '.',
 }) async {
-  final Image resizedImage = utils.createResizedImage(template.size, image);
+  final resizedImage = utils.createResizedImage(template.size, image);
   final pngFile = await utils.createFileIfNotExist(
     utils.withPrefix(
       prefixPath,
@@ -910,20 +912,20 @@ Future<void> writeResizedPng(
 ///
 /// Note: default iconName = "ic_launcher"
 Future<void> overwriteAndroidManifestWithNewLauncherIcon(
-  String iconName,
-  File androidManifestFile, {
-  String? roundIconName,
-  LILogger? logger,
+  final String iconName,
+  final File androidManifestFile, {
+  final String? roundIconName,
+  final LILogger? logger,
 }) async {
   // we do not use `file.readAsLines()` here because that always gets rid of the last empty newline
-  final List<String> oldManifestLines = (await androidManifestFile.readAsString()).split('\n');
-  final List<String> transformedLines = _transformAndroidManifestWithNewLauncherIcon(
+  final oldManifestLines = (await androidManifestFile.readAsString()).split('\n');
+  final transformedLines = _transformAndroidManifestWithNewLauncherIcon(
     oldManifestLines,
     iconName,
     roundIconName,
   );
   await androidManifestFile.writeAsString(transformedLines.join('\n'));
-  if (roundIconName == null && oldManifestLines.any((line) => line.contains('android:roundIcon'))) {
+  if (roundIconName == null && oldManifestLines.any((final line) => line.contains('android:roundIcon'))) {
     utils.printStatus(
       'WARNING: AndroidManifest.xml has a pre-existing android:roundIcon '
       'that may shadow themed icons. Configure `android.adaptive_icon_round` '
@@ -935,59 +937,54 @@ Future<void> overwriteAndroidManifestWithNewLauncherIcon(
 
 /// Updates only the line containing android:icon with the specified iconName, wiring android:roundIcon alongside it when [roundIconName] is given
 List<String> _transformAndroidManifestWithNewLauncherIcon(
-  List<String> oldManifestLines,
-  String iconName, [
-  String? roundIconName,
-]) {
-  return oldManifestLines.map((String line) {
-    var result = line;
-    // Never touch XML comments: a commented-out attribute is documentation, not configuration.
-    final isComment = result.trimLeft().startsWith('<!--');
-    if (result.contains('android:icon') && !isComment) {
-      // Using RegExp replace the value of android:icon to point to the new icon
-      // anything but a quote of any length: [^"]*
-      // an escaped quote: \\" (escape slash, because it exists regex)
-      // quote, no quote / quote with things behind : \"[^"]*
-      // repeat as often as wanted with no quote at start: [^"]*(\"[^"]*)*
-      // escaping the slash to place in string: [^"]*(\\"[^"]*)*"
-      // result: any string which does only include escaped quotes
-      result = result.replaceAll(
-        RegExp(r'android:icon="[^"]*(\\"[^"]*)*"'),
-        'android:icon="@mipmap/$iconName"',
-      );
-    }
-    if (roundIconName != null) {
-      if (result.contains('android:roundIcon')) {
+  final List<String> oldManifestLines,
+  final String iconName, [
+  final String? roundIconName,
+]) =>
+    oldManifestLines.map((final line) {
+      var result = line;
+      // Never touch XML comments: a commented-out attribute is documentation, not configuration.
+      final isComment = result.trimLeft().startsWith('<!--');
+      if (result.contains('android:icon') && !isComment) {
+        // Using RegExp replace the value of android:icon to point to the new icon
+        // anything but a quote of any length: [^"]*
+        // an escaped quote: \\" (escape slash, because it exists regex)
+        // quote, no quote / quote with things behind : \"[^"]*
+        // repeat as often as wanted with no quote at start: [^"]*(\"[^"]*)*
+        // escaping the slash to place in string: [^"]*(\\"[^"]*)*"
+        // result: any string which does only include escaped quotes
         result = result.replaceAll(
-          RegExp(r'android:roundIcon="[^"]*(\\"[^"]*)*"'),
-          'android:roundIcon="@mipmap/$roundIconName"',
+          RegExp(r'android:icon="[^"]*(\\"[^"]*)*"'),
+          'android:icon="@mipmap/$iconName"',
         );
-      } else if (result.contains('android:icon')) {
-        final roundAttr = ' android:roundIcon="@mipmap/$roundIconName"';
-        if (result.trimRight().endsWith('>')) {
-          final idx = result.lastIndexOf('>');
-          result = '${result.substring(0, idx)}$roundAttr${result.substring(idx)}';
-        } else {
-          result = '$result$roundAttr';
+      }
+      if (roundIconName != null) {
+        if (result.contains('android:roundIcon')) {
+          result = result.replaceAll(
+            RegExp(r'android:roundIcon="[^"]*(\\"[^"]*)*"'),
+            'android:roundIcon="@mipmap/$roundIconName"',
+          );
+        } else if (result.contains('android:icon')) {
+          final roundAttr = ' android:roundIcon="@mipmap/$roundIconName"';
+          if (result.trimRight().endsWith('>')) {
+            final idx = result.lastIndexOf('>');
+            result = '${result.substring(0, idx)}$roundAttr${result.substring(idx)}';
+          } else {
+            result = '$result$roundAttr';
+          }
         }
       }
-    }
-    return result;
-  }).toList();
-}
+      return result;
+    }).toList();
 
 /// Returns true if the adaptive icon configuration is an image file.
-bool isAdaptiveIconConfigImageFile(String backgroundFile) {
+bool isAdaptiveIconConfigImageFile(final String backgroundFile) {
   final normalizedPath = backgroundFile.toLowerCase();
   return normalizedPath.endsWith('.png') || normalizedPath.endsWith('.jpg') || normalizedPath.endsWith('.jpeg') || normalizedPath.endsWith('.webp') || normalizedPath.endsWith('.svg');
 }
 
 /// Returns true when the adaptive background is the `transparent` keyword (case-insensitive), meaning `@android:color/transparent` with no colors.xml entry.
-bool isTransparentAdaptiveBackground(String? backgroundConfig) {
-  return backgroundConfig?.toLowerCase() == 'transparent';
-}
+bool isTransparentAdaptiveBackground(final String? backgroundConfig) => backgroundConfig?.toLowerCase() == 'transparent';
 
 /// (NOTE THIS IS JUST USED FOR UNIT TEST) Ensures the correct path is used for generating adaptive icons "Next you must create alternative drawable resources in your app for use with Android 8.0 (API level 26) in res/mipmap-anydpi/ic_launcher.xml" Source: https://developer.android.com/develop/ui/compose/system/icon_design_adaptive
-bool isCorrectMipmapDirectoryForAdaptiveIcon(String dirPath) {
-  return dirPath == paths.androidAdaptiveXmlFolder(null);
-}
+bool isCorrectMipmapDirectoryForAdaptiveIcon(final String dirPath) => dirPath == paths.androidAdaptiveXmlFolder(null);

@@ -35,15 +35,16 @@ void main() {
         d.file('app_icon_favicon.png', imageFile.readAsBytesSync()),
       ]).create();
       prefixPath = path.join(d.sandbox, 'fli_test');
+      final webYaml = loadYaml(
+        templates.liWebConfig,
+      ) as Map<dynamic, dynamic>;
       config = Config.fromJson(
-        loadYaml(
-          templates.liWebConfig,
-        )['launcher_icons'] as Map<dynamic, dynamic>,
+        webYaml['launcher_icons'] as Map<dynamic, dynamic>,
       );
       context = IconGeneratorContext(
         config: config,
         prefixPath: prefixPath,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
       );
       generator = WebIconGenerator(context);
     });
@@ -87,7 +88,7 @@ void main() {
       final sizedContext = IconGeneratorContext(
         config: sizedConfig,
         prefixPath: prefixPath,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
       );
       final sizedGenerator = WebIconGenerator(sizedContext);
 
@@ -130,7 +131,7 @@ void main() {
       final outputContext = IconGeneratorContext(
         config: outputConfig,
         prefixPath: prefixPath,
-        logger: LILogger(false),
+        logger: LILogger(isVerbose: false),
       );
       final outputGenerator = WebIconGenerator(outputContext);
 

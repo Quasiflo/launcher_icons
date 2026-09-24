@@ -1,2 +1,3 @@
+---
 # Many suites change the process-wide working directory because the generators under test use CWD-relative paths and have no prefix support yet. CWD is process-global, so suites race when the runner executes test files concurrently — keep concurrency at 1 so `dart test` stays sequential. There is no all_tests.dart aggregator on purpose: the runner discovers every test/**/*_test.dart, and a hand-maintained list silently drifts out of sync.
 concurrency: 1

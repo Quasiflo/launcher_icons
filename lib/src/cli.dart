@@ -30,9 +30,8 @@ const String prefixOption = 'dir';
 const String flavorConfigFilePattern = r'^launcher_icons-(.*).yaml$';
 
 /// CLI entry point: parses [arguments], loads configs (including the flavor loop), and generates icons, exiting 0/1/2 on success, generation failure, or config/CLI failure.
-Future<void> createIconsFromArguments(List<String> arguments) async {
-  final ArgParser parser = ArgParser(allowTrailingOptions: true);
-  parser
+Future<void> createIconsFromArguments(final List<String> arguments) async {
+  final parser = ArgParser()
     ..addFlag(
       'help',
       abbr: 'h',
@@ -48,7 +47,6 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
       'verbose',
       abbr: 'v',
       help: 'Verbose Output',
-      defaultsTo: false,
     )
     ..addOption(
       configOption,
@@ -69,20 +67,19 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
     );
 
   final argResults = parser.parse(arguments);
-  final logger = LILogger(argResults.flag('verbose')); // creating logger based on -v flag
-
-  logger.verbose('Received args ${argResults.arguments}');
+  final logger = LILogger(isVerbose: argResults.flag('verbose'))..verbose('Received args ${argResults.arguments}'); // creating logger based on -v flag
 
   if (argResults.flag('version')) {
-    print(packageVersion);
+    logger.info(packageVersion);
     exit(0);
   }
 
-  print(introMessage());
+  logger.info(introMessage());
 
   if (argResults.flag('help')) {
-    logger.info('Generates launcher icons for Flutter projects');
-    logger.info(parser.usage);
+    logger
+      ..info('Generates launcher icons for Flutter projects')
+      ..info(parser.usage);
     exit(0);
   }
 
@@ -104,7 +101,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
   );
 
   // Collect all flavors from discovered flavor config files. Each file carries its own `launcher_icons-<flavor>:` section keyed by the file name.
-  for (var flavor in (await getFlavors(configValue)).entries) {
+  for (final flavor in (await getFlavors(configValue)).entries) {
     final sections = configSections(flavor.value);
     final section = sections[flavor.key];
     if (section != null) {
@@ -125,7 +122,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
 
   // An unknown --flavor is a CLI usage error: throw before running so it propagates instead of exiting.
   if (requestedFlavor != null && !configs.containsKey(requestedFlavor)) {
-    final known = configs.keys.where((k) => k != 'launcher_icons').join(', ');
+    final known = configs.keys.where((final k) => k != 'launcher_icons').join(', ');
     throw NoConfigFoundException(
       'No configuration found for "$requestedFlavor" flavor.'
       '${known.isEmpty ? '' : ' Available flavors: $known.'}',
@@ -134,7 +131,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
 
   // If a specific flavor was requested, purge all other flavors now
   if (requestedFlavor != null) {
-    configs.removeWhere((k, _) => k != requestedFlavor);
+    configs.removeWhere((final k, final _) => k != requestedFlavor);
   }
 
   if (configs.isEmpty) {
@@ -142,7 +139,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
   }
 
   // The default config runs nameless; every other entry runs as its bare flavor name so outputs land in the flavored locations.
-  final bool loopFlavors = requestedFlavor == null && !(configs.length == 1 && configs.containsKey('launcher_icons'));
+  final loopFlavors = requestedFlavor == null && !(configs.length == 1 && configs.containsKey('launcher_icons'));
   for (final entry in configs.entries) {
     final flavor = entry.key == 'launcher_icons' ? null : entry.key;
     if (flavor != null) {
@@ -191,7 +188,7 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
           }
           await platform.createIcons();
           progress.finish(message: 'done', showTiming: true);
-        } catch (e, st) {
+        } on Object catch (e, st) {
           progress.cancel();
           logger
             ..error(e.toString())
@@ -204,12 +201,14 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
         throw IconGenerationException(failedPlatforms);
       }
     } on IconGenerationException catch (e) {
-      logger.error('\n✕ Could not generate launcher icons');
-      logger.error(e);
+      logger
+        ..error('\n✕ Could not generate launcher icons')
+        ..error(e);
       exit(1);
-    } catch (e) {
-      logger.error('\n✕ Could not generate launcher icons');
-      logger.error(e);
+    } on Object catch (e) {
+      logger
+        ..error('\n✕ Could not generate launcher icons')
+        ..error(e);
       exit(2);
     }
   }
@@ -219,10 +218,10 @@ Future<void> createIconsFromArguments(List<String> arguments) async {
 }
 
 /// Discovers flavor configs directly inside [searchPath], mapping flavor name to file path. The search is flat: configs must live directly in the folder, never nested. Paths are absolute so loading stays correct regardless of the project-root prefix.
-Future<Map<String, String>> getFlavors(String searchPath) async {
+Future<Map<String, String>> getFlavors(final String searchPath) async {
   final flavors = <String, String>{};
 
-  await for (final item in Directory(searchPath).list(recursive: false)) {
+  await for (final item in Directory(searchPath).list()) {
     if (item is File) {
       final name = path.basename(item.path);
       final match = RegExp(flavorConfigFilePattern).firstMatch(name);
@@ -235,7 +234,7 @@ Future<Map<String, String>> getFlavors(String searchPath) async {
 }
 
 /// Reads the `launcher_icons` and `launcher_icons-<flavor>` sections out of the yaml file at [filePath], keyed by bare flavor name (`launcher_icons` itself keeps its full key as the default config). Missing, empty, or section-less files yield no sections.
-Map<String, Map<dynamic, dynamic>> configSections(String filePath) {
+Map<String, Map<dynamic, dynamic>> configSections(final String filePath) {
   final file = File(filePath);
   if (!file.existsSync()) {
     return {};
@@ -261,7 +260,7 @@ Map<String, Map<dynamic, dynamic>> configSections(String filePath) {
 }
 
 /// Merges decoded [sections] into [configs], throwing when a flavor is declared in more than one place. [source] names the file for the error.
-void mergeConfigs(Map<String, Config> configs, Map<String, Map<dynamic, dynamic>> sections, String source) {
+void mergeConfigs(final Map<String, Config> configs, final Map<String, Map<dynamic, dynamic>> sections, final String source) {
   for (final entry in sections.entries) {
     if (configs.containsKey(entry.key)) {
       final key = entry.key == 'launcher_icons' ? entry.key : 'launcher_icons-${entry.key}';

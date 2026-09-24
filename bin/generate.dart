@@ -10,7 +10,7 @@ import 'package:launcher_icons/src/version.dart';
 /// dart run launcher_icons:generate
 /// ```
 /// Calling this function will generate a launcher_icons.yaml file with a default config template.
-void main(List<String> arguments) {
+void main(final List<String> arguments) {
   final parser = ArgParser()
     ..addFlag(
       'help',
@@ -27,7 +27,6 @@ void main(List<String> arguments) {
       'override',
       abbr: 'o',
       help: 'Overwrites an existing $defaultConfigFileName file',
-      defaultsTo: false,
     )
     ..addOption(
       'config',
@@ -41,31 +40,32 @@ void main(List<String> arguments) {
   final fileName = results['config'] as String;
 
   if (results.flag('version')) {
-    print(packageVersion);
+    stdout.writeln(packageVersion);
     exit(0);
   }
 
-  print(introMessage());
+  stdout.writeln(introMessage());
 
   if (results.flag('help')) {
-    print('Generates template configuration file');
-    print(parser.usage);
+    stdout
+      ..writeln('Generates template configuration file')
+      ..writeln(parser.usage);
     exit(0);
   }
 
   // Check if fileName is valid and has a .yaml extension
   if (!fileName.endsWith('.yaml')) {
-    print('Invalid file name, please provide a valid file name');
+    stdout.writeln('Invalid file name, please provide a valid file name');
     return;
   }
 
   final file = File(fileName);
   if (file.existsSync()) {
     if (override) {
-      print('File already exists, overriding...');
+      stdout.writeln('File already exists, overriding...');
       _generateConfigFile(file);
     } else {
-      print(
+      stdout.writeln(
         'File already exists, use --override flag to override the file, or use --fileName flag to use a different file name',
       );
     }
@@ -74,26 +74,28 @@ void main(List<String> arguments) {
       file.createSync(recursive: true);
       _generateConfigFile(file);
     } on Exception catch (e) {
-      print('Error creating file: $e');
+      stdout.writeln('Error creating file: $e');
     }
   }
 }
 
-void _generateConfigFile(File configFile) {
+void _generateConfigFile(final File configFile) {
   try {
     configFile.writeAsStringSync(configFileTemplate);
 
-    print('\nConfig file generated successfully 🎉');
-    print(
-      'You can now use this new config file by using the command below:\n\n'
-      'dart run launcher_icons'
-      '${configFile.path == defaultConfigFileName ? '' : ' -f ${configFile.path}'}\n',
-    );
+    stdout
+      ..writeln('\nConfig file generated successfully 🎉')
+      ..writeln(
+        'You can now use this new config file by using the command below:\n\n'
+        'dart run launcher_icons'
+        '${configFile.path == defaultConfigFileName ? '' : ' -f ${configFile.path}'}\n',
+      );
   } on Exception catch (e) {
-    print('Error generating config file: $e');
+    stdout.writeln('Error generating config file: $e');
   }
 }
 
+// jscpd:ignore-start
 /// Default `launcher_icons.yaml` template. Public so tests can assert it covers every schema key the loader validates (see `test/generate_template_test.dart`): add new config keys here when they are introduced.
 const configFileTemplate = '''
 # dart run launcher_icons
@@ -273,3 +275,4 @@ launcher_icons:
   #   android:
   #     generate: true
 ''';
+// jscpd:ignore-end

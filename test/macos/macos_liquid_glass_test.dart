@@ -274,7 +274,7 @@ void main() {
     });
 
     test('rejects out-of-range optical values with labelled errors', () {
-      Map<String, dynamic> iconJsonFor(Map<String, dynamic> extra) {
+      Map<String, dynamic> iconJsonFor(final Map<String, dynamic> extra) {
         final config = Config.fromJson(<String, dynamic>{
           'macos': {
             'generate': true,
@@ -296,7 +296,7 @@ void main() {
           () => iconJsonFor({entry.key: entry.value}),
           throwsA(
             isA<InvalidConfigException>().having(
-              (e) => e.message,
+              (final e) => e.message,
               'message',
               contains('macos.${entry.key}'),
             ),
@@ -357,7 +357,7 @@ void main() {
       final glyph = groups[1] as Map<String, dynamic>;
       expect(glyph['name'], 'Glyph');
       expect((glyph['translucency'] as Map)['enabled'], isFalse);
-      expect((glyph['layers'] as List).first['glass'], isFalse);
+      expect(((glyph['layers'] as List).first as Map)['glass'], isFalse);
     });
 
     test('rejects layers and groups set together', () {
@@ -380,7 +380,7 @@ void main() {
         () => generateMacOSIconConfig(config),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('macos.liquid_glass_groups'),
           ),
@@ -389,7 +389,7 @@ void main() {
     });
 
     test('rejects invalid values with macos-labelled errors', () {
-      Map<String, dynamic> iconJsonFor(Map<String, dynamic> macos) {
+      Map<String, dynamic> iconJsonFor(final Map<String, dynamic> macos) {
         final config = Config.fromJson(<String, dynamic>{'macos': macos});
         return generateMacOSIconConfig(config);
       }
@@ -405,7 +405,7 @@ void main() {
         () => iconJsonFor(base()..['liquid_glass_shadow_kind'] = 'Invalid'),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('macos.liquid_glass_shadow_kind'),
           ),
@@ -415,7 +415,7 @@ void main() {
         () => iconJsonFor(base()..['liquid_glass_lighting'] = 'dramatic'),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('macos.liquid_glass_lighting'),
           ),
@@ -427,7 +427,7 @@ void main() {
         ),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('macos.liquid_glass_refractivity_enabled'),
           ),
@@ -439,7 +439,7 @@ void main() {
         ),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('macos.liquid_glass_specular_highlight_placement'),
           ),
@@ -454,7 +454,7 @@ void main() {
         }),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('macos.liquid_glass_layers[0].opacity'),
           ),
@@ -469,7 +469,7 @@ void main() {
         }),
         throwsA(
           isA<InvalidConfigException>().having(
-            (e) => e.message,
+            (final e) => e.message,
             'message',
             contains('macos.liquid_glass_layers[0].blend_mode'),
           ),
@@ -549,7 +549,7 @@ void main() {
       late String prefixPath;
       late Directory sandbox;
 
-      setUp(() async {
+      setUp(() {
         sandbox = Directory(
           path.join(
             Directory.current.path,
@@ -754,7 +754,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       );
@@ -775,7 +775,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       );
@@ -834,7 +834,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
           flavor: 'staging',
         ),
@@ -875,7 +875,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       );
@@ -903,7 +903,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       );
@@ -949,7 +949,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       );
@@ -971,7 +971,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       );
@@ -1040,7 +1040,7 @@ void main() {
       final generator = MacOSIconGenerator(
         IconGeneratorContext(
           config: config,
-          logger: LILogger(false),
+          logger: LILogger(isVerbose: false),
           prefixPath: prefixPath,
         ),
       );

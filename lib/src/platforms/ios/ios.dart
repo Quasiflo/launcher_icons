@@ -52,11 +52,11 @@ List<IosIconTemplate> iosIcons = <IosIconTemplate>[
 
 /// create the ios icons
 Future<void> createIcons(
-  Config config,
-  String? flavor, {
-  LILogger? logger,
-  String prefixPath = '.',
-  SvgRasterCache? cache,
+  final Config config,
+  final String? flavor, {
+  final LILogger? logger,
+  final String prefixPath = '.',
+  final SvgRasterCache? cache,
 }) async {
   // Fail fast on config errors before any decode or I/O: a bad flavor_mode
   // must not surface only after minutes of image work.
@@ -68,11 +68,11 @@ Future<void> createIcons(
   }
   // A custom icon_name only applies to unflavored runs (flavor runs always
   // write `AppIcon-<flavor>`); hoisted so the flavor branch can warn.
-  final String? customIconName = config.iosConfig?.iconName;
+  final customIconName = config.iosConfig?.iconName;
   // `.icon`-only runs skip the PNG catalog (and its base image) and emit just
   // the glass bundle; fail fast when there is nothing to emit at all.
-  final bool iconOnly = config.iosConfig?.iconOnly ?? false;
-  final bool hasGlass = (config.iosConfig?.liquidGlassLayers?.isNotEmpty ?? false) || (config.iosConfig?.liquidGlassGroups?.isNotEmpty ?? false);
+  final iconOnly = config.iosConfig?.iconOnly ?? false;
+  final hasGlass = (config.iosConfig?.liquidGlassLayers?.isNotEmpty ?? false) || (config.iosConfig?.liquidGlassGroups?.isNotEmpty ?? false);
   if (iconOnly && !hasGlass) {
     throw const InvalidConfigException(
       '`ios.icon_only` requires `liquid_glass_layers` or `liquid_glass_groups`: there is nothing else to emit.',
@@ -85,11 +85,11 @@ Future<void> createIcons(
   Image? darkImage;
   Image? tintedImage;
   // Single-size mode generates only the 1024px marketing icon: dark/tinted variants are skipped entirely (no decode, no I/O).
-  final bool singleSize = config.iosConfig?.singleSize == true;
+  final singleSize = config.iosConfig?.singleSize ?? false;
   if (!iconOnly) {
-    final String filePath = config.resolveImageFile(config.iosConfig?.imagePath, prefixPath);
-    final String? darkFilePath = config.iosConfig?.imagePathDarkTransparent;
-    final String? tintedFilePath = config.iosConfig?.imagePathTintedGrayscale;
+    final filePath = config.resolveImageFile(config.iosConfig?.imagePath, prefixPath);
+    final darkFilePath = config.iosConfig?.imagePathDarkTransparent;
+    final tintedFilePath = config.iosConfig?.imagePathTintedGrayscale;
 
     // decodeImageFile throws on missing/undecodable files, so a specified but bad path is a hard error rather than a silent skip.
     image = await decodeImageFile(
@@ -131,7 +131,7 @@ Future<void> createIcons(
     }
 
     // remove_alpha mattes the base image onto the background color. The dark variant intentionally keeps its transparency (Apple: the system background shows through), while the tinted variant is forced opaque like the base image.
-    if (config.iosConfig?.removeAlpha == true) {
+    if (config.iosConfig?.removeAlpha ?? false) {
       if (image.hasAlpha) {
         image = _removeAlphaChannel(image, config);
       }
@@ -160,10 +160,9 @@ Future<void> createIcons(
   }
   // Artwork loaders hand out the finished master for any requested size. Sizing happens exactly once at the write sites ([saveNewIcons] and [overwriteDefaultIcons] resize to the template size), so loaders must not pre-resize: a second resampling pass wastes time and softens pixels. Callers only read the shared master (resize/encode never mutate it).
   Future<Image> Function(int) sizeLoaderFor({
-    required Image master,
-  }) {
-    return (int size) async => master;
-  }
+    required final Image master,
+  }) =>
+      (final size) async => master;
 
   // Built only for PNG runs. Icon-only runs never touch the loaders (the PNG branch below is skipped), so the unassigned `late` masters stay unread.
   late final Future<Image> Function(int) loadBase;
@@ -179,21 +178,21 @@ Future<void> createIcons(
   String? darkIconName;
   String? tintedIconName;
   // Single-size mode generates only the 1024px marketing icon.
-  final List<IosIconTemplate> generateIosIcons = singleSize
+  final generateIosIcons = singleSize
       ? <IosIconTemplate>[
           IosIconTemplate(name: '-1024x1024@1x', size: 1024),
         ]
       : iosIcons;
   final concurrentIconUpdates = <Future<void>>[];
   // The name of the icon catalog the generated icons are written to. The liquid glass .icon bundle is created with the same name so Xcode associates it with the catalog.
-  String catalogName = paths.appIconCatalogName(flavor);
+  var catalogName = paths.appIconCatalogName(flavor);
   if (iconOnly) {
     // No PNG catalog, Contents.json, or APPICON_NAME edits: catalogName only names the `.icon` bundle below (a custom name still applies off-flavor).
     if (customIconName != null && flavor == null) {
       catalogName = customIconName;
     }
     printStatus(
-      'Skipping the PNG asset catalog (`ios.icon_only`): emitting $catalogName.icon only — set the target\'s App Icon to it in Xcode.',
+      "Skipping the PNG asset catalog (`ios.icon_only`): emitting $catalogName.icon only — set the target's App Icon to it in Xcode.",
       logger,
     );
     iconName = catalogName;
@@ -206,10 +205,10 @@ Future<void> createIcons(
         logger,
       );
     }
-    for (IosIconTemplate template in generateIosIcons) {
+    for (final template in generateIosIcons) {
       concurrentIconUpdates.add(
         loadBase(template.size).then(
-          (sized) => saveNewIcons(
+          (final sized) => saveNewIcons(
             template: template,
             image: sized,
             catalogName: catalogName,
@@ -222,13 +221,13 @@ Future<void> createIcons(
     }
 
     if (darkImage != null) {
-      final String darkName = '$catalogName${paths.appIconDarkSuffix}';
+      final darkName = '$catalogName${paths.appIconDarkSuffix}';
       darkIconName = darkName;
       printStatus('Building iOS dark launcher icon for $flavor', logger);
-      for (IosIconTemplate template in generateIosIcons) {
+      for (final template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadDark!(template.size).then(
-            (sized) => saveNewIcons(
+            (final sized) => saveNewIcons(
               template: template,
               image: sized,
               catalogName: catalogName,
@@ -240,13 +239,13 @@ Future<void> createIcons(
       }
     }
     if (tintedImage != null) {
-      final String tintedName = '$catalogName${paths.appIconTintedSuffix}';
+      final tintedName = '$catalogName${paths.appIconTintedSuffix}';
       tintedIconName = tintedName;
       printStatus('Building iOS tinted launcher icon for $flavor', logger);
-      for (IosIconTemplate template in generateIosIcons) {
+      for (final template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadTinted!(template.size).then(
-            (sized) => saveNewIcons(
+            (final sized) => saveNewIcons(
               template: template,
               image: sized,
               catalogName: catalogName,
@@ -284,19 +283,19 @@ Future<void> createIcons(
       catalogName,
       darkIconName,
       tintedIconName,
-      singleSize,
-      prefixPath,
+      singleSize: singleSize,
+      prefixPath: prefixPath,
     );
   } else if (customIconName != null) {
     // If a custom icon_name is configured then the user has specified a new icon to be created and for the old icon file to be kept
-    final String newIconName = customIconName;
+    final newIconName = customIconName;
     // Like the flavor flow, a custom name gets its own catalog so the folder matches APPICON_NAME (<custom>.appiconset, not AppIcon).
     catalogName = newIconName;
     printStatus('Adding new iOS launcher icon', logger);
-    for (IosIconTemplate template in generateIosIcons) {
+    for (final template in generateIosIcons) {
       concurrentIconUpdates.add(
         loadBase(template.size).then(
-          (sized) => saveNewIcons(
+          (final sized) => saveNewIcons(
             template: template,
             image: sized,
             catalogName: catalogName,
@@ -307,13 +306,13 @@ Future<void> createIcons(
       );
     }
     if (darkImage != null) {
-      final String darkName = newIconName + '-Dark';
+      final darkName = '$newIconName-Dark';
       darkIconName = darkName;
       printStatus('Adding new iOS dark launcher icon', logger);
-      for (IosIconTemplate template in generateIosIcons) {
+      for (final template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadDark!(template.size).then(
-            (sized) => saveNewIcons(
+            (final sized) => saveNewIcons(
               template: template,
               image: sized,
               catalogName: catalogName,
@@ -325,13 +324,13 @@ Future<void> createIcons(
       }
     }
     if (tintedImage != null) {
-      final String tintedName = newIconName + '-Tinted';
+      final tintedName = '$newIconName-Tinted';
       tintedIconName = tintedName;
       printStatus('Adding new iOS tinted launcher icon', logger);
-      for (IosIconTemplate template in generateIosIcons) {
+      for (final template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadTinted!(template.size).then(
-            (sized) => saveNewIcons(
+            (final sized) => saveNewIcons(
               template: template,
               image: sized,
               catalogName: catalogName,
@@ -354,17 +353,17 @@ Future<void> createIcons(
       iconName,
       darkIconName,
       tintedIconName,
-      singleSize,
-      prefixPath,
+      singleSize: singleSize,
+      prefixPath: prefixPath,
     );
   }
   // Otherwise the user wants the new icon to use the default icons name and update config file to use it
   else {
     printStatus('Overwriting default iOS launcher icon with new icon', logger);
-    for (IosIconTemplate template in generateIosIcons) {
+    for (final template in generateIosIcons) {
       concurrentIconUpdates.add(
         loadBase(template.size).then(
-          (sized) => overwriteDefaultIcons(template, sized, '', prefixPath),
+          (final sized) => overwriteDefaultIcons(template, sized, '', prefixPath),
         ),
       );
     }
@@ -373,10 +372,10 @@ Future<void> createIcons(
         'Overwriting default iOS dark launcher icon with new icon',
         logger,
       );
-      for (IosIconTemplate template in generateIosIcons) {
+      for (final template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadDark!(template.size).then(
-            (sized) => overwriteDefaultIcons(template, sized, paths.appIconDarkSuffix, prefixPath),
+            (final sized) => overwriteDefaultIcons(template, sized, paths.appIconDarkSuffix, prefixPath),
           ),
         );
       }
@@ -387,10 +386,10 @@ Future<void> createIcons(
         'Overwriting default iOS tinted launcher icon with new icon',
         logger,
       );
-      for (IosIconTemplate template in generateIosIcons) {
+      for (final template in generateIosIcons) {
         concurrentIconUpdates.add(
           loadTinted!(template.size).then(
-            (sized) => overwriteDefaultIcons(template, sized, paths.appIconTintedSuffix, prefixPath),
+            (final sized) => overwriteDefaultIcons(template, sized, paths.appIconTintedSuffix, prefixPath),
           ),
         );
       }
@@ -409,8 +408,8 @@ Future<void> createIcons(
       iconName,
       darkIconName,
       tintedIconName,
-      singleSize,
-      prefixPath,
+      singleSize: singleSize,
+      prefixPath: prefixPath,
     );
   }
   await Future.wait(concurrentIconUpdates);
@@ -458,11 +457,11 @@ Future<void> createIcons(
 ///
 /// Runs when the current catalog carries no layers/groups: without it, unsetting the layers would leave a stale bundle (and pbxproj reference) shipping old glass. Returns whether anything was removed.
 Future<void> removeStaleLiquidGlassBundle({
-  required String iconFolderRelative,
-  required String catalogName,
-  String? xcodeprojPath,
-  String prefixPath = '.',
-  LILogger? logger,
+  required final String iconFolderRelative,
+  required final String catalogName,
+  final String? xcodeprojPath,
+  final String prefixPath = '.',
+  final LILogger? logger,
 }) async {
   final dir = Directory(withPrefix(prefixPath, iconFolderRelative));
   if (!dir.existsSync()) {
@@ -483,18 +482,18 @@ Future<void> removeStaleLiquidGlassBundle({
 
 /// Removes the liquid glass `.icon` file reference for [iconName] from project.pbxproj (the inverse of [addLiquidGlassIconToProject]). Missing files are a no-op: the icons themselves are unaffected.
 Future<void> removeLiquidGlassIconFromProject(
-  String iconName, [
-  String? xcodeprojPath,
-  LILogger? logger,
-  String prefixPath = '.',
+  final String iconName, [
+  final String? xcodeprojPath,
+  final LILogger? logger,
+  final String prefixPath = '.',
 ]) async {
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
-  final File iOSConfigFile = File(resolvedPath);
+  final iOSConfigFile = File(resolvedPath);
   if (!iOSConfigFile.existsSync()) {
     return;
   }
-  final String wholeFile = await iOSConfigFile.readAsString();
-  final String changedFile = removeLiquidGlassIconReference(wholeFile, iconName);
+  final wholeFile = await iOSConfigFile.readAsString();
+  final changedFile = removeLiquidGlassIconReference(wholeFile, iconName);
   if (changedFile == wholeFile) {
     return;
   }
@@ -508,10 +507,10 @@ Future<void> removeLiquidGlassIconFromProject(
 /// Removes the liquid glass `.icon` file references for [iconName] from the given [pbxprojContent] and returns the modified content.
 ///
 /// Drops every line mentioning `<iconName>.icon` (every reference form [addLiquidGlassIconReference] writes carries one). The `.icon` suffix anchors the match so similarly-named bundles never shadow each other. Returns the original content unchanged when nothing references the bundle.
-String removeLiquidGlassIconReference(String pbxprojContent, String iconName) {
-  final List<String> lines = const LineSplitter().convert(pbxprojContent);
-  final String token = '$iconName.icon';
-  final kept = lines.where((line) => !line.contains(token)).toList();
+String removeLiquidGlassIconReference(final String pbxprojContent, final String iconName) {
+  final lines = const LineSplitter().convert(pbxprojContent);
+  final token = '$iconName.icon';
+  final kept = lines.where((final line) => !line.contains(token)).toList();
   if (kept.length == lines.length) {
     return pbxprojContent;
   }
@@ -521,7 +520,7 @@ String removeLiquidGlassIconReference(String pbxprojContent, String iconName) {
 /// Whether [image] reads as grayscale, sampled on an 8x8 grid (64 reads regardless of image size) instead of a full O(n) pixel walk.
 ///
 /// A sample counts as colored when its channel spread exceeds 8 levels, tolerating JPEG-style compression noise around true gray. Checking one pixel (or every pixel) is the wrong trade-off: a single origin sample misses off-center color, while a full scan costs millions of reads on a 1024px source to answer a boolean.
-bool isGrayscaleImage(Image image, {int gridDivisions = 8}) {
+bool isGrayscaleImage(final Image image, {final int gridDivisions = 8}) {
   assert(gridDivisions > 0, 'gridDivisions must be positive');
   for (var row = 0; row < gridDivisions; row++) {
     final y = ((row + 0.5) * image.height / gridDivisions).floor().clamp(
@@ -541,7 +540,7 @@ bool isGrayscaleImage(Image image, {int gridDivisions = 8}) {
         (r - g).abs(),
         (g - b).abs(),
         (r - b).abs(),
-      ].reduce((a, c) => a > c ? a : c);
+      ].reduce((final a, final c) => a > c ? a : c);
       if (spread > 8) {
         return false;
       }
@@ -552,12 +551,12 @@ bool isGrayscaleImage(Image image, {int gridDivisions = 8}) {
 
 /// Overwrites the default `AppIcon` set in place, optionally suffixed for the dark/tinted variants.
 Future<void> overwriteDefaultIcons(
-  IosIconTemplate template,
-  Image image, [
-  String iconNameSuffix = '',
-  String prefixPath = '.',
+  final IosIconTemplate template,
+  final Image image, [
+  final String iconNameSuffix = '',
+  final String prefixPath = '.',
 ]) async {
-  final Image newImage = createResizedImage(template.size, image);
+  final newImage = createResizedImage(template.size, image);
   await File(
     withPrefix(
       prefixPath,
@@ -568,14 +567,14 @@ Future<void> overwriteDefaultIcons(
 
 /// Writes fresh PNGs into `<catalogName>.appiconset/` under [iconName], keeping any previous set intact.
 Future<void> saveNewIcons({
-  required IosIconTemplate template,
-  required Image image,
-  required String catalogName,
-  required String iconName,
-  String prefixPath = '.',
+  required final IosIconTemplate template,
+  required final Image image,
+  required final String catalogName,
+  required final String iconName,
+  final String prefixPath = '.',
 }) async {
-  final String newIconFolder = path.join(paths.iosAssetFolder, '$catalogName.appiconset');
-  final Image newImage = createResizedImage(template.size, image);
+  final newIconFolder = path.join(paths.iosAssetFolder, '$catalogName.appiconset');
+  final newImage = createResizedImage(template.size, image);
   final newFile = await createFileIfNotExist(
     withPrefix(prefixPath, path.join(newIconFolder, '$iconName${template.name}.png')),
   );
@@ -584,13 +583,13 @@ Future<void> saveNewIcons({
 
 /// Add liquid glass .icon file reference to project.pbxproj
 Future<void> addLiquidGlassIconToProject(
-  String iconName, [
-  String? xcodeprojPath,
-  LILogger? logger,
-  String prefixPath = '.',
+  final String iconName, [
+  final String? xcodeprojPath,
+  final LILogger? logger,
+  final String prefixPath = '.',
 ]) async {
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
-  final File iOSConfigFile = File(resolvedPath);
+  final iOSConfigFile = File(resolvedPath);
   if (!iOSConfigFile.existsSync()) {
     printStatus(
       'Warning: project.pbxproj not found, skipping .icon reference addition',
@@ -598,8 +597,8 @@ Future<void> addLiquidGlassIconToProject(
     );
     return;
   }
-  final String wholeFile = await iOSConfigFile.readAsString();
-  final String changedFile = addLiquidGlassIconReference(wholeFile, iconName);
+  final wholeFile = await iOSConfigFile.readAsString();
+  final changedFile = addLiquidGlassIconReference(wholeFile, iconName);
   if (changedFile == wholeFile) {
     printStatus(
       'Liquid glass .icon reference already exists in project.pbxproj',
@@ -615,36 +614,36 @@ Future<void> addLiquidGlassIconToProject(
 }
 
 /// Adds the liquid glass `.icon` file references for [iconName] to the given [pbxprojContent] and returns the modified content. If the reference already exists, the original content is returned unchanged.
-String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
-  final List<String> lines = const LineSplitter().convert(pbxprojContent);
-  final String iconPath = '$iconName.icon';
+String addLiquidGlassIconReference(final String pbxprojContent, final String iconName) {
+  final lines = const LineSplitter().convert(pbxprojContent);
+  final iconPath = '$iconName.icon';
 
   // Check if .icon reference already exists. Match the exact reference forms
   // this function writes (`/* <name>.icon */` comments and `path = <name>.icon;`)
   // so similarly-named bundles never shadow each other.
-  final String fileToken = '/* $iconPath */';
-  final String pathToken = 'path = $iconPath;';
-  final bool alreadyExists = lines.any((line) => line.contains(fileToken) || line.contains(pathToken));
+  final fileToken = '/* $iconPath */';
+  final pathToken = 'path = $iconPath;';
+  final alreadyExists = lines.any((final line) => line.contains(fileToken) || line.contains(pathToken));
   if (alreadyExists) {
     return pbxprojContent;
   }
 
   // Generate unique IDs for the .icon file references
-  final String fileRefId = _generateUniqueId('fileRef$iconName', pbxprojContent);
-  final String buildFileId = _generateUniqueId('buildRef$iconName', pbxprojContent);
+  final fileRefId = _generateUniqueId('fileRef$iconName', pbxprojContent);
+  final buildFileId = _generateUniqueId('buildRef$iconName', pbxprojContent);
 
   // Find insertion points
   int? fileRefInsertIndex;
   int? buildFileInsertIndex;
   int? resourcesBuildphaseInsertIndex;
   int? resourcesPBXGroupInsertIndex;
-  for (int i = 0; i < lines.length; i++) {
-    final String line = lines[i];
+  for (var i = 0; i < lines.length; i++) {
+    final line = lines[i];
 
     // Find PBXFileReference section
     if (line.contains('/* Begin PBXFileReference section */') && fileRefInsertIndex == null) {
       // Insert after the first existing file reference
-      for (int j = i + 1; j < lines.length; j++) {
+      for (var j = i + 1; j < lines.length; j++) {
         if (lines[j].trim().endsWith('};') && lines[j].contains('isa = PBXFileReference')) {
           fileRefInsertIndex = j + 1;
           break;
@@ -655,7 +654,7 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
     // Find PBXBuildFile section
     if (line.contains('/* Begin PBXBuildFile section */') && buildFileInsertIndex == null) {
       // Insert after the first existing build file
-      for (int j = i + 1; j < lines.length; j++) {
+      for (var j = i + 1; j < lines.length; j++) {
         if (lines[j].trim().endsWith('};') && lines[j].contains('isa = PBXBuildFile')) {
           buildFileInsertIndex = j + 1;
           break;
@@ -665,7 +664,7 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
 
     // Find Resources section
     if (line.contains('/* Begin PBXResourcesBuildPhase section */') && resourcesBuildphaseInsertIndex == null) {
-      for (int j = i + 1; j < lines.length; j++) {
+      for (var j = i + 1; j < lines.length; j++) {
         if (lines[j].trim().contains('files = (')) {
           resourcesBuildphaseInsertIndex = j + 1;
           break;
@@ -673,9 +672,9 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
       }
     }
     if (line.contains('/* Begin PBXGroup section */') && resourcesPBXGroupInsertIndex == null) {
-      for (int j = i + 1; j < lines.length; j++) {
+      for (var j = i + 1; j < lines.length; j++) {
         if (lines[j].trim().contains('/* Runner */ = {')) {
-          for (int h = j + 1; h < lines.length; h++) {
+          for (var h = j + 1; h < lines.length; h++) {
             if (lines[h].trim().contains('children = (')) {
               resourcesPBXGroupInsertIndex = h + 1;
               break;
@@ -709,14 +708,14 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
 
   // Add to Resources section
   if (resourcesBuildphaseInsertIndex != null) {
-    final int adjustedIndex = resourcesBuildphaseInsertIndex + (fileRefInsertIndex != null && resourcesBuildphaseInsertIndex > fileRefInsertIndex ? 1 : 0) + (buildFileInsertIndex != null && resourcesBuildphaseInsertIndex > buildFileInsertIndex ? 1 : 0);
+    final adjustedIndex = resourcesBuildphaseInsertIndex + (fileRefInsertIndex != null && resourcesBuildphaseInsertIndex > fileRefInsertIndex ? 1 : 0) + (buildFileInsertIndex != null && resourcesBuildphaseInsertIndex > buildFileInsertIndex ? 1 : 0);
     lines.insert(
       adjustedIndex,
       '\t\t\t\t$buildFileId /* $iconPath in Resources */,',
     );
   }
   if (resourcesPBXGroupInsertIndex != null) {
-    final int adjustedIndex = resourcesPBXGroupInsertIndex + (fileRefInsertIndex != null && resourcesPBXGroupInsertIndex > fileRefInsertIndex ? 1 : 0) + (buildFileInsertIndex != null && resourcesPBXGroupInsertIndex > buildFileInsertIndex ? 1 : 0) + (resourcesBuildphaseInsertIndex != null && resourcesPBXGroupInsertIndex > resourcesBuildphaseInsertIndex ? 1 : 0);
+    final adjustedIndex = resourcesPBXGroupInsertIndex + (fileRefInsertIndex != null && resourcesPBXGroupInsertIndex > fileRefInsertIndex ? 1 : 0) + (buildFileInsertIndex != null && resourcesPBXGroupInsertIndex > buildFileInsertIndex ? 1 : 0) + (resourcesBuildphaseInsertIndex != null && resourcesPBXGroupInsertIndex > resourcesBuildphaseInsertIndex ? 1 : 0);
     lines.insert(
       adjustedIndex,
       '\t\t\t\t$fileRefId /* $iconPath */,',
@@ -727,19 +726,17 @@ String addLiquidGlassIconReference(String pbxprojContent, String iconName) {
 }
 
 /// Generate a unique ID for Xcode project file references. Uses a format similar to existing Xcode IDs (24 character hex string)
-String _generateUniqueId(String fileName, String projectFile) {
-  String generateHash(String input) {
+String _generateUniqueId(final String fileName, final String projectFile) {
+  String generateHash(final String input) {
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
     return digest.toString().substring(0, 24).toUpperCase();
   }
 
-  bool isIdUnique(String id, String file) {
-    return !file.contains(id);
-  }
+  bool isIdUnique(final String id, final String file) => !file.contains(id);
 
-  String id = generateHash(fileName);
-  int attempt = 0;
+  var id = generateHash(fileName);
+  var attempt = 0;
   while (!isIdUnique(id, projectFile)) {
     attempt++;
     id = generateHash('$fileName-$attempt');
@@ -751,8 +748,8 @@ String _generateUniqueId(String fileName, String projectFile) {
 ///
 /// Prefers an explicit [xcodeprojPath], then the standard `ios/Runner.xcodeproj` location, then the first `*.xcodeproj` found under `ios/` so renamed Runner projects keep working. Returns `null` when no project file exists.
 String? resolveIosPbxprojPath([
-  String? xcodeprojPath,
-  String prefixPath = '.',
+  final String? xcodeprojPath,
+  final String prefixPath = '.',
 ]) {
   if (xcodeprojPath != null) {
     // Explicit paths are project-relative like everything else, so they honor
@@ -766,7 +763,7 @@ String? resolveIosPbxprojPath([
   }
   final iosDir = Directory(withPrefix(prefixPath, paths.iosDirPath));
   if (iosDir.existsSync()) {
-    final candidates = iosDir.listSync().whereType<Directory>().where((dir) => dir.path.endsWith(paths.xcodeprojExtension)).toList()..sort((a, b) => a.path.compareTo(b.path));
+    final candidates = iosDir.listSync().whereType<Directory>().where((final dir) => dir.path.endsWith(paths.xcodeprojExtension)).toList()..sort((final a, final b) => a.path.compareTo(b.path));
     for (final dir in candidates) {
       final candidate = '${dir.path}/${paths.pbxprojFileName}';
       if (File(candidate).existsSync()) {
@@ -779,23 +776,23 @@ String? resolveIosPbxprojPath([
 
 /// Change the iOS launcher icon
 Future<void> changeIosLauncherIcon(
-  String iconName,
-  String? flavor, [
-  String? xcodeprojPath,
-  String prefixPath = '.',
-  LILogger? logger,
+  final String iconName,
+  final String? flavor, [
+  final String? xcodeprojPath,
+  final String prefixPath = '.',
+  final LILogger? logger,
 ]) async {
   // Falls back to the standard location so a missing project still fails with the historical PathNotFoundException.
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
-  final File iOSConfigFile = File(resolvedPath);
-  final List<String> lines = await iOSConfigFile.readAsLines();
+  final iOSConfigFile = File(resolvedPath);
+  final lines = await iOSConfigFile.readAsLines();
 
-  bool onConfigurationSection = false;
+  var onConfigurationSection = false;
   String? currentConfig;
-  bool replacedAny = false;
+  var replacedAny = false;
 
-  for (int x = 0; x < lines.length; x++) {
-    final String line = lines[x];
+  for (var x = 0; x < lines.length; x++) {
+    final line = lines[x];
     if (line.contains('/* Begin XCBuildConfiguration section */')) {
       onConfigurationSection = true;
     }
@@ -810,7 +807,7 @@ Future<void> changeIosLauncherIcon(
       if (header != null) {
         currentConfig = header.group(1);
       }
-      final match = RegExp('.*/\\* (.*)\.xcconfig \\*/;').firstMatch(line);
+      final match = RegExp(r'.*/\* (.*).xcconfig \*/;').firstMatch(line);
       if (match != null) {
         // A shared base xcconfig must not clobber a flavored block header (the common Flutter-flavors shape reuses Debug.xcconfig).
         final headerIsOurs = currentConfig != null && flavor != null && (currentConfig == flavor || currentConfig.endsWith('-$flavor'));
@@ -822,7 +819,7 @@ Future<void> changeIosLauncherIcon(
       if (currentConfig != null && (flavor == null || currentConfig == flavor || currentConfig.endsWith('-$flavor')) && line.contains('ASSETCATALOG') && line.contains('APPICON_NAME')) {
         // Targeted replacement: only the APPICON_NAME pair, leaving any other settings on the line untouched.
         lines[x] = line.replaceFirst(
-          RegExp('ASSETCATALOG_COMPILER_APPICON_NAME\\s*=\\s*[^;]*;'),
+          RegExp(r'ASSETCATALOG_COMPILER_APPICON_NAME\s*=\s*[^;]*;'),
           'ASSETCATALOG_COMPILER_APPICON_NAME = $iconName;',
         );
         replacedAny = true;
@@ -842,7 +839,7 @@ Future<void> changeIosLauncherIcon(
     );
   }
 
-  final String entireFile = '${lines.join('\n')}\n';
+  final entireFile = '${lines.join('\n')}\n';
   // Write via temp-file rename so a crash cannot leave a half-written, corrupt project file behind.
   final tmpFile = File('${iOSConfigFile.path}.tmp');
   await tmpFile.writeAsString(entireFile);
@@ -850,23 +847,21 @@ Future<void> changeIosLauncherIcon(
 }
 
 /// Whether [configName] (e.g. `Debug-staging`) belongs to [flavor]: the name itself or a `-<flavor>` suffix. Substring matching collides (`tag` must not match `Debug-staging`).
-bool _isFlavorConfig(String configName, String flavor) {
-  return configName == flavor || configName.endsWith('-$flavor');
-}
+bool _isFlavorConfig(final String configName, final String flavor) => configName == flavor || configName.endsWith('-$flavor');
 
 /// Removes flavor-matching `ASSETCATALOG_COMPILER_APPICON_NAME` lines from project.pbxproj so `xcconfig` overrides take effect (pbxproj values shadow xcconfig base values — verified with `xcodebuild -showBuildSettings`). Returns the number of removed lines.
 Future<int> clearIosFlavorAppIconLines(
-  String flavor, [
-  String? xcodeprojPath,
-  String prefixPath = '.',
-  LILogger? logger,
+  final String flavor, [
+  final String? xcodeprojPath,
+  final String prefixPath = '.',
+  final LILogger? logger,
 ]) async {
   // Falls back to the standard location so a missing project still fails with the historical PathNotFoundException.
   final resolvedPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath) ?? withPrefix(prefixPath, paths.iosConfigFile);
-  final File iOSConfigFile = File(resolvedPath);
-  final List<String> lines = await iOSConfigFile.readAsLines();
+  final iOSConfigFile = File(resolvedPath);
+  final lines = await iOSConfigFile.readAsLines();
 
-  bool onConfigurationSection = false;
+  var onConfigurationSection = false;
   String? currentConfig;
   final kept = <String>[];
   var removed = 0;
@@ -885,7 +880,7 @@ Future<int> clearIosFlavorAppIconLines(
       if (header != null) {
         currentConfig = header.group(1);
       }
-      final match = RegExp('.*/\\* (.*)\.xcconfig \\*/;').firstMatch(line);
+      final match = RegExp(r'.*/\* (.*).xcconfig \*/;').firstMatch(line);
       if (match != null) {
         // A shared base xcconfig must not clobber a flavored block header.
         if (currentConfig == null || !_isFlavorConfig(currentConfig, flavor)) {
@@ -916,10 +911,10 @@ Future<int> clearIosFlavorAppIconLines(
 
 /// Writes per-mode `ios/Flutter/<flavor>-<Mode>.xcconfig` overrides pointing `ASSETCATALOG_COMPILER_APPICON_NAME` at [catalogName], creating missing files seeded with the Generated include. Assign the files as the base configuration files in Xcode once; the tool keeps the setting in place after that.
 Future<void> writeIosFlavorXcconfigs(
-  String flavor,
-  String catalogName, {
-  String prefixPath = '.',
-  LILogger? logger,
+  final String flavor,
+  final String catalogName, {
+  final String prefixPath = '.',
+  final LILogger? logger,
 }) async {
   const setting = 'ASSETCATALOG_COMPILER_APPICON_NAME';
   for (final mode in ['Debug', 'Profile', 'Release']) {
@@ -951,11 +946,11 @@ Future<void> writeIosFlavorXcconfigs(
 ///
 /// A catalog is orphaned when its name appears in none of [referenceTexts] (project.pbxproj / xcconfig contents). Every deletion is logged loudly; a still-referenced catalog is always kept so the build cannot break.
 Future<void> removeOrphanedCatalogs({
-  required String assetFolderRelative,
-  required String currentCatalog,
-  required List<String> referenceTexts,
-  String prefixPath = '.',
-  LILogger? logger,
+  required final String assetFolderRelative,
+  required final String currentCatalog,
+  required final List<String> referenceTexts,
+  final String prefixPath = '.',
+  final LILogger? logger,
 }) async {
   final dir = Directory(withPrefix(prefixPath, assetFolderRelative));
   if (!dir.existsSync()) {
@@ -970,7 +965,7 @@ Future<void> removeOrphanedCatalogs({
     if (name == currentCatalog || name == paths.appIconCatalogName(null)) {
       continue;
     }
-    if (referenceTexts.any((text) => _catalogIsReferenced(text, name))) {
+    if (referenceTexts.any((final text) => _catalogIsReferenced(text, name))) {
       continue;
     }
     printStatus(
@@ -984,15 +979,15 @@ Future<void> removeOrphanedCatalogs({
 /// Whether [catalogName] (e.g. `AppIcon-staging`) is referenced by [referenceText] (project.pbxproj / xcconfig contents) as an exact token.
 ///
 /// Substring matching over-keeps (`AppIcon-dev` would look referenced when only `AppIcon-dev2` is wired, so genuine orphans are never collected); token boundaries keep collection working while a wired set is never deleted.
-bool _catalogIsReferenced(String referenceText, String catalogName) {
+bool _catalogIsReferenced(final String referenceText, final String catalogName) {
   final token = RegExp('(^|[^A-Za-z0-9_.-])${RegExp.escape(catalogName)}([^A-Za-z0-9_.-]|\$)');
   return token.hasMatch(referenceText);
 }
 
 /// Reads the reference texts for iOS catalog orphan detection: the resolved project.pbxproj plus every `ios/Flutter/*.xcconfig`.
 Future<List<String>> iosCatalogReferenceTexts([
-  String? xcodeprojPath,
-  String prefixPath = '.',
+  final String? xcodeprojPath,
+  final String prefixPath = '.',
 ]) async {
   final references = <String>[];
   final pbxprojPath = resolveIosPbxprojPath(xcodeprojPath, prefixPath);
@@ -1012,57 +1007,57 @@ Future<List<String>> iosCatalogReferenceTexts([
 
 /// Create the Contents.json file
 Future<void> modifyContentsFile(
-  String newIconName,
-  String? darkIconName,
-  String? tintedIconName, [
-  bool singleSize = false,
-  String prefixPath = '.',
-]) async {
-  final String newContentsFilename = withPrefix(
+  final String newIconName,
+  final String? darkIconName,
+  final String? tintedIconName, {
+  final bool singleSize = false,
+  final String prefixPath = '.',
+}) async {
+  final newContentsFilename = withPrefix(
     prefixPath,
     path.join(paths.iosAssetFolder, '$newIconName.appiconset', 'Contents.json'),
   );
   final contentsJsonFile = await createFileIfNotExist(newContentsFilename);
-  final String contentsFileContent = generateContentsFileAsString(
+  final contentsFileContent = generateContentsFileAsString(
     newIconName,
     darkIconName,
     tintedIconName,
-    singleSize,
+    singleSize: singleSize,
   );
   await contentsJsonFile.writeAsString(contentsFileContent);
 }
 
 /// Modify default Contents.json file
 Future<void> modifyDefaultContentsFile(
-  String newIconName,
-  String? darkIconName,
-  String? tintedIconName, [
-  bool singleSize = false,
-  String prefixPath = '.',
-]) async {
-  final String newIconFolder = withPrefix(
+  final String newIconName,
+  final String? darkIconName,
+  final String? tintedIconName, {
+  final bool singleSize = false,
+  final String prefixPath = '.',
+}) async {
+  final newIconFolder = withPrefix(
     prefixPath,
     path.join(paths.iosAssetFolder, 'AppIcon.appiconset', 'Contents.json'),
   );
   final contentsJsonFile = await createFileIfNotExist(newIconFolder);
-  final String contentsFileContent = generateContentsFileAsString(
+  final contentsFileContent = generateContentsFileAsString(
     newIconName,
     darkIconName,
     tintedIconName,
-    singleSize,
+    singleSize: singleSize,
   );
   await contentsJsonFile.writeAsString(contentsFileContent);
 }
 
 /// Serializes the `Contents.json` image list (plus `xcode` info block) to a JSON string.
 String generateContentsFileAsString(
-  String newIconName,
-  String? darkIconName,
-  String? tintedIconName, [
-  bool singleSize = false,
-]) {
+  final String newIconName,
+  final String? darkIconName,
+  final String? tintedIconName, {
+  final bool singleSize = false,
+}) {
   final imageList = singleSize ? createSingleSizeImageList(newIconName) : createImageList(newIconName, darkIconName, tintedIconName);
-  final Map<String, dynamic> contentJson = <String, dynamic>{
+  final contentJson = <String, dynamic>{
     'images': imageList,
     'info': ContentsInfoObject(version: 1, author: 'xcode').toJson(),
   };
@@ -1084,12 +1079,10 @@ class ContentsImageAppearanceObject {
   final String value;
 
   /// Serializes to the catalog JSON form.
-  Map<String, String> toJson() {
-    return <String, String>{
-      'appearance': appearance,
-      'value': value,
-    };
-  }
+  Map<String, String> toJson() => <String, String>{
+        'appearance': appearance,
+        'value': value,
+      };
 }
 
 /// One image entry of an asset-catalog `Contents.json`.
@@ -1123,16 +1116,14 @@ class ContentsImageObject {
   final List<ContentsImageAppearanceObject>? appearances;
 
   /// Serializes to the catalog JSON form.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'size': size,
-      'idiom': idiom,
-      'filename': filename,
-      'scale': scale,
-      if (platform != null) 'platform': platform,
-      if (appearances != null) 'appearances': appearances!.map((e) => e.toJson()).toList(),
-    };
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'size': size,
+        'idiom': idiom,
+        'filename': filename,
+        'scale': scale,
+        if (platform != null) 'platform': platform,
+        if (appearances != null) 'appearances': appearances!.map((final e) => e.toJson()).toList(),
+      };
 }
 
 /// The `info` block of an asset-catalog `Contents.json`.
@@ -1147,34 +1138,30 @@ class ContentsInfoObject {
   final String author;
 
   /// Serializes to the catalog JSON form.
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'version': version,
-      'author': author,
-    };
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'version': version,
+        'author': author,
+      };
 }
 
 /// Create a single-entry image list for `ios.single_size` mode.
-List<Map<String, dynamic>> createSingleSizeImageList(String fileNamePrefix) {
-  return <Map<String, dynamic>>[
-    ContentsImageObject(
-      size: '1024x1024',
-      idiom: 'universal',
-      filename: '$fileNamePrefix-1024x1024@1x.png',
-      platform: 'ios',
-      scale: '1x',
-    ).toJson(),
-  ];
-}
+List<Map<String, dynamic>> createSingleSizeImageList(final String fileNamePrefix) => <Map<String, dynamic>>[
+      ContentsImageObject(
+        size: '1024x1024',
+        idiom: 'universal',
+        filename: '$fileNamePrefix-1024x1024@1x.png',
+        platform: 'ios',
+        scale: '1x',
+      ).toJson(),
+    ];
 
 /// Create the image list for the Contents.json file for Xcode versions Xcode 14 and above
 List<Map<String, dynamic>> createImageList(
-  String fileNamePrefix,
-  String? darkFileNamePrefix,
-  String? tintedFileNamePrefix,
+  final String fileNamePrefix,
+  final String? darkFileNamePrefix,
+  final String? tintedFileNamePrefix,
 ) {
-  const List<Map<String, dynamic>> imageConfigurations = [
+  const imageConfigurations = <Map<String, dynamic>>[
     {
       'size': '20x20',
       'idiom': 'universal',
@@ -1242,7 +1229,7 @@ List<Map<String, dynamic>> createImageList(
     },
   ];
 
-  final List<Map<String, dynamic>> imageList = <Map<String, dynamic>>[];
+  final imageList = <Map<String, dynamic>>[];
 
   for (final config in imageConfigurations) {
     final size = config['size']! as String;
@@ -1267,7 +1254,7 @@ List<Map<String, dynamic>> createImageList(
   // Prevent ios-marketing icon from being tinted or dark
 
   if (darkFileNamePrefix != null) {
-    for (final config in imageConfigurations.where((e) => e['idiom'] == 'universal')) {
+    for (final config in imageConfigurations.where((final e) => e['idiom'] == 'universal')) {
       final size = config['size']! as String;
       final idiom = config['idiom']! as String;
       final platform = config['platform'] as String?;
@@ -1295,7 +1282,7 @@ List<Map<String, dynamic>> createImageList(
   }
 
   if (tintedFileNamePrefix != null) {
-    for (final config in imageConfigurations.where((e) => e['idiom'] == 'universal')) {
+    for (final config in imageConfigurations.where((final e) => e['idiom'] == 'universal')) {
       final size = config['size']! as String;
       final idiom = config['idiom']! as String;
       final platform = config['platform'] as String?;
@@ -1325,14 +1312,14 @@ List<Map<String, dynamic>> createImageList(
   return imageList;
 }
 
-ColorUint8 _getBackgroundColor(Config config) {
+ColorUint8 _getBackgroundColor(final Config config) {
   final backgroundColor = config.iosConfig?.backgroundColor ?? '#ffffff';
   final (:r, :g, :b) = parseHexColor(backgroundColor);
   return ColorUint8.rgba(r, g, b, 0xff);
 }
 
 /// Mattes [source] onto the configured background color, returning an opaque 3-channel image.
-Image _removeAlphaChannel(Image source, Config config) {
+Image _removeAlphaChannel(final Image source, final Config config) {
   final backgroundColor = _getBackgroundColor(config);
   final pixel = source.getPixel(0, 0);
   do {
@@ -1342,18 +1329,16 @@ Image _removeAlphaChannel(Image source, Config config) {
   return source.convert(numChannels: 3);
 }
 
-Color _alphaBlend(Color fg, ColorUint8 bg) {
-  if (fg.format != Format.uint8) {
-    fg = fg.convert(format: Format.uint8);
-  }
-  if (fg.a == 0) {
+Color _alphaBlend(final Color fg, final ColorUint8 bg) {
+  final converted = fg.format != Format.uint8 ? fg.convert(format: Format.uint8) : fg;
+  if (converted.a == 0) {
     return bg;
   } else {
-    final invAlpha = 0xff - fg.a;
+    final invAlpha = 0xff - converted.a;
     return ColorUint8.rgba(
-      (fg.a * fg.r + invAlpha * bg.r) ~/ 0xff,
-      (fg.a * fg.g + invAlpha * bg.g) ~/ 0xff,
-      (fg.a * fg.b + invAlpha * bg.b) ~/ 0xff,
+      (converted.a * converted.r + invAlpha * bg.r) ~/ 0xff,
+      (converted.a * converted.g + invAlpha * bg.g) ~/ 0xff,
+      (converted.a * converted.b + invAlpha * bg.b) ~/ 0xff,
       0xff,
     );
   }
