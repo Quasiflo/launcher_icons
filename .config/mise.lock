@@ -43,50 +43,53 @@ url = "https://github.com/Kitware/CMake/releases/download/v4.4.3/cmake-4.4.3-win
 url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/529578311"
 
 [[tools."aqua:astral-sh/uv"]]
-version = "0.12.13"
+version = "0.12.17"
 backend = "aqua:astral-sh/uv"
-specifiers = ["0.12.13"]
+specifiers = [
+    "0.12.13",
+    "0.12.17",
+]
 
 [tools."aqua:astral-sh/uv"."platforms.linux-arm64"]
-checksum = "sha256:2eaa5d94f5db7b3a1a092156b9420459e42ab0217d917fe74a876309cef9b5e9"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.13/uv-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/555670186"
+checksum = "sha256:d636d1b678e9e7f367ecb22b46bd1cabbed234d6bc3b4d96365d2b507f72f86c"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573252936"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.linux-arm64-musl"]
-checksum = "sha256:f44bc1037a17889fe562fffd2002d4ed108e499fbe68b4f022af244dc7b8244f"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.13/uv-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/555670202"
+checksum = "sha256:a6096da273d548cb9f277d237a01ac7344a39ef0f455c0e148e4dc9737c1596b"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573252947"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.linux-x64"]
-checksum = "sha256:745765a3b6e360ad76743599ae5c42e9278c7edf8bbff9fc76d05bf2623a04dd"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.13/uv-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/555670375"
+checksum = "sha256:fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253080"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.linux-x64-musl"]
-checksum = "sha256:4e2bfd0c9007b1032a50e539e965fd0a6037d87ad93ae1580d220a92d4c94098"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.13/uv-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/555670382"
+checksum = "sha256:6401c4665d8fa2a9893e087c91f585430738e3170f5398a1141483efb4a93310"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253085"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-arm64"]
-checksum = "sha256:7e6ddb9316acc00f2296c82ff4d99977870ee34b2f0ddcae9444d714db9364ed"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.13/uv-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/555670160"
+checksum = "sha256:85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573252913"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-x64"]
-checksum = "sha256:5e287ef61cb6a9b61b3a83fef124fd143e400468a7dac794230147a810e17119"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.13/uv-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/555670348"
+checksum = "sha256:8dcf05a8c809bb3c471d2b614788ba27a6e41298fc8c31ac84b5f4339fd468e5"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253060"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.windows-x64"]
-checksum = "sha256:a86c9dc7bad9b03f388583b7187c05fe9951c2e0d392217e8fd43d97787f6ec2"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.13/uv-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/555670362"
+checksum = "sha256:a252121d5b59398fcb137c6ea448176459a44010f33f67e0072305a637119ca7"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253071"
 provenance = "github-attestations"
 
 [[tools."aqua:google/yamlfmt"]]
@@ -332,50 +335,53 @@ url = "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.
 url_api = "https://api.github.com/repos/ninja-build/ninja/releases/assets/318863577"
 
 [[tools."aqua:rvben/rumdl"]]
-version = "0.2.73"
+version = "0.2.74"
 backend = "aqua:rvben/rumdl"
-specifiers = ["0.2.73"]
+specifiers = [
+    "0.2.73",
+    "0.2.74",
+]
 
 [tools."aqua:rvben/rumdl"."platforms.linux-arm64"]
-checksum = "sha256:83fb9a5899d192b828625f21cb26f8971dc5e6c280a947594db1f0932cb9e7df"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.73/rumdl-v0.2.73-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/557839622"
+checksum = "sha256:ab6d4beff8d75a44d12f105abeb615fb2328cb8e806eaf2c256320c32529ddbb"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.74/rumdl-v0.2.74-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/573014003"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-arm64-musl"]
-checksum = "sha256:f51548adfc71c4982cb5cc239d847bcd4c884e6ac8dc67efd68efd3eea9753a4"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.73/rumdl-v0.2.73-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/557839618"
+checksum = "sha256:6126d87c3586ac56e608f1e64f6cc43197b9dc44e5eb8aebe693e948f6b487ef"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.74/rumdl-v0.2.74-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/573014007"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-x64"]
-checksum = "sha256:d56a8e40471af32fe3229e845f3e299e3691665b15cd4ca28f2deb502c487666"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.73/rumdl-v0.2.73-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/557839623"
+checksum = "sha256:6e73dff282427061e5f086213e8923962714664cece97230bd3a0c5c02a5ebf9"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.74/rumdl-v0.2.74-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/573014016"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-x64-musl"]
-checksum = "sha256:dc4aa9bf98f936f667039224a34fc2e26ddf6be3589bf59d63e4d6b038be4f5c"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.73/rumdl-v0.2.73-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/557839615"
+checksum = "sha256:8720bd8b101048433c2058c54597fe6a300f1ff6b2692acfe66586573fc1815c"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.74/rumdl-v0.2.74-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/573014015"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.macos-arm64"]
-checksum = "sha256:54e0e7c3031b8bfa37e3c57104cc0c93988e02f5b7023c1804749fd180822f9e"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.73/rumdl-v0.2.73-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/557839617"
+checksum = "sha256:6d623ffce778f3eeed50377284b9825dadc569cb1238bd52b3e774928be7dbe6"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.74/rumdl-v0.2.74-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/573014012"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.macos-x64"]
-checksum = "sha256:ad181073e75df52e982025d1f5a9508ef6588f895ef5f78227301499325ea132"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.73/rumdl-v0.2.73-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/557839628"
+checksum = "sha256:0e05ef86d1136d5f329809dddf801dc3174f975c9fae5b5cfd85402f7be4e146"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.74/rumdl-v0.2.74-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/573014009"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.windows-x64"]
-checksum = "sha256:bc6c86d61588e9c92ec9927903ed4973986d30b94d042732ddf62424755dd3c8"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.73/rumdl-v0.2.73-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/557839616"
+checksum = "sha256:eb664d85f690754796ca7a475aa79c9e8bda8f024b37d087a5cbcf2c1e66c69a"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.74/rumdl-v0.2.74-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/573014014"
 provenance = "github-attestations"
 
 [[tools."aqua:tombi-toml/tombi"]]
@@ -436,97 +442,103 @@ backend = "gem:cocoapods"
 specifiers = ["1.17.0"]
 
 [[tools."github:kucherenko/jscpd"]]
-version = "5.2.1"
+version = "5.3.0"
 backend = "github:kucherenko/jscpd"
-specifiers = ["v5.2.1"]
+specifiers = [
+    "v5.2.1",
+    "v5.3.0",
+]
 
 [tools."github:kucherenko/jscpd"."platforms.linux-arm64"]
-checksum = "sha256:35beb27a3bde88fcc0bd5173238b0f6ebdfed95cf0e692c29d3599ed7d3d3153"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.2.1/jscpd-linux-arm64-gnu.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/565085639"
+checksum = "sha256:3a4f4c39ff461af8ae7a918ccd4733909f50d552fe97f93ab4318eabf86cd1b6"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.0/jscpd-linux-arm64-gnu.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/572631015"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.linux-arm64-musl"]
-checksum = "sha256:5699ae97f557b922bae06de52ef93eb70d544a6209ebeb47c650728af1385ed7"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.2.1/jscpd-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/565085642"
+checksum = "sha256:bcc195e2a9be8788d314eda80b4602ec3980386f56b7cbcbb9e3da7fa4f75493"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.0/jscpd-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/572631017"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.linux-x64"]
-checksum = "sha256:1030dfff5e4b0525f4804c12e49cdce40a8140935f9453b312fdb9da45eac743"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.2.1/jscpd-linux-x64-gnu.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/565085641"
+checksum = "sha256:ba861876bc692d97e81bdb7932c21466358c355614e4b0b1c5efcdaeb523cc58"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.0/jscpd-linux-x64-gnu.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/572631016"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.linux-x64-musl"]
-checksum = "sha256:4f5af330e1eabb0cffbf79dd110fd873eb2395222451d21bf4b25514fc635b59"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.2.1/jscpd-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/565085653"
+checksum = "sha256:5edce973e5b6b64bbb2dd6c0d6e64e49fff94fd83cbdbfc603f4134d364e470f"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.0/jscpd-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/572631027"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.macos-arm64"]
-checksum = "sha256:0b166a710f62a674fa0d81850e1f005069e05d8b1170e8ffed36baa0305f5340"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.2.1/jscpd-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/565085640"
+checksum = "sha256:54c10b999d9ff934b82f20244f20f57322bb57688d82ecf9f7b1b8fd51b4d24b"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.0/jscpd-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/572631018"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.macos-x64"]
-checksum = "sha256:c9a28525e986029c062b8ef5e0c872b11eb4934d545cab13b2ff6fa942caa702"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.2.1/jscpd-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/565085643"
+checksum = "sha256:5adbad7c93d0ec90f7020b7facac110b5cc3e8968fb2f8a847c31d772e6a6a6d"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.0/jscpd-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/572631012"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.windows-x64"]
-checksum = "sha256:b4941605a87dc0e4957fcf727d2c92e68b8ed92aaac5c378a86a9636357654cb"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.2.1/jscpd-windows-x64-msvc.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/565085656"
+checksum = "sha256:b60405867c77e337232e5916709fdeae9df7d5904319c36c53a310e690a022e2"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.0/jscpd-windows-x64-msvc.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/572631028"
 provenance = "github-attestations"
 
 [[tools."github:mongodb/kingfisher"]]
-version = "2.4.0"
+version = "2.5.0"
 backend = "github:mongodb/kingfisher"
-specifiers = ["v2.4.0"]
+specifiers = [
+    "v2.4.0",
+    "v2.5.0",
+]
 
 [tools."github:mongodb/kingfisher"."platforms.linux-arm64"]
-checksum = "sha256:15a29496e2d9536758cd7f6b6418b9b09588dd456a9dffb9e63fc435f7311c88"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.4.0/kingfisher-linux-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/569625572"
+checksum = "sha256:06501830ace101da6aa34acdf51e1fbac6f82863a1b7efba0803d463bc47ec3f"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.5.0/kingfisher-linux-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/573313823"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-arm64-musl"]
-checksum = "sha256:15a29496e2d9536758cd7f6b6418b9b09588dd456a9dffb9e63fc435f7311c88"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.4.0/kingfisher-linux-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/569625572"
+checksum = "sha256:06501830ace101da6aa34acdf51e1fbac6f82863a1b7efba0803d463bc47ec3f"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.5.0/kingfisher-linux-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/573313823"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-x64"]
-checksum = "sha256:fecee4c46e0303672c4db8be2050936ea8b16a8f204e38c4ba64f25d95e585ad"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.4.0/kingfisher-linux-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/569625481"
+checksum = "sha256:830d493f97c6b4e38c1a1566acbf7ddab3a9d6b782c0a72f0c08808be2c22529"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.5.0/kingfisher-linux-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/573313749"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-x64-musl"]
-checksum = "sha256:fecee4c46e0303672c4db8be2050936ea8b16a8f204e38c4ba64f25d95e585ad"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.4.0/kingfisher-linux-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/569625481"
+checksum = "sha256:830d493f97c6b4e38c1a1566acbf7ddab3a9d6b782c0a72f0c08808be2c22529"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.5.0/kingfisher-linux-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/573313749"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.macos-arm64"]
-checksum = "sha256:3c8332117a25be0d4bbc3975b6740dcc36c832cb99a97cab9309d232a7a07f44"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.4.0/kingfisher-darwin-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/569625708"
+checksum = "sha256:720e920ea8d90de67ad976298340d7e3c788c583dc78d0c87cae3df9281872ba"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.5.0/kingfisher-darwin-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/573313944"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.macos-x64"]
-checksum = "sha256:89e896eeebfbc319363e9dae7d23a265e4c99ea9ace54dd5d3bc7cea774bb8f2"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.4.0/kingfisher-darwin-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/569625686"
+checksum = "sha256:9836708116d1980f90fbac4c165f919803ffb31427325dc58e10c0cc5a4bbd0e"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.5.0/kingfisher-darwin-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/573313916"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.windows-x64"]
-checksum = "sha256:eebaae508784ca373758ce6036d23df6e89f3883b2dde81803b7cb21e6de11cf"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.4.0/kingfisher-windows-x64.zip"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/569625420"
+checksum = "sha256:5379ebd3522a92582a67fed25342675cd0b80d9c0165d4360e1cc7a1d5e8dd38"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.5.0/kingfisher-windows-x64.zip"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/573313648"
 provenance = "github-attestations"
 
 [[tools."github:zizmorcore/zizmor"]]
@@ -602,9 +614,12 @@ checksum = "sha256:0ccd71931f49c2fbe394b1eeb6d79af3d624058a043ea0d03d34160581624
 url = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.47.5-stable.zip"
 
 [[tools.java]]
-version = "25.0.2"
+version = "25.0.4+7.0.LTS"
 backend = "core:java"
-specifiers = ["25.0.2"]
+specifiers = [
+    "25.0.2",
+    "25.0.4+7.0.LTS",
+]
 
 [tools.java.options]
 shorthand_vendor = "openjdk"
