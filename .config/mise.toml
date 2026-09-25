@@ -23,7 +23,7 @@ GRADLE_OPTS = "--enable-native-access=ALL-UNNAMED"              # Don't warn abo
 "aqua:loeffel-io/ls-lint" = "2.3.1"    # Used for enforcing folder & file naming conventions
 "aqua:google/yamlfmt" = "0.21.0"       # Used for formatting YAML
 "github:mongodb/kingfisher" = "v2.5.0" # Used for checking for leaked credentials & secrets
-"github:kucherenko/jscpd" = "v5.3.0"   # Used for detecting code duplication
+"github:kucherenko/jscpd" = "v5.3.1"   # Used for detecting code duplication
 "github:zizmorcore/zizmor" = "v1.30.1" # Used for statically analyzing github actions
 "pipx:yamllint" = "1.38.0"             # Used for linting YAML
 
