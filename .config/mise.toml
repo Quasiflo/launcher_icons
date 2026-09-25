@@ -7,7 +7,7 @@ GRADLE_OPTS = "--enable-native-access=ALL-UNNAMED"              # Don't warn abo
 
 [tools]
 #* Main
-"core:java" = "25.0.4+7.0.LTS"                        # Used for Android builds
+"core:java" = "temurin-25.0.4+101.0.LTS"      # Used for Android builds
 "aqua:Kitware/CMake" = "4.4.3"                # Used for Linux builds
 "aqua:ninja-build/ninja" = "1.13.2"           # Used for Linux builds
 "gem:cocoapods" = "1.17.0"                    # Used for MacOS builds
