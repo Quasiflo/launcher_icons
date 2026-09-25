@@ -1,1 +1,9 @@
 *       @Attempt3035
+
+# Carve-outs for files that Renovate, Release-Please (and similar bots) commonly modify. Empty owners -> no automatic review request for these paths.
+CHANGELOG.md
+.config/rp-manifest.json
+.config/mise/*
+.config/mise.toml
+.config/mise.lock
+pubspec.lock
