@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>Quasiflo/configs//renovate/renovate.json5#v0.2.2"
+    "github>Quasiflo/configs//renovate/renovate.json5#v0.2.4"
   ]
 }
