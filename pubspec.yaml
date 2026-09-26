@@ -1,7 +1,7 @@
 ---
 name: launcher_icons
 description: Thorough, predictable flutter app launcher icon generation & integration across all platforms!
-version: 0.15.0
+version: 0.16.0
 maintainer: Luke Aguilar (@Attempt3035)
 homepage: https://github.com/Quasiflo/launcher_icons
 repository: https://github.com/Quasiflo/launcher_icons/
