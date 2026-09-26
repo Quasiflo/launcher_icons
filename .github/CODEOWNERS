@@ -3,8 +3,9 @@
 # Carve-outs for files that Renovate, Release-Please (and similar bots) commonly modify. Empty owners -> no automatic review request for these paths.
 CHANGELOG.md
 .github/workflows/release-please.yml
+.github/renovate.json5
 .config/rp-manifest.json
-.config/templatry.json
+.config/templatry.toml
 .config/version.pkl
 .config/hk.pkl
 .config/mise/*
