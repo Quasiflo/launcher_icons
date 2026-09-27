@@ -332,50 +332,50 @@ url = "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.
 url_api = "https://api.github.com/repos/ninja-build/ninja/releases/assets/318863577"
 
 [[tools."aqua:rvben/rumdl"]]
-version = "0.2.76"
+version = "0.2.77"
 backend = "aqua:rvben/rumdl"
-specifiers = ["0.2.76"]
+specifiers = ["0.2.77"]
 
 [tools."aqua:rvben/rumdl"."platforms.linux-arm64"]
-checksum = "sha256:a8a3a89bc0e1ebe92d1e5084a3785a1cce8189f02a1b3a08a69c55f53bbea967"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.76/rumdl-v0.2.76-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583329267"
+checksum = "sha256:04569b09b8e7eb31f6a410b0a17e448f220906c5e8e13e8301319c3540fd4d29"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.77/rumdl-v0.2.77-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583859182"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-arm64-musl"]
-checksum = "sha256:ef4f1a707dad07f2fcfe207959ed03f2de6e0e0ff9e0c236dd64e89d88d75758"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.76/rumdl-v0.2.76-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583329276"
+checksum = "sha256:cd7e0cd23697c4c0e915fb65b3566f71b4a2a0e90a392b193c418971e9ed399f"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.77/rumdl-v0.2.77-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583859181"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-x64"]
-checksum = "sha256:90a8589a34cdc9aa50c9cf9a2b1e41837afe16bb11b2a7ace2e05dfb56a51176"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.76/rumdl-v0.2.76-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583329282"
+checksum = "sha256:cbe5cea929fbb58b64bb428a464b069f3fe12645545adedc8932e738c8bbe862"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.77/rumdl-v0.2.77-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583859172"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-x64-musl"]
-checksum = "sha256:0fe0c75a72849e877a779538d550cbefb2b4656911de188dac54067995a6ae2f"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.76/rumdl-v0.2.76-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583329275"
+checksum = "sha256:0a516c0590dfd2f3cb0abfc42580464c7fadb9e631cbdffbcc5c2546ae885ad0"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.77/rumdl-v0.2.77-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583859184"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.macos-arm64"]
-checksum = "sha256:10ec95ee46e1d3f67560250db97725681a5fa4bc488f383615cc54b06c4bdbc7"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.76/rumdl-v0.2.76-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583329273"
+checksum = "sha256:52744729012b44514b3b4de1431839035d7018464899c5b09627204eebfb73bb"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.77/rumdl-v0.2.77-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583859185"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.macos-x64"]
-checksum = "sha256:415df77d4c5d11f336733c9570a72cd0a188d8e6a7460a76134c4c033ec5ece7"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.76/rumdl-v0.2.76-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583329272"
+checksum = "sha256:0951dbddfa6a28274d202581f136884474fc7225349519f7ad0eb6038c4dc8ab"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.77/rumdl-v0.2.77-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583859176"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.windows-x64"]
-checksum = "sha256:f7efe829339cd70c13a5b9d0f334094e4c1c30f935fa143edd4d5d8839746655"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.76/rumdl-v0.2.76-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583329269"
+checksum = "sha256:8b4d0f45e67c5b17aecfe992335d285019095d3f2994befc9ea44ee4cde981c2"
+url = "https://github.com/rvben/rumdl/releases/download/v0.2.77/rumdl-v0.2.77-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/583859183"
 provenance = "github-attestations"
 
 [[tools."aqua:tombi-toml/tombi"]]
@@ -436,50 +436,50 @@ backend = "gem:cocoapods"
 specifiers = ["1.17.0"]
 
 [[tools."github:kucherenko/jscpd"]]
-version = "5.3.1"
+version = "5.3.2"
 backend = "github:kucherenko/jscpd"
-specifiers = ["v5.3.1"]
+specifiers = ["v5.3.2"]
 
 [tools."github:kucherenko/jscpd"."platforms.linux-arm64"]
-checksum = "sha256:5ea4ccba7784fb7c836a0be2dd7cdf0fa4750ac866401a4390213c66ac621670"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.1/jscpd-linux-arm64-gnu.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/579237034"
+checksum = "sha256:ddf336de86eb7e26632062a01e751417f6579b4422e9156aa3836fdab1d0265d"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.2/jscpd-linux-arm64-gnu.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/583634217"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.linux-arm64-musl"]
-checksum = "sha256:01e3a7add9e7cee483e479f211c91814fd93ebad5387bf9669516335b134b7e3"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.1/jscpd-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/579237036"
+checksum = "sha256:d40703301880f7f6407904920e59140651bfc68e3af29447ad5e760fab7f438f"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.2/jscpd-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/583634212"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.linux-x64"]
-checksum = "sha256:f3e7e7e3c537a0c8fd6efae781e244633dfa89024f38cd5d09b131eaf0ecfc7d"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.1/jscpd-linux-x64-gnu.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/579237033"
+checksum = "sha256:97259f222ea7f6d51a0f2faa98ed5889430233e0fb8d2c129f23d84aff4b93b2"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.2/jscpd-linux-x64-gnu.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/583634214"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.linux-x64-musl"]
-checksum = "sha256:59abbc010eb93289fb9fb6b31d9380e106f46fd327fc8c48899dee851ce91030"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.1/jscpd-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/579237061"
+checksum = "sha256:bfae3e3cfc18040a044d2dada4c9d99761a9953d08c509c41a2eb5bfafef8309"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.2/jscpd-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/583634242"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.macos-arm64"]
-checksum = "sha256:c5ff2727090942e4ad31ded7f49ce2529e8be7057e79e3d16383856f68b2b7b3"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.1/jscpd-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/579237035"
+checksum = "sha256:c629e1d2c7a6c41230a0f3bdd72d5ee69996013527a19eabbb5f0e845249dfbc"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.2/jscpd-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/583634218"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.macos-x64"]
-checksum = "sha256:bbc5cc56d1f276ff45295d56aeceb2117a44906112497f6cdab7aca1b6b87837"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.1/jscpd-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/579237032"
+checksum = "sha256:435ae3f0c4d6256ac84199494c45c31fc04ba1165358151c2c1a1b036f1c523d"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.2/jscpd-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/583634215"
 provenance = "github-attestations"
 
 [tools."github:kucherenko/jscpd"."platforms.windows-x64"]
-checksum = "sha256:d6ca5713fe3dba805ac8d194dffaf492d07f40d7f88de0ace9430fc8fb8d20d8"
-url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.1/jscpd-windows-x64-msvc.tar.gz"
-url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/579237065"
+checksum = "sha256:165778418ef43d754d42ec014bb56f609b167655449ad17ed00f9ed05cee2441"
+url = "https://github.com/kucherenko/jscpd/releases/download/v5.3.2/jscpd-windows-x64-msvc.tar.gz"
+url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/583634243"
 provenance = "github-attestations"
 
 [[tools."github:mongodb/kingfisher"]]
