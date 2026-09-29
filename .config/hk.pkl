@@ -1,6 +1,6 @@
 // * HK - Git Hook Configuration
 // This file ensures you are committing properly linted and formatted files which will pass ci
-amends "package://github.com/jdx/hk/releases/download/v2.1.0/hk@2.1.0#/Config.pkl"
+amends "package://github.com/jdx/hk/releases/download/v2.2.0/hk@2.2.0#/Config.pkl"
 
 import "generated/generated.pkl"
 
