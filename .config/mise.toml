@@ -14,7 +14,7 @@ GRADLE_OPTS = "--enable-native-access=ALL-UNNAMED"              # Don't warn abo
 "cargo:templatry" = "0.2.0"                   # Used for generating config files
 "vfox:mise-plugins/vfox-android-sdk" = "23.0" # Used for acquiring android sdk tools, which install the sdk using the mise postinstall script
 #* Linting
-"aqua:jdx/hk" = "2.1.0"                # Used for running linting, formatting & git hooks
+"aqua:jdx/hk" = "2.2.0"                # Used for running linting, formatting & git hooks
 "aqua:astral-sh/uv" = "0.12.19"        # Used for python (pipx) linting tools
 "aqua:mikefarah/yq" = "4.53.6"         # Used for validating & formatting JSON & toml parsing
 "aqua:tombi-toml/tombi" = "1.5.5"      # Used for validating & formatting TOML
