@@ -1,0 +1,30 @@
+---
+name: auto-assign-issues
+
+on:
+  issues:
+    types: [opened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions: {} # no default token permissions; each job grants only what it needs
+
+jobs:
+  assign:
+    runs-on: ubuntu-slim
+    name: Auto Assign
+    permissions:
+      issues: write # adjust label assignees
+    steps:
+      - name: Assign to me
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: ['Attempt3035']
+            })
