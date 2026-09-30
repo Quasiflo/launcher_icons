@@ -425,7 +425,8 @@ class WebIconGenerator extends IconGenerator {
     final manifestFile = await utils.createFileIfNotExist(
       path.join(context.prefixPath, paths.webManifestFilePath(_webRoot)),
     );
-    final manifestConfig = jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
+    final original = await manifestFile.readAsString();
+    final manifestConfig = jsonDecode(original) as Map<String, dynamic>;
 
     // update background_color; theme_color is html-only as light/dark mode isn't supported by manifest, so drop any leftover theme_color
     if (context.config.webConfig?.backgroundColor != null) {
@@ -443,7 +444,11 @@ class WebIconGenerator extends IconGenerator {
       manifestConfig['shortcuts'] = shortcutManifests;
     }
 
-    await manifestFile.writeAsString(utils.prettifyJsonEncode(manifestConfig));
+    final updated = utils.prettifyJsonEncode(manifestConfig);
+    if (updated == original || _equalsIgnoringWhitespace(updated, original)) {
+      return;
+    }
+    await manifestFile.writeAsString(updated);
   }
 
   /// Generates an opaque 180x180 `apple-touch-icon.png` by flattening the source onto `background_color` (white fallback).
@@ -489,13 +494,19 @@ class WebIconGenerator extends IconGenerator {
   }
 
   /// Manages an idempotent `<!--LI-->…<!--LIEND-->` block in index.html wiring up the favicon, apple-touch-icon, manifest, background/theme colors, and social preview images. An existing block is replaced in place; otherwise the block is inserted before `</head>`.
+  ///
+  /// The `<!--LI-->`/`<!--LIEND-->` delimiters default to two leading spaces
+  /// (matching the surrounding `<head>` content). Whitespace-only differences
+  /// are disregarded so custom formatters don't cause churn: when the updated
+  /// file is behaviourally identical to the existing one ignoring whitespace,
+  /// the file is left untouched.
   Future<void> _updateIndexFile({
     required final bool hasFaviconSvg,
     required final bool hasOpengraph,
     required final bool hasTwitter,
   }) async {
     final indexFile = File(path.join(context.prefixPath, paths.webIndexFilePath(_webRoot)));
-    var content = await indexFile.readAsString();
+    final original = await indexFile.readAsString();
 
     final favSize = context.config.webConfig?.faviconSize ?? constants.faviconDefaultSize;
     final backgroundColor = context.config.webConfig?.backgroundColor;
@@ -516,14 +527,23 @@ class WebIconGenerator extends IconGenerator {
   <link rel="manifest" href="manifest.json"/>${colorLines.isNotEmpty ? '\n${colorLines.join('\n')}' : ''}${hasOpengraph ? '\n  <meta property="og:image" content="opengraph.png"/>' : ''}${hasTwitter ? '\n  <meta name="twitter:card" content="summary_large_image"/>\n  <meta name="twitter:image" content="twitter.png"/>' : ''}
   <!--LIEND-->''';
 
-    final pattern = RegExp('<!--LI-->.*?<!--LIEND-->', dotAll: true);
-    if (pattern.hasMatch(content)) {
-      content = content.replaceAll(pattern, block);
-    } else if (content.contains('</head>')) {
-      content = content.replaceFirst('</head>', '$block\n</head>');
+    // Consume any existing leading indentation so replacing never accumulates
+    // extra spaces on the opening tag; the replacement always uses two spaces.
+    final pattern = RegExp(r'[ \t]*<!--LI-->.*?<!--LIEND-->', dotAll: true);
+    final String updated;
+    if (pattern.hasMatch(original)) {
+      updated = original.replaceAll(pattern, block);
+    } else if (original.contains('</head>')) {
+      updated = original.replaceFirst('</head>', '$block\n</head>');
     } else {
-      content = '$content\n$block\n';
+      updated = '$original\n$block\n';
     }
-    await indexFile.writeAsString(content);
+    if (updated == original || _equalsIgnoringWhitespace(updated, original)) {
+      return;
+    }
+    await indexFile.writeAsString(updated);
   }
+
+  /// Returns true when [a] and [b] differ only by whitespace (or not at all).
+  static bool _equalsIgnoringWhitespace(final String a, final String b) => a.replaceAll(RegExp(r'\s+'), '') == b.replaceAll(RegExp(r'\s+'), '');
 }

@@ -94,13 +94,60 @@ void main() {
       });
 
       await generator.createIcons();
+      final first = await File(
+        path.join(prefixPath, 'web', 'index.html'),
+      ).readAsString();
       await generator.createIcons();
+      final second = await File(
+        path.join(prefixPath, 'web', 'index.html'),
+      ).readAsString();
+      await generator.createIcons();
+      final third = await File(
+        path.join(prefixPath, 'web', 'index.html'),
+      ).readAsString();
 
+      expect('<!--LI-->'.allMatches(third), hasLength(1));
+      expect('<!--LIEND-->'.allMatches(third), hasLength(1));
+      // Regression for https://github.com/Quasiflo/launcher_icons/issues/29:
+      // repeated runs must leave the file byte-identical (no growing indent).
+      expect(second, equals(first));
+      expect(third, equals(first));
+    });
+
+    test('index block delimiters default to two leading spaces', () async {
+      final generator = generatorFor(<String, dynamic>{
+        'generate': true,
+        'image_path': 'master-light-1024.png',
+      });
+
+      await generator.createIcons();
       final index = await File(
         path.join(prefixPath, 'web', 'index.html'),
       ).readAsString();
-      expect('<!--LI-->'.allMatches(index), hasLength(1));
-      expect('<!--LIEND-->'.allMatches(index), hasLength(1));
+      final liLine = index.split('\n').firstWhere((final l) => l.contains('<!--LI-->') && !l.contains('LIEND'));
+      final liendLine = index.split('\n').firstWhere((final l) => l.contains('<!--LIEND-->'));
+      expect(liLine, equals('  <!--LI-->'));
+      expect(liendLine, equals('  <!--LIEND-->'));
+    });
+
+    test('index block disregards whitespace-only custom formatting', () async {
+      final generator = generatorFor(<String, dynamic>{
+        'generate': true,
+        'image_path': 'master-light-1024.png',
+      });
+
+      await generator.createIcons();
+      final indexFile = File(path.join(prefixPath, 'web', 'index.html'));
+      final first = await indexFile.readAsString();
+
+      // Simulate a custom formatter re-indenting the managed block.
+      final reformatted = first.replaceAll('\n  <!--LI-->', '\n    <!--LI-->').replaceAll('\n  <link', '\n    <link').replaceAll('\n  <!--LIEND-->', '\n    <!--LIEND-->');
+      expect(reformatted, isNot(equals(first)));
+      await indexFile.writeAsString(reformatted);
+
+      await generator.createIcons();
+      final second = await indexFile.readAsString();
+      expect(second, equals(reformatted));
     });
   });
 }
