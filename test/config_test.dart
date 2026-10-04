@@ -104,6 +104,7 @@ void main() {
             'background_color': '#0175C2',
             'theme_color_light': '#0175C2',
             'theme_color_dark': null,
+            'query_string': null,
           }),
         );
         // windows
@@ -283,6 +284,7 @@ void main() {
             'background_color': '#0175C2',
             'theme_color_light': '#0175C2',
             'theme_color_dark': null,
+            'query_string': null,
           }),
         );
         // windows
@@ -384,6 +386,7 @@ void main() {
             'background_color': '#0175C2',
             'theme_color_light': '#0175C2',
             'theme_color_dark': null,
+            'query_string': null,
           }),
         );
         // windows

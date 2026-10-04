@@ -26,6 +26,9 @@ const String flavorOption = 'flavor';
 /// CLI option name for the project-root dir prefix (`-d`).
 const String prefixOption = 'dir';
 
+/// CLI option name for the web cache-busting query-string override (`-q`).
+const String queryStringOption = 'query-string';
+
 /// File-name pattern for per-flavor configs (`launcher_icons-<flavor>.yaml`).
 const String flavorConfigFilePattern = r'^launcher_icons-(.*).yaml$';
 
@@ -64,6 +67,11 @@ Future<void> createIconsFromArguments(final List<String> arguments) async {
       abbr: 'd',
       help: 'Set a different project root directory (cwd by default)',
       defaultsTo: '.',
+    )
+    ..addOption(
+      queryStringOption,
+      abbr: 'q',
+      help: 'Override web.query_string for every flavor ("" forces bare URLs, "dynamic" enables per-asset output hashes)',
     );
 
   final argResults = parser.parse(arguments);
@@ -86,6 +94,8 @@ Future<void> createIconsFromArguments(final List<String> arguments) async {
   final prefixPath = argResults[prefixOption] as String;
   final configValue = (argResults[configOption] as String) == '' ? '.' : argResults[configOption] as String; // Specified folder or CWD
   final requestedFlavor = (argResults[flavorOption] as String?) == '' ? null : argResults[flavorOption] as String?;
+  // No defaultsTo above so absent stays null (YAML applies); any parsed value — including "" — overrides the YAML.
+  final cliQueryString = argResults[queryStringOption] as String?;
 
   if (!Directory(configValue).existsSync()) {
     throw InvalidCommandException('Config folder ${Directory(configValue).absolute} does not exist!');
@@ -155,6 +165,7 @@ Future<void> createIconsFromArguments(final List<String> arguments) async {
         logger: logger,
         prefixPath: prefixPath,
         flavor: flavor,
+        queryStringOverride: cliQueryString,
       );
       final platformList = <IconGenerator>[];
       if (entry.value.androidEnabled) {

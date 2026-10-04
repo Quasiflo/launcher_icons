@@ -100,12 +100,28 @@ class WebIconGenerator extends IconGenerator {
       return false;
     }
 
+    // Cache-busting query string (YAML or --query-string override) must use
+    // only the allowed charset, or be the exact word "dynamic".
+    try {
+      utils.normalizeWebQueryString(
+        context.queryStringOverride ?? webConfig.queryString,
+      );
+    } on InvalidConfigException catch (e) {
+      context.logger.error(e.message);
+      return false;
+    }
+
     return true;
   }
 
   @override
   Future<void> createIcons() async {
     final webConfig = context.config.webConfig!;
+    // Effective cache-busting query: CLI override wins ("" forces off), else
+    // YAML. Throws on invalid values so direct calls fail fast; the CLI path
+    // validates first via validateRequirements().
+    final query = utils.normalizeWebQueryString(_rawQuery);
+    final isDynamic = utils.isDynamicWebQueryString(query);
     final imgFilePath = path.join(
       context.prefixPath,
       context.config.resolveImageFile(webConfig.imagePath, context.prefixPath),
@@ -234,7 +250,12 @@ class WebIconGenerator extends IconGenerator {
     context.logger.verbose(
       'Updating ${path.join(context.prefixPath, paths.webManifestFilePath(_webRoot))}...',
     );
-    await _updateManifestFile(iconTemplates, shortcutManifests);
+    await _updateManifestFile(
+      iconTemplates,
+      shortcutManifests,
+      query: query,
+      isDynamic: isDynamic,
+    );
 
     // iOS Safari needs an explicit opaque 180px touch icon.
     context.logger.verbose('Generating apple-touch-icon from $imgFilePath...');
@@ -248,7 +269,31 @@ class WebIconGenerator extends IconGenerator {
       hasFaviconSvg: hasFaviconSvg,
       hasOpengraph: hasOpengraph,
       hasTwitter: hasTwitter,
+      query: query,
+      isDynamic: isDynamic,
     );
+  }
+
+  /// Raw effective query value (CLI override or YAML) for this run.
+  String? get _rawQuery => context.queryStringOverride ?? context.config.webConfig?.queryString;
+
+  /// Suffixes [bareUrl] (web-root-relative, e.g. `favicon.png` or
+  /// `icons/Icon-192.png`) per the effective query mode: bare when off,
+  /// `?token` for a static token, or `?<7-hex>` of the referenced output
+  /// file's bytes in dynamic mode.
+  Future<String> _suffixedUrl(
+    final String bareUrl, {
+    required final String? query,
+    required final bool isDynamic,
+  }) async {
+    if (query == null) {
+      return bareUrl;
+    }
+    if (isDynamic) {
+      final bytes = await File(path.join(context.prefixPath, _webRoot, bareUrl)).readAsBytes();
+      return utils.withWebQueryString(bareUrl, utils.shortOutputHash(bytes));
+    }
+    return utils.withWebQueryString(bareUrl, query);
   }
 
   Future<void> _generateFavicon(final utils.SizeImageLoader loadBase) async {
@@ -420,8 +465,10 @@ class WebIconGenerator extends IconGenerator {
 
   Future<void> _updateManifestFile(
     final List<WebIconTemplate> templates,
-    final List<Map<String, dynamic>> shortcutManifests,
-  ) async {
+    final List<Map<String, dynamic>> shortcutManifests, {
+    required final String? query,
+    required final bool isDynamic,
+  }) async {
     final manifestFile = await utils.createFileIfNotExist(
       path.join(context.prefixPath, paths.webManifestFilePath(_webRoot)),
     );
@@ -433,15 +480,42 @@ class WebIconGenerator extends IconGenerator {
       manifestConfig['background_color'] = context.config.webConfig?.backgroundColor;
     }
 
+    // Suffix every emitted icon src (static token shared, dynamic per-file
+    // output hash). Shortcut navigation urls are never suffixed.
+    final icons = <Map<String, dynamic>>[];
+    for (final template in templates) {
+      final entry = Map<String, dynamic>.from(template.iconManifest);
+      entry['src'] = await _suffixedUrl(
+        entry['src'] as String,
+        query: query,
+        isDynamic: isDynamic,
+      );
+      icons.add(entry);
+    }
+    final shortcuts = <Map<String, dynamic>>[];
+    for (final shortcut in shortcutManifests) {
+      final entry = Map<String, dynamic>.from(shortcut);
+      final shortcutIcons = ((shortcut['icons'] as List?) ?? const []).map((final e) => Map<String, dynamic>.from(e as Map)).toList();
+      for (final icon in shortcutIcons) {
+        icon['src'] = await _suffixedUrl(
+          icon['src'] as String,
+          query: query,
+          isDynamic: isDynamic,
+        );
+      }
+      entry['icons'] = shortcutIcons;
+      shortcuts.add(entry);
+    }
+
     // replace existing icons to eliminate conflicts, and drop stale entries
     // (theme_color is html-only; shortcuts are re-added below when configured)
     manifestConfig
       ..remove('theme_color')
       ..remove('icons')
-      ..['icons'] = templates.map<Map<String, dynamic>>((final e) => e.iconManifest).toList()
+      ..['icons'] = icons
       ..remove('shortcuts');
-    if (shortcutManifests.isNotEmpty) {
-      manifestConfig['shortcuts'] = shortcutManifests;
+    if (shortcuts.isNotEmpty) {
+      manifestConfig['shortcuts'] = shortcuts;
     }
 
     final updated = utils.prettifyJsonEncode(manifestConfig);
@@ -504,6 +578,8 @@ class WebIconGenerator extends IconGenerator {
     required final bool hasFaviconSvg,
     required final bool hasOpengraph,
     required final bool hasTwitter,
+    required final String? query,
+    required final bool isDynamic,
   }) async {
     final indexFile = File(path.join(context.prefixPath, paths.webIndexFilePath(_webRoot)));
     final original = await indexFile.readAsString();
@@ -513,6 +589,20 @@ class WebIconGenerator extends IconGenerator {
     final themeLight = context.config.webConfig?.themeColorLight;
     final themeDark = context.config.webConfig?.themeColorDark;
     final includeIco = context.config.webConfig?.faviconIco ?? true;
+    // Every emitted asset URL carries the cache-busting suffix (off = bare).
+    // The manifest href uses the final manifest.json output hash in dynamic
+    // mode, so manifest is read after _updateManifestFile wrote it above.
+    final faviconIcoHref = includeIco ? await _suffixedUrl('favicon.ico', query: query, isDynamic: isDynamic) : null;
+    final faviconPngHref = await _suffixedUrl('favicon.png', query: query, isDynamic: isDynamic);
+    final faviconSvgHref = hasFaviconSvg ? await _suffixedUrl('favicon.svg', query: query, isDynamic: isDynamic) : null;
+    final touchHref = await _suffixedUrl(
+      'icons/${paths.appleTouchIconFileName}',
+      query: query,
+      isDynamic: isDynamic,
+    );
+    final manifestHref = await _suffixedUrl('manifest.json', query: query, isDynamic: isDynamic);
+    final opengraphContent = hasOpengraph ? await _suffixedUrl('opengraph.png', query: query, isDynamic: isDynamic) : null;
+    final twitterContent = hasTwitter ? await _suffixedUrl('twitter.png', query: query, isDynamic: isDynamic) : null;
     final colorLines = <String>[
       if (backgroundColor != null) '  <style>html, body { background-color: $backgroundColor; }</style>',
       if (themeLight != null && themeDark != null) '  <meta name="theme-color" media="(prefers-color-scheme: light)" content="$themeLight"/>',
@@ -521,10 +611,10 @@ class WebIconGenerator extends IconGenerator {
       if (themeDark != null && themeLight == null) '  <meta name="theme-color" content="$themeDark"/>',
     ];
     final block = '''
-  <!--LI-->${includeIco ? '\n  <link rel="icon" type="image/x-icon" sizes="any" href="favicon.ico"/>' : ''}
-  <link rel="icon" type="image/png" sizes="${favSize}x$favSize" href="favicon.png"/>${hasFaviconSvg ? '\n  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>' : ''}
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
-  <link rel="manifest" href="manifest.json"/>${colorLines.isNotEmpty ? '\n${colorLines.join('\n')}' : ''}${hasOpengraph ? '\n  <meta property="og:image" content="opengraph.png"/>' : ''}${hasTwitter ? '\n  <meta name="twitter:card" content="summary_large_image"/>\n  <meta name="twitter:image" content="twitter.png"/>' : ''}
+  <!--LI-->${faviconIcoHref != null ? '\n  <link rel="icon" type="image/x-icon" sizes="any" href="$faviconIcoHref"/>' : ''}
+  <link rel="icon" type="image/png" sizes="${favSize}x$favSize" href="$faviconPngHref"/>${faviconSvgHref != null ? '\n  <link rel="icon" type="image/svg+xml" href="$faviconSvgHref"/>' : ''}
+  <link rel="apple-touch-icon" href="$touchHref"/>
+  <link rel="manifest" href="$manifestHref"/>${colorLines.isNotEmpty ? '\n${colorLines.join('\n')}' : ''}${opengraphContent != null ? '\n  <meta property="og:image" content="$opengraphContent"/>' : ''}${twitterContent != null ? '\n  <meta name="twitter:card" content="summary_large_image"/>\n  <meta name="twitter:image" content="$twitterContent"/>' : ''}
   <!--LIEND-->''';
 
     // Consume any existing leading indentation so replacing never accumulates

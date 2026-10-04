@@ -25,6 +25,7 @@ class WebConfig {
     this.backgroundColor,
     this.themeColorLight,
     this.themeColorDark,
+    this.queryString,
   });
 
   /// Creates [WebConfig] from [json]
@@ -92,6 +93,16 @@ class WebConfig {
   /// Dark-scheme theme color, emitted as `<meta name="theme-color" media="(prefers-color-scheme: dark)">`. When only one of light/dark is set, it is emitted without a media query.
   @JsonKey(name: 'theme_color_dark')
   final String? themeColorDark;
+
+  /// Cache-busting query string appended as `?<value>` to every web URL the
+  /// tool emits (index.html links/meta, manifest.json icon `src`s). Absent or
+  /// empty means off (bare URLs). The exact value `"dynamic"` enables
+  /// per-asset mode: each URL gets `?<7-hex>` derived from its output file's
+  /// bytes. Any other value must match `[A-Za-z0-9._-]+` and is used verbatim
+  /// for every asset. A leading `?` is tolerated and stripped. Overridden by
+  /// the `--query-string` CLI flag (explicit `""` forces off).
+  @JsonKey(name: 'query_string')
+  final String? queryString;
 
   /// Creates [Map] from [WebConfig]
   Map<String, dynamic> toJson() => _$WebConfigToJson(this);

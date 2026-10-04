@@ -125,6 +125,7 @@ Main command (`dart run launcher_icons`):
 | `-c, --config <folder>` | Folder to search for config files. Defaults to `.` |
 | `-d, --dir <path>` | Project root. Defaults to the current directory |
 | `-f, --flavor <name>` | Run a single flavor (bare name) |
+| `-q, --query-string <value>` | Override `web.query_string` for every flavor (`""` forces bare URLs, `"dynamic"` enables per-asset output hashes) |
 
 Template generator (`dart run launcher_icons:generate`):
 

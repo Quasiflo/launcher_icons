@@ -245,6 +245,7 @@ launcher_icons:
     # background_color: "#0175C2" # hex color, written to manifest.json
     # theme_color_light: "#0175C2" # hex color for light scheme <meta> in index.html
     # theme_color_dark: "#000000" # hex color for dark scheme <meta> in index.html
+    # query_string: "dynamic" # cache-bust suffix (?<value>) on every web URL; "dynamic" = per-asset 7-hex output hash, any [A-Za-z0-9._-] token is shared, empty/absent = off; --query-string/-q overrides
 
   windows:
     generate: true

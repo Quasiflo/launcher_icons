@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:image/image.dart';
 import 'package:launcher_icons/src/core/custom_exceptions.dart';
 import 'package:launcher_icons/src/core/icon_generator.dart' show IconGeneratorContext;
@@ -294,6 +295,61 @@ bool isHexColor(final String color) {
   }
   return int.tryParse(hex, radix: 16) != null;
 }
+
+/// Exact `web.query_string` value enabling per-asset dynamic mode. Matched
+/// exactly (lowercase); a literal `"dynamic"` suffix cannot be used statically.
+const String webQueryStringDynamic = 'dynamic';
+
+/// Allowed charset for static `web.query_string` values: letters, digits,
+/// dots, underscores, and dashes. Nothing else (no `=`, `&`, `?`, `#`, `/`,
+/// or spaces). Dynamic hashes are lowercase hex and always match.
+final RegExp webQueryStringPattern = RegExp(r'^[A-Za-z0-9._-]+$');
+
+/// Maximum length for a static `web.query_string` value.
+const int webQueryStringMaxLength = 128;
+
+/// Length of the per-asset dynamic hash (first N hex chars of the output
+/// file's SHA-256).
+const int webQueryHashLength = 7;
+
+/// Normalizes a raw `query_string` value (YAML or CLI) to its effective form:
+/// `null` when off (null/empty/bare `?`), `"dynamic"` for per-asset mode, or
+/// the validated static token. A single leading `?` is tolerated and
+/// stripped. Throws [InvalidConfigException] when the value uses characters
+/// outside `[A-Za-z0-9._-]` or exceeds [webQueryStringMaxLength].
+String? normalizeWebQueryString(final String? raw) {
+  if (raw == null) {
+    return null;
+  }
+  final stripped = raw.startsWith('?') ? raw.substring(1) : raw;
+  if (stripped.isEmpty) {
+    return null;
+  }
+  if (stripped == webQueryStringDynamic) {
+    return webQueryStringDynamic;
+  }
+  if (stripped.length > webQueryStringMaxLength) {
+    throw InvalidConfigException(
+      'Invalid web.query_string "$raw": must be at most $webQueryStringMaxLength characters.',
+    );
+  }
+  if (!webQueryStringPattern.hasMatch(stripped)) {
+    throw InvalidConfigException(
+      'Invalid web.query_string "$raw": only letters, digits, dots, underscores, and dashes are allowed (or the exact value "dynamic").',
+    );
+  }
+  return stripped;
+}
+
+/// Whether [normalized] (see [normalizeWebQueryString]) enables dynamic mode.
+bool isDynamicWebQueryString(final String? normalized) => normalized == webQueryStringDynamic;
+
+/// Appends a cache-busting query suffix to a bare web URL: `url?suffix`.
+String withWebQueryString(final String url, final String suffix) => '$url?$suffix';
+
+/// Short cache-busting hash for output [bytes]: the first
+/// [webQueryHashLength] hex chars of the SHA-256 digest (lowercase).
+String shortOutputHash(final List<int> bytes) => crypto.sha256.convert(bytes).toString().substring(0, webQueryHashLength);
 
 /// Creates [File] in the given [filePath] if not exists
 Future<File> createFileIfNotExist(final String filePath) async {

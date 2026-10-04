@@ -30,6 +30,7 @@ class IconGeneratorContext {
     required this.logger,
     required this.prefixPath,
     this.flavor,
+    this.queryStringOverride,
     final SvgRasterCache? svgRasterCache,
   }) : svgRasterCache = svgRasterCache ?? SvgRasterCache();
 
@@ -44,6 +45,11 @@ class IconGeneratorContext {
 
   /// Value of `--flavor` flag
   final String? flavor;
+
+  /// Value of `--query-string` CLI override (`null` when the flag was absent,
+  /// so the YAML `web.query_string` applies). Any non-null value — including
+  /// `""` (force off) and `"dynamic"` — overrides the YAML for every flavor.
+  final String? queryStringOverride;
 
   /// Single-run memo of SVG rasterizations, shared by every platform generator in this run. Owned by the context (one per run) so deduplication never leaks across runs.
   final SvgRasterCache svgRasterCache;
