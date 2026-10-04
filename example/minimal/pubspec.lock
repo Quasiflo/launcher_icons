@@ -137,7 +137,7 @@ packages:
       path: "../.."
       relative: true
     source: path
-    version: "0.15.0"
+    version: "0.16.0"
   leak_tracker:
     dependency: transitive
     description:
