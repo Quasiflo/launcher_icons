@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.16.0](https://github.com/Quasiflo/launcher_icons/compare/launcher_icons-v0.15.0...v0.16.0) (2026-10-04)
+
+
+### Features
+
+* support automatic & manual web cache bust asset query strings ([c0d4e09](https://github.com/Quasiflo/launcher_icons/commit/c0d4e09d020c24111465560353f8163ced413feb))
+
+
+### Bug Fixes
+
+* **web:** avoid adding extra indent to &lt;!--LI--&gt; tag every run ([b464a48](https://github.com/Quasiflo/launcher_icons/commit/b464a481e79182014966f99cbc2095309538c51e))
+
 ## [0.15.0](https://github.com/Quasiflo/launcher_icons/compare/05c7bdd11c6b3298d331c60683c369c850ee2b2e...launcher_icons-v0.15.0) (2026-09-19)
 
 
