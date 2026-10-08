@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.1](https://github.com/Quasiflo/launcher_icons/compare/v0.16.0...v0.16.1) (2026-10-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency cupertino_icons to v2 ([#49](https://github.com/Quasiflo/launcher_icons/issues/49)) ([13a5dca](https://github.com/Quasiflo/launcher_icons/commit/13a5dcabd499c5e37826690aea34c24c183aae17))
+
 ## [0.16.0](https://github.com/Quasiflo/launcher_icons/compare/launcher_icons-v0.15.0...v0.16.0) (2026-10-04)
 
 
