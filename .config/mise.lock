@@ -379,50 +379,50 @@ url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/598548749"
 provenance = "github-attestations"
 
 [[tools."aqua:tombi-toml/tombi"]]
-version = "1.7.2"
+version = "1.7.3"
 backend = "aqua:tombi-toml/tombi"
-specifiers = ["1.7.2"]
+specifiers = ["1.7.3"]
 
 [tools."aqua:tombi-toml/tombi"."platforms.linux-arm64"]
-checksum = "sha256:10f364314b03e84b8ef57421fd7197502a49d40d6c4181e73aded12df57e5f53"
-url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.2/tombi-cli-1.7.2-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/610147823"
+checksum = "sha256:20bd2470c3de95eff95445466bd2e982c6e0920c5dbd0a618ac06c9a64b4dda9"
+url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.3/tombi-cli-1.7.3-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/615901879"
 provenance = "github-attestations"
 
 [tools."aqua:tombi-toml/tombi"."platforms.linux-arm64-musl"]
-checksum = "sha256:10f364314b03e84b8ef57421fd7197502a49d40d6c4181e73aded12df57e5f53"
-url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.2/tombi-cli-1.7.2-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/610147823"
+checksum = "sha256:20bd2470c3de95eff95445466bd2e982c6e0920c5dbd0a618ac06c9a64b4dda9"
+url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.3/tombi-cli-1.7.3-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/615901879"
 provenance = "github-attestations"
 
 [tools."aqua:tombi-toml/tombi"."platforms.linux-x64"]
-checksum = "sha256:70d702da0bb92758469c4f85761935b93c8172598b2682d9c89d7ab383a23a4c"
-url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.2/tombi-cli-1.7.2-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/610147847"
+checksum = "sha256:90aa18e34c5133879942272fda31677d78dd4221ce8eb06e991c487893aaaba4"
+url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.3/tombi-cli-1.7.3-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/615901928"
 provenance = "github-attestations"
 
 [tools."aqua:tombi-toml/tombi"."platforms.linux-x64-musl"]
-checksum = "sha256:70d702da0bb92758469c4f85761935b93c8172598b2682d9c89d7ab383a23a4c"
-url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.2/tombi-cli-1.7.2-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/610147847"
+checksum = "sha256:90aa18e34c5133879942272fda31677d78dd4221ce8eb06e991c487893aaaba4"
+url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.3/tombi-cli-1.7.3-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/615901928"
 provenance = "github-attestations"
 
 [tools."aqua:tombi-toml/tombi"."platforms.macos-arm64"]
-checksum = "sha256:478c67124b15960f9911f5fe2b24746c0807a77378dc6d03667b701bd2ed91e2"
-url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.2/tombi-cli-1.7.2-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/610147826"
+checksum = "sha256:ff9b64bf45e9cd0881119567f604163212788d6f1a9aba9178f656b49295e97a"
+url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.3/tombi-cli-1.7.3-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/615901880"
 provenance = "github-attestations"
 
 [tools."aqua:tombi-toml/tombi"."platforms.macos-x64"]
-checksum = "sha256:cdbb5f7ac355a821950493296adf9c47da981bc996d6b4de5e90269bed243e27"
-url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.2/tombi-cli-1.7.2-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/610147821"
+checksum = "sha256:ae3c9799acf5e5068e48b87bc486803091b8eb49efa60e480c65568496221a88"
+url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.3/tombi-cli-1.7.3-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/615901881"
 provenance = "github-attestations"
 
 [tools."aqua:tombi-toml/tombi"."platforms.windows-x64"]
-checksum = "sha256:b5bf95bf49a8624e3fa2e7d3ee64d02fe06a42678731f1ba392abb72e161608a"
-url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.2/tombi-cli-1.7.2-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/610147849"
+checksum = "sha256:6f72039120a4b0b2821a032a1ea6c98b502d2568a650b5cdb106abd67a187478"
+url = "https://github.com/tombi-toml/tombi/releases/download/v1.7.3/tombi-cli-1.7.3-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/tombi-toml/tombi/releases/assets/615901924"
 provenance = "github-attestations"
 
 [[tools."cargo:templatry"]]
@@ -483,50 +483,50 @@ url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/6015336
 provenance = "github-attestations"
 
 [[tools."github:mongodb/kingfisher"]]
-version = "2.10.0"
+version = "2.11.0"
 backend = "github:mongodb/kingfisher"
-specifiers = ["v2.10.0"]
+specifiers = ["v2.11.0"]
 
 [tools."github:mongodb/kingfisher"."platforms.linux-arm64"]
-checksum = "sha256:92ef36db9755bf7f1d2ed2944fb6cd247f012a09aa2dbdff977454365fb481b5"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.10.0/kingfisher-linux-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/609020631"
+checksum = "sha256:4fef19da45e05480fe8e89ff990d280b7f75296d2f2ca32acafdeb18839fe56c"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.11.0/kingfisher-linux-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/616898287"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-arm64-musl"]
-checksum = "sha256:92ef36db9755bf7f1d2ed2944fb6cd247f012a09aa2dbdff977454365fb481b5"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.10.0/kingfisher-linux-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/609020631"
+checksum = "sha256:4fef19da45e05480fe8e89ff990d280b7f75296d2f2ca32acafdeb18839fe56c"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.11.0/kingfisher-linux-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/616898287"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-x64"]
-checksum = "sha256:5159e580ee91431cf5674c289dc9b41f9f07d5e7c76e8f975cb04ad411e68f97"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.10.0/kingfisher-linux-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/609020576"
+checksum = "sha256:2d880b1d1c3410073cf7b305ea22350e78cf3c8644e6048f53f5271a56444ce7"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.11.0/kingfisher-linux-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/616898117"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-x64-musl"]
-checksum = "sha256:5159e580ee91431cf5674c289dc9b41f9f07d5e7c76e8f975cb04ad411e68f97"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.10.0/kingfisher-linux-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/609020576"
+checksum = "sha256:2d880b1d1c3410073cf7b305ea22350e78cf3c8644e6048f53f5271a56444ce7"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.11.0/kingfisher-linux-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/616898117"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.macos-arm64"]
-checksum = "sha256:049bf250c1c4d27bf05733261f82138f1d3bafe87261b401b0c4ab9185f2e9e5"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.10.0/kingfisher-darwin-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/609020700"
+checksum = "sha256:4daf65c8cae6c4b14e31a3fd94a9469a6fc77f7bcf2c201ad83e3d8f3e869aaf"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.11.0/kingfisher-darwin-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/616898502"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.macos-x64"]
-checksum = "sha256:c43eb1668534edeb1a3f53db6411fc8482f513c21cefe87bc2ac9cf4c3ca50b9"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.10.0/kingfisher-darwin-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/609020681"
+checksum = "sha256:1dfcb35684fff1b0e042617a684f810d7c93d8c70385a0e6091c41c591d210e6"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.11.0/kingfisher-darwin-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/616898453"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.windows-x64"]
-checksum = "sha256:44a1801f23d47dc93fe110101cc0dfe9592d87eef6cc1c3e3b13352bd51aa2c3"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.10.0/kingfisher-windows-x64.zip"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/609020519"
+checksum = "sha256:e52bd9238b1862de90dec1d362e755cdc2ffe6db223b55f0604fd5215209e192"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.11.0/kingfisher-windows-x64.zip"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/616897984"
 provenance = "github-attestations"
 
 [[tools."github:zizmorcore/zizmor"]]
