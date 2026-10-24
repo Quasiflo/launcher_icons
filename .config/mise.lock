@@ -43,50 +43,50 @@ url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-win
 url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605998125"
 
 [[tools."aqua:astral-sh/uv"]]
-version = "0.13.2"
+version = "0.13.3"
 backend = "aqua:astral-sh/uv"
-specifiers = ["0.13.2"]
+specifiers = ["0.13.3"]
 
 [tools."aqua:astral-sh/uv"."platforms.linux-arm64"]
-checksum = "sha256:3143e25fccac6f81b3b400792caa2ec431a5e8824d855cde9550a25f0fac8ea0"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.2/uv-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657430060"
+checksum = "sha256:611ff684f193a84d2fdad29c5f12505d02ece94984c7c982cdde950eba5c95b9"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.3/uv-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657907667"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.linux-arm64-musl"]
-checksum = "sha256:b7444ae484d951d856b1ea0bae8224bf0ea856e9cefe8bd67c6d3f5d98375c78"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.2/uv-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657430086"
+checksum = "sha256:4a58785768ab0577497ca7940be2f9fd5a34e48c3fd37923692fc0a81d71ac9f"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.3/uv-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657907682"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.linux-x64"]
-checksum = "sha256:e14d48c117ec33601d6f860dda47aa5ea490d77a5a9ef770529c448fa6747d9f"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.2/uv-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657430342"
+checksum = "sha256:e4f169ec380f1793b898a6f1fcbacd22db25cf7ca0349a6e96ffb85b69998d04"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.3/uv-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657907872"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.linux-x64-musl"]
-checksum = "sha256:aba5d9e0af3662ee85772c5da147c3824cd6728a50bce6c507ae20672df7e83e"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.2/uv-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657430369"
+checksum = "sha256:a36fca4c151d1ac13707984a88a4e2742edec0f2bc1b3e1c18c1c751e4679fd3"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.3/uv-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657907885"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-arm64"]
-checksum = "sha256:4a5d878cd0db3a57d79eec638c275e71c394e10533ae54c77b33d940866f53b7"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.2/uv-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657430030"
+checksum = "sha256:bf1e4fb6f5f5079a2902ad3f3a9e2d337575b226a1378f2449d8404353650608"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.3/uv-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657907636"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-x64"]
-checksum = "sha256:08f0cb0d63a012ffa07659d1872030c1110fccdd665d49bc3683b0ca262b4a62"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.2/uv-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657430296"
+checksum = "sha256:5c35634957db7ebd9c2e4cc6c66b8979fb2c26a6b0dbd1d214d6acbac4033a89"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.3/uv-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657907827"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.windows-x64"]
-checksum = "sha256:9cfb447a4027550f134753253fdffbcd35b79a66dd888260bf6776891916069e"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.2/uv-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657430310"
+checksum = "sha256:bb701bd35b586c45966654ea2703c9bd116a6a4fc0a8ca755bd644c2c41c5ebe"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.3/uv-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/657907852"
 provenance = "github-attestations"
 
 [[tools."aqua:google/yamlfmt"]]
@@ -483,50 +483,50 @@ url_api = "https://api.github.com/repos/kucherenko/jscpd/releases/assets/6249388
 provenance = "github-attestations"
 
 [[tools."github:mongodb/kingfisher"]]
-version = "2.13.0"
+version = "2.14.0"
 backend = "github:mongodb/kingfisher"
-specifiers = ["v2.13.0"]
+specifiers = ["v2.14.0"]
 
 [tools."github:mongodb/kingfisher"."platforms.linux-arm64"]
-checksum = "sha256:00088ab409e44f9370e5edfea653f03b83ea1927863fbcae296b77e773105077"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.13.0/kingfisher-linux-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/635672312"
+checksum = "sha256:3b04c3a339c9bb5f4ce6796e6cfa977cdea2c7ddc0b709ac61f24fd803e196d5"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.14.0/kingfisher-linux-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/658004559"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-arm64-musl"]
-checksum = "sha256:00088ab409e44f9370e5edfea653f03b83ea1927863fbcae296b77e773105077"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.13.0/kingfisher-linux-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/635672312"
+checksum = "sha256:3b04c3a339c9bb5f4ce6796e6cfa977cdea2c7ddc0b709ac61f24fd803e196d5"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.14.0/kingfisher-linux-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/658004559"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-x64"]
-checksum = "sha256:5209e9d260b93ae0cf467690c71e5f272469d9324cf2915a36c68405c2edf202"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.13.0/kingfisher-linux-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/635672048"
+checksum = "sha256:45fc2e12d64dddc17f1f3143d7c0e5dddbc2079b92ec420c20be1a57a8e4829a"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.14.0/kingfisher-linux-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/658004459"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.linux-x64-musl"]
-checksum = "sha256:5209e9d260b93ae0cf467690c71e5f272469d9324cf2915a36c68405c2edf202"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.13.0/kingfisher-linux-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/635672048"
+checksum = "sha256:45fc2e12d64dddc17f1f3143d7c0e5dddbc2079b92ec420c20be1a57a8e4829a"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.14.0/kingfisher-linux-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/658004459"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.macos-arm64"]
-checksum = "sha256:caed7302e3d233bd177a3c865ca4b869c024c0fdc01fa4576a91f16409e3ce36"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.13.0/kingfisher-darwin-arm64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/635672563"
+checksum = "sha256:df6710130fac7314a6479e3ac7b2b092f8aa3a2bef131fbd307fa3dd8d7d9471"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.14.0/kingfisher-darwin-arm64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/658004769"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.macos-x64"]
-checksum = "sha256:5ce19ddfc904ec80e96c3f12672f1a53232b4a02aa02697824b1a71a4cfa8028"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.13.0/kingfisher-darwin-x64.tgz"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/635672505"
+checksum = "sha256:0f31c55ddcb9e10509f96a05f5ed1506f8a52e2ccc2927e2175c04dbc1a21c30"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.14.0/kingfisher-darwin-x64.tgz"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/658004723"
 provenance = "github-attestations"
 
 [tools."github:mongodb/kingfisher"."platforms.windows-x64"]
-checksum = "sha256:995ddefbc5a967033279d4936b75de4ec6a50411dc4a03facb6ad14e15d66b61"
-url = "https://github.com/mongodb/kingfisher/releases/download/v2.13.0/kingfisher-windows-x64.zip"
-url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/635671892"
+checksum = "sha256:9f188b6fa16cec210203cb71439d3d661ab371a03305b3ada865f8defe601ffb"
+url = "https://github.com/mongodb/kingfisher/releases/download/v2.14.0/kingfisher-windows-x64.zip"
+url_api = "https://api.github.com/repos/mongodb/kingfisher/releases/assets/658004257"
 provenance = "github-attestations"
 
 [[tools."github:zizmorcore/zizmor"]]
