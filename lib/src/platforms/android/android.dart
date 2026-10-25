@@ -861,8 +861,10 @@ Future<void> updateColorsFile(final File colorsFile, final String backgroundColo
   if (RegExp(r'^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$').hasMatch(normalizedColor)) {
     normalizedColor = '#$normalizedColor';
   }
-  // Write foreground color
-  final lines = await colorsFile.readAsLines();
+  // Use readAsString + split to preserve the trailing newline and CRLF
+  // (readAsLines drops them, stripping the final newline on every run, see #92).
+  final content = await colorsFile.readAsString();
+  final lines = content.split('\n');
   var foundExisting = false;
   for (var x = 0; x < lines.length; x++) {
     var line = lines[x];
@@ -881,10 +883,18 @@ Future<void> updateColorsFile(final File colorsFile, final String backgroundColo
 
   // Add new line if we didn't find an existing value
   if (!foundExisting) {
-    lines.insert(
-      lines.length - 1,
-      '\t<color name="ic_launcher_background">$normalizedColor</color>',
+    final eolSuffix = content.contains('\r\n') ? '\r' : '';
+    final newEntry = '\t<color name="ic_launcher_background">$normalizedColor</color>$eolSuffix';
+    // Insert before </resources> so a trailing newline (split's final empty
+    // element) stays trailing instead of ending up inside <resources>.
+    final closeIndex = lines.lastIndexWhere(
+      (final l) => l.contains('</resources>'),
     );
+    if (closeIndex != -1) {
+      lines.insert(closeIndex, newEntry);
+    } else {
+      lines.insert(lines.length - 1, newEntry);
+    }
   }
 
   await colorsFile.writeAsString(lines.join('\n'));
