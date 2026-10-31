@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.16.1](https://github.com/Quasiflo/launcher_icons/compare/v0.16.0...v0.16.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency cupertino_icons to v2 ([#49](https://github.com/Quasiflo/launcher_icons/issues/49)) ([13a5dca](https://github.com/Quasiflo/launcher_icons/commit/13a5dcabd499c5e37826690aea34c24c183aae17))
+* non-idepotent colors.xml editing ([e957347](https://github.com/Quasiflo/launcher_icons/commit/e95734758ef8cfa4c7e99895c634dd39d24585c4)), closes [#92](https://github.com/Quasiflo/launcher_icons/issues/92)
+
 ## [0.16.0](https://github.com/Quasiflo/launcher_icons/compare/launcher_icons-v0.15.0...v0.16.0) (2026-10-04)
 
 
