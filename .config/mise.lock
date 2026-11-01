@@ -3,44 +3,51 @@
 lockfile_version = 2
 
 [[tools."aqua:Kitware/CMake"]]
-version = "4.4.4"
+version = "4.4.5"
 backend = "aqua:Kitware/CMake"
-specifiers = ["4.4.4"]
+specifiers = ["4.4.5"]
 
 [tools."aqua:Kitware/CMake"."platforms.linux-arm64"]
-checksum = "sha256:a1b6cc63636a0e55c63257cf3315a8a5f129e42fade25db1afea4ff8ab06f25e"
-url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-linux-aarch64.tar.gz"
-url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605992024"
+checksum = "sha256:301d5063ab259577c1b57ce5490b1aab9ea5c56dc4c822f73499553dab94925f"
+checksum_source = "mise-versions"
+url = "https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-linux-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/682698880"
 
 [tools."aqua:Kitware/CMake"."platforms.linux-arm64-musl"]
-checksum = "sha256:a1b6cc63636a0e55c63257cf3315a8a5f129e42fade25db1afea4ff8ab06f25e"
-url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-linux-aarch64.tar.gz"
-url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605992024"
+checksum = "sha256:301d5063ab259577c1b57ce5490b1aab9ea5c56dc4c822f73499553dab94925f"
+checksum_source = "mise-versions"
+url = "https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-linux-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/682698880"
 
 [tools."aqua:Kitware/CMake"."platforms.linux-x64"]
-checksum = "sha256:e5bb807f7728cb60cd8b27ebc97a2edb469b68655f21e844a600c3575b76f5bb"
-url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-linux-x86_64.tar.gz"
-url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605992585"
+checksum = "sha256:ed85135c5a5135b45e50423cb406dea04ca3338da0b8ef3c9ede963559680be0"
+checksum_source = "mise-versions"
+url = "https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/682699189"
 
 [tools."aqua:Kitware/CMake"."platforms.linux-x64-musl"]
-checksum = "sha256:e5bb807f7728cb60cd8b27ebc97a2edb469b68655f21e844a600c3575b76f5bb"
-url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-linux-x86_64.tar.gz"
-url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605992585"
+checksum = "sha256:ed85135c5a5135b45e50423cb406dea04ca3338da0b8ef3c9ede963559680be0"
+checksum_source = "mise-versions"
+url = "https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/682699189"
 
 [tools."aqua:Kitware/CMake"."platforms.macos-arm64"]
-checksum = "sha256:4b7b73704b1db9b374e5c9ab8e17ac6148b817b6396ee75cd94a852cbac9d305"
-url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-macos-universal.tar.gz"
-url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605993514"
+checksum = "sha256:679e77a96b9ef9484cc6c1445255fc4f84206b48a65420efbedf16bdab55fbff"
+checksum_source = "mise-versions"
+url = "https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-macos-universal.tar.gz"
+url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/682699600"
 
 [tools."aqua:Kitware/CMake"."platforms.macos-x64"]
-checksum = "sha256:4b7b73704b1db9b374e5c9ab8e17ac6148b817b6396ee75cd94a852cbac9d305"
-url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-macos-universal.tar.gz"
-url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605993514"
+checksum = "sha256:679e77a96b9ef9484cc6c1445255fc4f84206b48a65420efbedf16bdab55fbff"
+checksum_source = "mise-versions"
+url = "https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-macos-universal.tar.gz"
+url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/682699600"
 
 [tools."aqua:Kitware/CMake"."platforms.windows-x64"]
-checksum = "sha256:bace36e94b31c68ab6fa295f26dfa11219e0701cf7c94b0284a7d1cb13dac536"
-url = "https://github.com/Kitware/CMake/releases/download/v4.4.4/cmake-4.4.4-windows-x86_64.zip"
-url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/605998125"
+checksum = "sha256:326c826486d46a23cf9d5a1c9ee3a567d427bdd02c4a34071937a2a675cff004"
+checksum_source = "mise-versions"
+url = "https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-windows-x86_64.zip"
+url_api = "https://api.github.com/repos/Kitware/CMake/releases/assets/682701242"
 
 [[tools."aqua:astral-sh/uv"]]
 version = "0.13.6"
@@ -338,50 +345,50 @@ url = "https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.
 url_api = "https://api.github.com/repos/ninja-build/ninja/releases/assets/318863577"
 
 [[tools."aqua:rvben/rumdl"]]
-version = "0.3.0"
+version = "0.3.1"
 backend = "aqua:rvben/rumdl"
-specifiers = ["0.3.0"]
+specifiers = ["0.3.1"]
 
 [tools."aqua:rvben/rumdl"."platforms.linux-arm64"]
-checksum = "sha256:b0ea55fdbabcc2b86e7ef594c3fd86cfee620844c2d8cea4a3135b9468d2845c"
-url = "https://github.com/rvben/rumdl/releases/download/v0.3.0/rumdl-v0.3.0-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/649870478"
+checksum = "sha256:e25e70e6d0dd5f437ccbba4d252201f4ca1163831d0b26138d586fe0eb8d4eb4"
+url = "https://github.com/rvben/rumdl/releases/download/v0.3.1/rumdl-v0.3.1-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/682862207"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-arm64-musl"]
-checksum = "sha256:5a6274e69bf22164ee6adb47381c870f61ece4648a89fa8b178f0ed24857154a"
-url = "https://github.com/rvben/rumdl/releases/download/v0.3.0/rumdl-v0.3.0-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/649870475"
+checksum = "sha256:70b0a54dd74f1f06550b936cadc2a55256b0ec8c7f7d7ba5a3b13b1b108b1a16"
+url = "https://github.com/rvben/rumdl/releases/download/v0.3.1/rumdl-v0.3.1-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/682862210"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-x64"]
-checksum = "sha256:1d23c7f8c10d534e53c76b34a22f7dea7f5e5ebe493adbb7e25a401f88620c87"
-url = "https://github.com/rvben/rumdl/releases/download/v0.3.0/rumdl-v0.3.0-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/649870483"
+checksum = "sha256:068dc9cbe3377af0adca8580d135e8fa3a5a6ce127ada6849fd47ee13f86b4d0"
+url = "https://github.com/rvben/rumdl/releases/download/v0.3.1/rumdl-v0.3.1-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/682862209"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.linux-x64-musl"]
-checksum = "sha256:6c90c398f04c11a09dcbd2da08bdaa6d53d9b14393e3cd32dbdf4da5620eec5c"
-url = "https://github.com/rvben/rumdl/releases/download/v0.3.0/rumdl-v0.3.0-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/649870477"
+checksum = "sha256:81a389a894f3e22233b9e94f385d784744362ee7ed3fffde532ea6f1c9b392fd"
+url = "https://github.com/rvben/rumdl/releases/download/v0.3.1/rumdl-v0.3.1-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/682862201"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.macos-arm64"]
-checksum = "sha256:bc62f4176dd9257547c939fa152b535b6f393365acd352fcfd94e5e19a792bb4"
-url = "https://github.com/rvben/rumdl/releases/download/v0.3.0/rumdl-v0.3.0-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/649870474"
+checksum = "sha256:24020efd5ac8935c111ff2497c88a12a34514b24c18dbd75e7732e72495de32f"
+url = "https://github.com/rvben/rumdl/releases/download/v0.3.1/rumdl-v0.3.1-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/682862205"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.macos-x64"]
-checksum = "sha256:beb48c38948fcb9bb4eb4994af9830cbb6b8a0b97a3ec0ea3233151065d2e56e"
-url = "https://github.com/rvben/rumdl/releases/download/v0.3.0/rumdl-v0.3.0-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/649870476"
+checksum = "sha256:583656a8a59d6c31e09b5ef96eaef280fad46a2ea9f0b836a662d3555230466e"
+url = "https://github.com/rvben/rumdl/releases/download/v0.3.1/rumdl-v0.3.1-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/682862204"
 provenance = "github-attestations"
 
 [tools."aqua:rvben/rumdl"."platforms.windows-x64"]
-checksum = "sha256:72ed0bd3912560758cfc66cb439a2804755a858573e605cd3d1e65e8aa79d2a1"
-url = "https://github.com/rvben/rumdl/releases/download/v0.3.0/rumdl-v0.3.0-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/649870485"
+checksum = "sha256:edee2e23083fc5565d453cacd373c451b7b635ee6e571474c0615efea2bba1a5"
+url = "https://github.com/rvben/rumdl/releases/download/v0.3.1/rumdl-v0.3.1-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/682862212"
 provenance = "github-attestations"
 
 [[tools."aqua:tombi-toml/tombi"]]
