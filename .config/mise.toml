@@ -18,7 +18,7 @@ GRADLE_OPTS = "--enable-native-access=ALL-UNNAMED"              # Don't warn abo
 "aqua:astral-sh/uv" = "0.13.9"        # Used for python (pipx) linting tools
 "aqua:mikefarah/yq" = "4.54.3"         # Used for validating & formatting JSON & toml parsing
 "aqua:tombi-toml/tombi" = "1.11.3"      # Used for validating & formatting TOML
-"aqua:rvben/rumdl" = "0.3.4"          # Used for linting & formatting markdown
+"aqua:rvben/rumdl" = "0.3.5"          # Used for linting & formatting markdown
 "aqua:lycheeverse/lychee" = "0.24.2"   # Used for checking for dead links
 "aqua:loeffel-io/ls-lint" = "2.3.2"    # Used for enforcing folder & file naming conventions
 "aqua:google/yamlfmt" = "0.21.0"       # Used for formatting YAML
